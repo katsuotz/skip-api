@@ -44,12 +44,14 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 		return
 	}
 
+	tanggalLahir, _ := helper.StringToDate(req.TanggalLahir)
+
 	newProfile := entity.Profile{
 		ID:           profile.ID,
 		Nama:         req.Nama,
 		JenisKelamin: req.JenisKelamin,
 		TempatLahir:  req.TempatLahir,
-		TanggalLahir: req.TanggalLahir,
+		TanggalLahir: tanggalLahir,
 	}
 
 	_, err := c.ProfileRepository.UpdateProfile(ctx, newProfile)

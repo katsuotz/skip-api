@@ -7,7 +7,7 @@ import (
 )
 
 type KelasRepository interface {
-	GetKelas(ctx context.Context) []entity.Kelas
+	GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []entity.Kelas
 	CreateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	UpdateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	DeleteKelas(ctx context.Context, kelasID int) error
@@ -21,9 +21,20 @@ func NewKelasRepository(db *gorm.DB) KelasRepository {
 	return &kelasRepository{db: db}
 }
 
-func (r *kelasRepository) GetKelas(ctx context.Context) []entity.Kelas {
+func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []entity.Kelas {
 	var kelas []entity.Kelas
-	r.db.Find(&kelas)
+	temp := r.db.Model(&kelas)
+
+	if jurusanID != "" {
+		temp.Where("jurusan_id = ?", jurusanID)
+	}
+
+	if tahunAjarID != "" {
+		temp.Where("tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	temp.Preload("Guru").Find(&kelas)
+
 	return kelas
 }
 

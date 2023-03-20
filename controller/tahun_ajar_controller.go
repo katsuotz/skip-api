@@ -75,8 +75,8 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 	}
 
 	tahunAjarID, err := strconv.ParseInt(ctx.Param("tahun_ajar_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || tahunAjarID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -101,8 +101,8 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 
 func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 	tahunAjarID, err := strconv.ParseInt(ctx.Param("tahun_ajar_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || tahunAjarID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -122,8 +122,8 @@ func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 
 func (c *tahunAjarController) SetActiveTahunAjar(ctx *gin.Context) {
 	tahunAjarID, err := strconv.ParseInt(ctx.Param("tahun_ajar_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || tahunAjarID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}

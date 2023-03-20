@@ -73,8 +73,8 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 	}
 
 	jurusanID, err := strconv.ParseInt(ctx.Param("jurusan_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || jurusanID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -99,8 +99,8 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 
 func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
 	jurusanID, err := strconv.ParseInt(ctx.Param("jurusan_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || jurusanID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}

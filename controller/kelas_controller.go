@@ -31,7 +31,16 @@ func NewKelasController(kelasRepository repository.KelasRepository, jwtService s
 }
 
 func (c *kelasController) GetKelas(ctx *gin.Context) {
-	kelas := c.KelasRepository.GetKelas(ctx)
+	jurusanID := ctx.DefaultQuery("jurusan_id", "")
+	tahunAjarID := ctx.Query("tahun_ajar_id")
+
+	if tahunAjarID == "" {
+		response := helper.BuildErrorResponse("Tahun Ajar Needed", nil, nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	kelas := c.KelasRepository.GetKelas(ctx, jurusanID, tahunAjarID)
 	response := helper.BuildSuccessResponse("", kelas)
 	ctx.JSON(http.StatusOK, response)
 	return
@@ -50,6 +59,7 @@ func (c *kelasController) CreateKelas(ctx *gin.Context) {
 		NamaKelas:   req.NamaKelas,
 		JurusanID:   req.JurusanID,
 		TahunAjarID: req.TahunAjarID,
+		GuruID:      req.GuruID,
 	}
 
 	_, err := c.KelasRepository.CreateKelas(ctx, kelas)
@@ -75,8 +85,8 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 	}
 
 	kelasID, err := strconv.ParseInt(ctx.Param("kelas_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -103,8 +113,8 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 
 func (c *kelasController) DeleteKelas(ctx *gin.Context) {
 	kelasID, err := strconv.ParseInt(ctx.Param("kelas_id"), 0, 0)
-	if err != nil {
-		response := helper.BuildErrorResponse("Not Found", nil, nil)
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}

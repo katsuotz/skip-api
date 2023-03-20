@@ -13,6 +13,8 @@ type Router struct {
 	JurusanController   controller.JurusanController
 	TahunAjarController controller.TahunAjarController
 	KelasController     controller.KelasController
+	GuruController      controller.GuruController
+	SiswaController     controller.SiswaController
 	JWTService          service.JWTService
 }
 
@@ -22,6 +24,8 @@ func NewRouter(server *gin.Engine,
 	jurusanController controller.JurusanController,
 	tahunAjarController controller.TahunAjarController,
 	kelasController controller.KelasController,
+	guruController controller.GuruController,
+	siswaController controller.SiswaController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -31,6 +35,8 @@ func NewRouter(server *gin.Engine,
 		jurusanController,
 		tahunAjarController,
 		kelasController,
+		guruController,
+		siswaController,
 		jwtService,
 	}
 }
@@ -67,7 +73,23 @@ func (r *Router) Init() {
 	{
 		kelas.GET("/", r.KelasController.GetKelas)
 		kelas.POST("/", r.KelasController.CreateKelas)
-		kelas.PATCH("/:jurusan_id", r.KelasController.UpdateKelas)
-		kelas.DELETE("/:jurusan_id", r.KelasController.DeleteKelas)
+		kelas.PATCH("/:kelas_id", r.KelasController.UpdateKelas)
+		kelas.DELETE("/:kelas_id", r.KelasController.DeleteKelas)
+	}
+
+	guru := basePath.Group("/guru", r.JWTService.GetUser)
+	{
+		guru.GET("/", r.GuruController.GetGuru)
+		guru.POST("/", r.GuruController.CreateGuru)
+		guru.PATCH("/:guru_id", r.GuruController.UpdateGuru)
+		guru.DELETE("/:guru_id", r.GuruController.DeleteGuru)
+	}
+
+	siswa := basePath.Group("/siswa", r.JWTService.GetUser)
+	{
+		//siswa.GET("/", r.KelasController.GetKelas)
+		siswa.POST("/", r.SiswaController.CreateSiswa)
+		//siswa.PATCH("/:jurusan_id", r.KelasController.UpdateKelas)
+		//siswa.DELETE("/:jurusan_id", r.KelasController.DeleteKelas)
 	}
 }

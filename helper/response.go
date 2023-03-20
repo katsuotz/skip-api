@@ -24,9 +24,11 @@ func getErrorMsg(fe validator.FieldError) string {
 }
 
 func BuildSuccessResponse(message string, data interface{}) any {
-	res := gin.H{
-		"status": true,
+	if message == "" && data != nil {
+		return data
 	}
+
+	res := gin.H{}
 
 	if message != "" {
 		res["message"] = message
@@ -41,7 +43,7 @@ func BuildSuccessResponse(message string, data interface{}) any {
 
 func BuildErrorResponse(message string, err error, data interface{}) any {
 	res := gin.H{
-		"status":  false,
+		"error":   true,
 		"message": message,
 	}
 	var ve validator.ValidationErrors

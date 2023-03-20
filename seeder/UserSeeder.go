@@ -1,7 +1,6 @@
 package seeder
 
 import (
-	"fmt"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gorm.io/gorm"
@@ -39,6 +38,4 @@ func CreateUser(
 	}, entity.Profile{
 		UserID: user.ID,
 	})
-
-	fmt.Println(hashedPassword)
 }

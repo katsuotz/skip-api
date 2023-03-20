@@ -18,12 +18,16 @@ func main() {
 	jurusanRepository := repository.NewJurusanRepository(database)
 	tahunAjarRepository := repository.NewTahunAjarRepository(database)
 	kelasRepository := repository.NewKelasRepository(database)
+	siswaRepository := repository.NewSiswaRepository(database)
+	guruRepository := repository.NewGuruRepository(database)
 
 	authController := controller.NewAuthController(userRepository, jwtService)
 	profileController := controller.NewProfileController(profileRepository, jwtService)
 	jurusanController := controller.NewJurusanController(jurusanRepository, jwtService)
 	tahunAjarController := controller.NewTahunAjarController(tahunAjarRepository, jwtService)
 	kelasController := controller.NewKelasController(kelasRepository, jwtService)
+	siswaController := controller.NewSiswaController(siswaRepository, jwtService)
+	guruController := controller.NewGuruController(guruRepository, jwtService)
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -41,6 +45,8 @@ func main() {
 		jurusanController,
 		tahunAjarController,
 		kelasController,
+		guruController,
+		siswaController,
 		jwtService,
 	)
 
