@@ -15,9 +15,11 @@ func main() {
 	jwtService := service.NewJWTService()
 	userRepository := repository.NewUserRepository(database)
 	profileRepository := repository.NewProfileRepository(database)
+	jurusanRepository := repository.NewJurusanRepository(database)
 
 	authController := controller.NewAuthController(userRepository, jwtService)
 	profileController := controller.NewProfileController(profileRepository, jwtService)
+	jurusanController := controller.NewJurusanController(jurusanRepository, jwtService)
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -32,6 +34,7 @@ func main() {
 		app,
 		authController,
 		profileController,
+		jurusanController,
 		jwtService,
 	)
 

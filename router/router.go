@@ -10,18 +10,21 @@ type Router struct {
 	server            *gin.Engine
 	AuthController    controller.AuthController
 	ProfileController controller.ProfileController
+	JurusanController controller.JurusanController
 	JWTService        service.JWTService
 }
 
 func NewRouter(server *gin.Engine,
 	authController controller.AuthController,
 	profileController controller.ProfileController,
+	jurusanController controller.JurusanController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
 		server,
 		authController,
 		profileController,
+		jurusanController,
 		jwtService,
 	}
 }
@@ -35,5 +38,13 @@ func (r *Router) Init() {
 	profile := basePath.Group("/profile", r.JWTService.GetUser)
 	{
 		profile.PATCH("/", r.ProfileController.UpdateProfile)
+	}
+
+	jurusan := basePath.Group("/jurusan", r.JWTService.GetUser)
+	{
+		jurusan.GET("/", r.JurusanController.GetJurusan)
+		jurusan.POST("/", r.JurusanController.CreateJurusan)
+		jurusan.PATCH("/:jurusan_id", r.JurusanController.UpdateJurusan)
+		jurusan.DELETE("/:jurusan_id", r.JurusanController.DeleteJurusan)
 	}
 }

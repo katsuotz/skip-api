@@ -35,8 +35,6 @@ func SetupDatabaseConnection() *gorm.DB {
 		&entity.User{},
 		&entity.TahunAjar{},
 		&entity.Jurusan{},
-		&entity.Kelas{},
-		&entity.DetailKelas{},
 	)
 	if err != nil {
 		fmt.Println("Automigrate error")
