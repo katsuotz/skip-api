@@ -28,7 +28,20 @@ func SetupDatabaseConnection() *gorm.DB {
 		fmt.Println("Failed connect database")
 	}
 
-	db.AutoMigrate(&entity.User{})
+	err = db.AutoMigrate(
+		&entity.Profile{},
+		&entity.Siswa{},
+		&entity.Guru{},
+		&entity.User{},
+		&entity.TahunAjar{},
+		&entity.Jurusan{},
+		&entity.Kelas{},
+		&entity.DetailKelas{},
+	)
+	if err != nil {
+		fmt.Println("Automigrate error")
+		fmt.Println(err.Error())
+	}
 
 	seeder.CreateUser(db, "admin", "admin", "admin")
 

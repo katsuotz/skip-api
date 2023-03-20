@@ -6,6 +6,7 @@ import (
 	"gitlab.com/katsuotz/skip-api/config"
 	"gitlab.com/katsuotz/skip-api/controller"
 	"gitlab.com/katsuotz/skip-api/repository"
+	"gitlab.com/katsuotz/skip-api/router"
 	"gitlab.com/katsuotz/skip-api/service"
 )
 
@@ -13,11 +14,13 @@ func main() {
 	database := config.SetupDatabaseConnection()
 	jwtService := service.NewJWTService()
 	userRepository := repository.NewUserRepository(database)
+	profileRepository := repository.NewProfileRepository(database)
 
 	authController := controller.NewAuthController(userRepository, jwtService)
+	profileController := controller.NewProfileController(profileRepository, jwtService)
 
-	r := gin.Default()
-	r.Use(cors.New(cors.Config{
+	app := gin.Default()
+	app.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowHeaders:     []string{"Content-Type", "Authorization", "X-Requested-With", "*"},
 		AllowMethods:     []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
@@ -25,20 +28,16 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	r.GET("/", authController.Tes)
+	r := router.NewRouter(
+		app,
+		authController,
+		profileController,
+		jwtService,
+	)
 
-	api := r.Group("/api")
-	{
-		api.POST("/login", authController.Login)
-	}
+	r.Init()
 
-	//v1mid := r.Group("/api/v1")
-	//{
-	//v1mid.PUT("/user", userController.updateUser)
-	//v1mid.POST("/user/password", userController.updatePassword)
-	//}
-
-	err := r.Run(":9100")
+	err := app.Run(":9100")
 	if err != nil {
 		return
 	}
