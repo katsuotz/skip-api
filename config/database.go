@@ -29,10 +29,11 @@ func SetupDatabaseConnection() *gorm.DB {
 	}
 
 	err = db.AutoMigrate(
+		&entity.User{},
 		&entity.Profile{},
+		&entity.Kelas{},
 		&entity.Siswa{},
 		&entity.Guru{},
-		&entity.User{},
 		&entity.TahunAjar{},
 		&entity.Jurusan{},
 	)
@@ -41,7 +42,16 @@ func SetupDatabaseConnection() *gorm.DB {
 		fmt.Println(err.Error())
 	}
 
-	seeder.CreateUser(db, "admin", "admin", "admin")
+	seeder.CreateUser(
+		db,
+		"admin",
+		"admin",
+		"admin",
+		"Administrator",
+		"Bandung",
+		"2000-01-01",
+		"L",
+	)
 
 	return db
 }

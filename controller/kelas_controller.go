@@ -11,34 +11,34 @@ import (
 	"strconv"
 )
 
-type JurusanController interface {
-	GetJurusan(ctx *gin.Context)
-	CreateJurusan(ctx *gin.Context)
-	UpdateJurusan(ctx *gin.Context)
-	DeleteJurusan(ctx *gin.Context)
+type KelasController interface {
+	GetKelas(ctx *gin.Context)
+	CreateKelas(ctx *gin.Context)
+	UpdateKelas(ctx *gin.Context)
+	DeleteKelas(ctx *gin.Context)
 }
 
-type jurusanController struct {
-	JurusanRepository repository.JurusanRepository
-	JWTService        service.JWTService
+type kelasController struct {
+	KelasRepository repository.KelasRepository
+	JWTService      service.JWTService
 }
 
-func NewJurusanController(jurusanRepository repository.JurusanRepository, jwtService service.JWTService) JurusanController {
-	return &jurusanController{
-		jurusanRepository,
+func NewKelasController(kelasRepository repository.KelasRepository, jwtService service.JWTService) KelasController {
+	return &kelasController{
+		kelasRepository,
 		jwtService,
 	}
 }
 
-func (c *jurusanController) GetJurusan(ctx *gin.Context) {
-	jurusan := c.JurusanRepository.GetJurusan(ctx)
-	response := helper.BuildSuccessResponse("", jurusan)
+func (c *kelasController) GetKelas(ctx *gin.Context) {
+	kelas := c.KelasRepository.GetKelas(ctx)
+	response := helper.BuildSuccessResponse("", kelas)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *jurusanController) CreateJurusan(ctx *gin.Context) {
-	req := dto.JurusanRequest{}
+func (c *kelasController) CreateKelas(ctx *gin.Context) {
+	req := dto.KelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -46,11 +46,13 @@ func (c *jurusanController) CreateJurusan(ctx *gin.Context) {
 		return
 	}
 
-	jurusan := entity.Jurusan{
-		NamaJurusan: req.NamaJurusan,
+	kelas := entity.Kelas{
+		NamaKelas:   req.NamaKelas,
+		JurusanID:   req.JurusanID,
+		TahunAjarID: req.TahunAjarID,
 	}
 
-	_, err := c.JurusanRepository.CreateJurusan(ctx, jurusan)
+	_, err := c.KelasRepository.CreateKelas(ctx, kelas)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -58,13 +60,13 @@ func (c *jurusanController) CreateJurusan(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Jurusan created successfully", nil)
+	response := helper.BuildSuccessResponse("Kelas created successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
-	req := dto.JurusanRequest{}
+func (c *kelasController) UpdateKelas(ctx *gin.Context) {
+	req := dto.KelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -72,19 +74,21 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 		return
 	}
 
-	jurusanID, err := strconv.ParseInt(ctx.Param("jurusan_id"), 0, 0)
+	kelasID, err := strconv.ParseInt(ctx.Param("kelas_id"), 0, 0)
 	if err != nil {
 		response := helper.BuildErrorResponse("Not Found", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	newJurusan := entity.Jurusan{
-		ID:          int(jurusanID),
-		NamaJurusan: req.NamaJurusan,
+	newKelas := entity.Kelas{
+		ID:          int(kelasID),
+		NamaKelas:   req.NamaKelas,
+		JurusanID:   req.JurusanID,
+		TahunAjarID: req.TahunAjarID,
 	}
 
-	_, err = c.JurusanRepository.UpdateJurusan(ctx, newJurusan)
+	_, err = c.KelasRepository.UpdateKelas(ctx, newKelas)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -92,20 +96,20 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Jurusan updated successfully", nil)
+	response := helper.BuildSuccessResponse("Kelas updated successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
-	jurusanID, err := strconv.ParseInt(ctx.Param("jurusan_id"), 0, 0)
+func (c *kelasController) DeleteKelas(ctx *gin.Context) {
+	kelasID, err := strconv.ParseInt(ctx.Param("kelas_id"), 0, 0)
 	if err != nil {
 		response := helper.BuildErrorResponse("Not Found", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.JurusanRepository.DeleteJurusan(ctx, int(jurusanID))
+	err = c.KelasRepository.DeleteKelas(ctx, int(kelasID))
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -113,7 +117,7 @@ func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Jurusan deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Kelas deleted successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

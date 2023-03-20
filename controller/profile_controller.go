@@ -38,14 +38,14 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 	userID := int(ctx.MustGet("user_id").(float64))
 
 	profile := c.ProfileRepository.FindByProfileID(ctx, userID)
-	if profile.ProfileID == 0 {
+	if profile.ID == 0 {
 		response := helper.BuildErrorResponse("Unauthorized", nil, nil)
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
 	}
 
 	newProfile := entity.Profile{
-		ProfileID:    profile.ProfileID,
+		ID:           profile.ID,
 		Nama:         req.Nama,
 		JenisKelamin: req.JenisKelamin,
 		TempatLahir:  req.TempatLahir,

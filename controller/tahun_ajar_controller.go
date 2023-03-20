@@ -82,8 +82,8 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 	}
 
 	newTahunAjar := entity.TahunAjar{
-		TahunAjarID: int(tahunAjarID),
-		TahunAjar:   req.TahunAjar,
+		ID:        int(tahunAjarID),
+		TahunAjar: req.TahunAjar,
 	}
 
 	_, err = c.TahunAjarRepository.UpdateTahunAjar(ctx, newTahunAjar)

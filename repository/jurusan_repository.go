@@ -38,6 +38,6 @@ func (r *jurusanRepository) UpdateJurusan(ctx context.Context, jurusan entity.Ju
 }
 
 func (r *jurusanRepository) DeleteJurusan(ctx context.Context, jurusanID int) error {
-	err := r.db.Where("jurusan_id = ?", jurusanID).Delete(&entity.Jurusan{}).Error
+	err := r.db.Where("id = ?", jurusanID).Delete(&entity.Jurusan{}).Error
 	return err
 }

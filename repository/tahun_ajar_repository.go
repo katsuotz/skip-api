@@ -39,7 +39,7 @@ func (r *tahunAjarRepository) UpdateTahunAjar(ctx context.Context, tahunAjar ent
 }
 
 func (r *tahunAjarRepository) DeleteTahunAjar(ctx context.Context, tahunAjarID int) error {
-	err := r.db.Where("tahun_ajar_id = ?", tahunAjarID).Delete(&entity.TahunAjar{}).Error
+	err := r.db.Where("id = ?", tahunAjarID).Delete(&entity.TahunAjar{}).Error
 	return err
 }
 
@@ -61,7 +61,7 @@ func (r *tahunAjarRepository) SetActiveTahunAjar(ctx context.Context, tahunAjarI
 		tx.Rollback()
 		return err
 	}
-	err = r.db.Model(&entity.TahunAjar{}).Where("tahun_ajar_id = ?", tahunAjarID).Update("is_active", true).Error
+	err = r.db.Model(&entity.TahunAjar{}).Where("id = ?", tahunAjarID).Update("is_active", true).Error
 	if err != nil {
 		tx.Rollback()
 		return err

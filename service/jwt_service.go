@@ -37,7 +37,7 @@ func getSecretKey() string {
 
 func (j *jwtService) GenerateToken(ctx context.Context, request entity.User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": request.UserID,
+		"user_id": request.ID,
 		"role":    request.Role,
 	})
 	tokenString, err := token.SignedString([]byte(j.secretKey))

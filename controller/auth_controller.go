@@ -40,7 +40,7 @@ func (c *authController) Login(ctx *gin.Context) {
 	}
 	user := c.UserRepository.FindByUsername(ctx, loginReq.Username)
 	match := helper.CheckPasswordHash(loginReq.Password, user.Password)
-	if !match || user.UserID == 0 {
+	if !match || user.ID == 0 {
 		response := helper.BuildErrorResponse("Wrong username or password", nil, nil)
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
