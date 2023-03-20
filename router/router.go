@@ -7,17 +7,19 @@ import (
 )
 
 type Router struct {
-	server            *gin.Engine
-	AuthController    controller.AuthController
-	ProfileController controller.ProfileController
-	JurusanController controller.JurusanController
-	JWTService        service.JWTService
+	server              *gin.Engine
+	AuthController      controller.AuthController
+	ProfileController   controller.ProfileController
+	JurusanController   controller.JurusanController
+	TahunAjarController controller.TahunAjarController
+	JWTService          service.JWTService
 }
 
 func NewRouter(server *gin.Engine,
 	authController controller.AuthController,
 	profileController controller.ProfileController,
 	jurusanController controller.JurusanController,
+	tahunAjarController controller.TahunAjarController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -25,6 +27,7 @@ func NewRouter(server *gin.Engine,
 		authController,
 		profileController,
 		jurusanController,
+		tahunAjarController,
 		jwtService,
 	}
 }
@@ -46,5 +49,14 @@ func (r *Router) Init() {
 		jurusan.POST("/", r.JurusanController.CreateJurusan)
 		jurusan.PATCH("/:jurusan_id", r.JurusanController.UpdateJurusan)
 		jurusan.DELETE("/:jurusan_id", r.JurusanController.DeleteJurusan)
+	}
+
+	tahunAjar := basePath.Group("/tahun-ajar", r.JWTService.GetUser)
+	{
+		tahunAjar.GET("/", r.TahunAjarController.GetTahunAjar)
+		tahunAjar.POST("/", r.TahunAjarController.CreateTahunAjar)
+		tahunAjar.PATCH("/:tahun_ajar_id", r.TahunAjarController.UpdateTahunAjar)
+		tahunAjar.DELETE("/:tahun_ajar_id", r.TahunAjarController.DeleteTahunAjar)
+		tahunAjar.PATCH("/:tahun_ajar_id/set-active", r.TahunAjarController.SetActiveTahunAjar)
 	}
 }
