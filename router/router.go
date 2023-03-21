@@ -87,9 +87,9 @@ func (r *Router) Init() {
 
 	siswa := basePath.Group("/siswa", r.JWTService.GetUser)
 	{
-		//siswa.GET("/", r.KelasController.GetKelas)
+		siswa.GET("/", r.SiswaController.GetSiswa)
 		siswa.POST("/", r.SiswaController.CreateSiswa)
-		//siswa.PATCH("/:jurusan_id", r.KelasController.UpdateKelas)
-		//siswa.DELETE("/:jurusan_id", r.KelasController.DeleteKelas)
+		siswa.PATCH("/:siswa_id", r.SiswaController.UpdateSiswa)
+		siswa.DELETE("/:siswa_id", r.SiswaController.DeleteSiswa)
 	}
 }

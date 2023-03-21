@@ -43,7 +43,7 @@ func (c *guruController) GetGuru(ctx *gin.Context) {
 }
 
 func (c *guruController) CreateGuru(ctx *gin.Context) {
-	req := dto.CreateGuruRequest{}
+	req := dto.GuruRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -65,7 +65,7 @@ func (c *guruController) CreateGuru(ctx *gin.Context) {
 }
 
 func (c *guruController) UpdateGuru(ctx *gin.Context) {
-	req := dto.CreateGuruRequest{}
+	req := dto.GuruRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)

@@ -10,8 +10,8 @@ import (
 
 type GuruRepository interface {
 	GetGuru(ctx context.Context, page int, perPage int, search string) dto.GuruPagination
-	CreateGuru(ctx context.Context, guru dto.CreateGuruRequest) error
-	UpdateGuru(ctx context.Context, guru dto.CreateGuruRequest, guruID int) error
+	CreateGuru(ctx context.Context, guru dto.GuruRequest) error
+	UpdateGuru(ctx context.Context, guru dto.GuruRequest, guruID int) error
 	DeleteGuru(ctx context.Context, guruID int) error
 }
 
@@ -52,7 +52,7 @@ func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, sea
 	return result
 }
 
-func (r *guruRepository) CreateGuru(ctx context.Context, req dto.CreateGuruRequest) error {
+func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) error {
 	tx := r.db.Begin()
 
 	defer func() {
@@ -113,7 +113,7 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.CreateGuruReque
 	return nil
 }
 
-func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.CreateGuruRequest, guruID int) error {
+func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, guruID int) error {
 	tx := r.db.Begin()
 
 	defer func() {
@@ -136,7 +136,6 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.CreateGuruReque
 	user := entity.User{
 		Username: req.Nip,
 		Password: helper.BirthDateToPassword(tanggalLahir),
-		Role:     "guru",
 	}
 
 	err := tx.Where("id = ?", findGuru.UserID).Updates(&user).Error

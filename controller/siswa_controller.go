@@ -30,14 +30,28 @@ func NewSiswaController(siswaRepository repository.SiswaRepository, jwtService s
 }
 
 func (c *siswaController) GetSiswa(ctx *gin.Context) {
-	//siswa := c.SiswaRepository.GetSiswa(ctx)
-	//response := helper.BuildSuccessResponse("", siswa)
-	//ctx.JSON(http.StatusOK, response)
-	//return
+	page := ctx.DefaultQuery("page", "1")
+	perPage := ctx.DefaultQuery("per_page", "10")
+	kelasID := ctx.DefaultQuery("kelas_id", "0")
+	search := ctx.DefaultQuery("search", "")
+	pageInt, _ := strconv.Atoi(page)
+	perPageInt, _ := strconv.Atoi(perPage)
+	kelasIDInt, _ := strconv.Atoi(kelasID)
+
+	if kelasIDInt == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	guru := c.SiswaRepository.GetSiswa(ctx, pageInt, perPageInt, search, kelasIDInt)
+	response := helper.BuildSuccessResponse("", guru)
+	ctx.JSON(http.StatusOK, response)
+	return
 }
 
 func (c *siswaController) CreateSiswa(ctx *gin.Context) {
-	req := dto.CreateSiswaRequest{}
+	req := dto.SiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)

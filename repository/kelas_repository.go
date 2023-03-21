@@ -33,7 +33,7 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 		temp.Where("tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Preload("Guru").Find(&kelas)
+	temp.Joins("Guru").Find(&kelas)
 
 	return kelas
 }
