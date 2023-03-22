@@ -15,6 +15,7 @@ type Router struct {
 	KelasController     controller.KelasController
 	GuruController      controller.GuruController
 	SiswaController     controller.SiswaController
+	DataScoreController controller.DataScoreController
 	JWTService          service.JWTService
 }
 
@@ -26,6 +27,7 @@ func NewRouter(server *gin.Engine,
 	kelasController controller.KelasController,
 	guruController controller.GuruController,
 	siswaController controller.SiswaController,
+	dataScoreController controller.DataScoreController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -37,6 +39,7 @@ func NewRouter(server *gin.Engine,
 		kelasController,
 		guruController,
 		siswaController,
+		dataScoreController,
 		jwtService,
 	}
 }
@@ -98,5 +101,13 @@ func (r *Router) Init() {
 		siswa.POST("/", r.SiswaController.CreateSiswa)
 		siswa.PATCH("/:siswa_id", r.SiswaController.UpdateSiswa)
 		siswa.DELETE("/:siswa_id", r.SiswaController.DeleteSiswa)
+	}
+
+	dataScore := basePath.Group("/data-score", r.JWTService.GetUser)
+	{
+		dataScore.GET("/", r.DataScoreController.GetDataScore)
+		dataScore.POST("/", r.DataScoreController.CreateDataScore)
+		dataScore.PATCH("/:data_score_id", r.DataScoreController.UpdateDataScore)
+		dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
 	}
 }
