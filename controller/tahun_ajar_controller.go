@@ -74,7 +74,7 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 		return
 	}
 
-	tahunAjarID, err := strconv.ParseInt(ctx.Param("tahun_ajar_id"), 0, 0)
+	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
 	if err != nil || tahunAjarID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
@@ -82,7 +82,7 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 	}
 
 	newTahunAjar := entity.TahunAjar{
-		ID:        int(tahunAjarID),
+		ID:        tahunAjarID,
 		TahunAjar: req.TahunAjar,
 	}
 
@@ -100,7 +100,7 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 }
 
 func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
-	tahunAjarID, err := strconv.ParseInt(ctx.Param("tahun_ajar_id"), 0, 0)
+	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
 	if err != nil || tahunAjarID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
@@ -121,7 +121,7 @@ func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 }
 
 func (c *tahunAjarController) SetActiveTahunAjar(ctx *gin.Context) {
-	tahunAjarID, err := strconv.ParseInt(ctx.Param("tahun_ajar_id"), 0, 0)
+	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
 	if err != nil || tahunAjarID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)

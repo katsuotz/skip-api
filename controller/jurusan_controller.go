@@ -72,7 +72,7 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 		return
 	}
 
-	jurusanID, err := strconv.ParseInt(ctx.Param("jurusan_id"), 0, 0)
+	jurusanID, err := strconv.Atoi(ctx.Param("jurusan_id"))
 	if err != nil || jurusanID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
@@ -80,7 +80,7 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 	}
 
 	newJurusan := entity.Jurusan{
-		ID:          int(jurusanID),
+		ID:          jurusanID,
 		NamaJurusan: req.NamaJurusan,
 	}
 
@@ -98,7 +98,7 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 }
 
 func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
-	jurusanID, err := strconv.ParseInt(ctx.Param("jurusan_id"), 0, 0)
+	jurusanID, err := strconv.Atoi(ctx.Param("jurusan_id"))
 	if err != nil || jurusanID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)

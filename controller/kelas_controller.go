@@ -16,6 +16,8 @@ type KelasController interface {
 	CreateKelas(ctx *gin.Context)
 	UpdateKelas(ctx *gin.Context)
 	DeleteKelas(ctx *gin.Context)
+	AddSiswaToKelas(ctx *gin.Context)
+	RemoveSiswaFromKelas(ctx *gin.Context)
 }
 
 type kelasController struct {
@@ -84,7 +86,7 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 		return
 	}
 
-	kelasID, err := strconv.ParseInt(ctx.Param("kelas_id"), 0, 0)
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
@@ -92,7 +94,7 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 	}
 
 	newKelas := entity.Kelas{
-		ID:          int(kelasID),
+		ID:          kelasID,
 		NamaKelas:   req.NamaKelas,
 		JurusanID:   req.JurusanID,
 		TahunAjarID: req.TahunAjarID,
@@ -112,7 +114,7 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 }
 
 func (c *kelasController) DeleteKelas(ctx *gin.Context) {
-	kelasID, err := strconv.ParseInt(ctx.Param("kelas_id"), 0, 0)
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
@@ -128,6 +130,64 @@ func (c *kelasController) DeleteKelas(ctx *gin.Context) {
 	}
 
 	response := helper.BuildSuccessResponse("Kelas deleted successfully", nil)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
+func (c *kelasController) AddSiswaToKelas(ctx *gin.Context) {
+	req := dto.DetailKelasRequest{}
+	errDTO := ctx.ShouldBindJSON(&req)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = c.KelasRepository.AddSiswaToKelas(ctx, kelasID, req.SiswaID)
+
+	if err != nil {
+		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		ctx.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.BuildSuccessResponse("Siswa added successfully", nil)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
+func (c *kelasController) RemoveSiswaFromKelas(ctx *gin.Context) {
+	req := dto.DetailKelasRequest{}
+	errDTO := ctx.ShouldBindJSON(&req)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = c.KelasRepository.RemoveSiswaFromKelas(ctx, kelasID, req.SiswaID)
+
+	if err != nil {
+		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		ctx.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.BuildSuccessResponse("Siswa removed successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

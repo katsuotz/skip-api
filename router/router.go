@@ -47,6 +47,11 @@ func (r *Router) Init() {
 	basePath.GET("/", r.AuthController.Tes)
 	basePath.POST("/login", r.AuthController.Login)
 
+	basePath2 := basePath.Group("/", r.JWTService.GetUser)
+	{
+		basePath2.GET("/me", r.ProfileController.GetMyProfile)
+	}
+
 	profile := basePath.Group("/profile", r.JWTService.GetUser)
 	{
 		profile.PATCH("/", r.ProfileController.UpdateProfile)
@@ -75,6 +80,8 @@ func (r *Router) Init() {
 		kelas.POST("/", r.KelasController.CreateKelas)
 		kelas.PATCH("/:kelas_id", r.KelasController.UpdateKelas)
 		kelas.DELETE("/:kelas_id", r.KelasController.DeleteKelas)
+		kelas.POST("/:kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
+		kelas.POST("/:kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
 	}
 
 	guru := basePath.Group("/guru", r.JWTService.GetUser)

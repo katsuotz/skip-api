@@ -32,11 +32,14 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 		temp.Where("name ilike ?", search, search)
 	}
 
-	temp.Select("siswa.id as id, siswa.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
+	temp.Select("siswa.id as id, siswa.user_id as user_id, nis, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
 	temp.Joins("join users on users.id = siswa.user_id")
 	temp.Joins("join profiles on profiles.user_id = users.id")
-	temp.Joins("detail_kelas on detail_kelas.siswa_id = siswa.id")
-	temp.Where("detail_kelas.kelas_id = ?", kelasID)
+
+	if kelasID != 0 {
+		temp.Joins("join detail_kelas on detail_kelas.siswa_id = siswa.id")
+		temp.Where("detail_kelas.kelas_id = ?", kelasID)
+	}
 
 	temp.Order("nama asc")
 	temp.Offset(perPage * (page - 1)).Limit(perPage)
@@ -151,7 +154,7 @@ func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest,
 		Nis: req.Nis,
 	}
 
-	err = tx.Where("guru_id = ?", findSiswa.ID).Updates(&siswa).Error
+	err = tx.Where("id = ?", findSiswa.ID).Updates(&siswa).Error
 
 	if err != nil {
 		tx.Rollback()

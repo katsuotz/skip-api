@@ -11,6 +11,7 @@ import (
 )
 
 type ProfileController interface {
+	GetMyProfile(ctx *gin.Context)
 	UpdateProfile(ctx *gin.Context)
 }
 
@@ -26,6 +27,15 @@ func NewProfileController(profileRepository repository.ProfileRepository, jwtSer
 	}
 }
 
+func (c *profileController) GetMyProfile(ctx *gin.Context) {
+	userID := int(ctx.MustGet("user_id").(float64))
+
+	profile := c.ProfileRepository.FindProfileWithJoinByID(ctx, userID)
+	response := helper.BuildSuccessResponse("", profile)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
 func (c *profileController) UpdateProfile(ctx *gin.Context) {
 	req := dto.ProfileRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
@@ -37,7 +47,7 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 
 	userID := int(ctx.MustGet("user_id").(float64))
 
-	profile := c.ProfileRepository.FindByProfileID(ctx, userID)
+	profile := c.ProfileRepository.FindProfileByID(ctx, userID)
 	if profile.ID == 0 {
 		response := helper.BuildErrorResponse("Unauthorized", nil, nil)
 		ctx.JSON(http.StatusUnauthorized, response)

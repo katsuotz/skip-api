@@ -2,10 +2,9 @@ package entity
 
 type DetailKelas struct {
 	ID      int   `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	KelasID int   `json:"kelas_id"`
-	SiswaID int   `json:"siswa_id"`
-	GuruID  int   `json:"guru_id,omitempty"`
-	Kelas   Kelas `gorm:"foreignKey:id" json:"kelas"`
-	Siswa   Siswa `gorm:"foreignKey:id" json:"siswa"`
+	KelasID int   `gorm:"index" json:"kelas_id"`
+	SiswaID int   `gorm:"index" json:"siswa_id"`
+	Kelas   Kelas `gorm:"foreignKey:KelasID" json:"kelas"`
+	Siswa   Siswa `gorm:"foreignKey:SiswaID" json:"siswa"`
 	Base
 }

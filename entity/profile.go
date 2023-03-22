@@ -8,6 +8,6 @@ type Profile struct {
 	JenisKelamin string    `gorm:"type:varchar(10)" json:"jenis_kelamin"`
 	TempatLahir  string    `gorm:"type:varchar(20)" json:"tempat_lahir"`
 	TanggalLahir time.Time `gorm:"type:date" json:"tanggal_lahir"`
-	UserID       int       `json:"user_id"`
+	UserID       int       `gorm:"uniqueIndex" json:"user_id"`
 	Base
 }

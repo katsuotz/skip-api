@@ -73,14 +73,14 @@ func (c *guruController) UpdateGuru(ctx *gin.Context) {
 		return
 	}
 
-	guruID, err := strconv.ParseInt(ctx.Param("guru_id"), 0, 0)
+	guruID, err := strconv.Atoi(ctx.Param("guru_id"))
 	if err != nil || guruID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.GuruRepository.UpdateGuru(ctx, req, int(guruID))
+	err = c.GuruRepository.UpdateGuru(ctx, req, guruID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -94,7 +94,7 @@ func (c *guruController) UpdateGuru(ctx *gin.Context) {
 }
 
 func (c *guruController) DeleteGuru(ctx *gin.Context) {
-	guruID, err := strconv.ParseInt(ctx.Param("guru_id"), 0, 0)
+	guruID, err := strconv.Atoi(ctx.Param("guru_id"))
 	if err != nil || guruID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)

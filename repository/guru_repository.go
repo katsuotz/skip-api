@@ -150,7 +150,7 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 		TipeGuru: req.TipeGuru,
 	}
 
-	err = tx.Where("guru_id = ?", findGuru.ID).Updates(&guru).Error
+	err = tx.Where("id = ?", findGuru.ID).Updates(&guru).Error
 
 	if err != nil {
 		tx.Rollback()

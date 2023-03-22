@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"gitlab.com/katsuotz/skip-api/entity"
+	"gitlab.com/katsuotz/skip-api/helper"
 	"gorm.io/gorm"
 )
 
@@ -11,6 +12,8 @@ type KelasRepository interface {
 	CreateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	UpdateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	DeleteKelas(ctx context.Context, kelasID int) error
+	AddSiswaToKelas(ctx context.Context, kelasID int, siswaIDs []int) error
+	RemoveSiswaFromKelas(ctx context.Context, kelasID int, siswaIDs []int) error
 }
 
 type kelasRepository struct {
@@ -33,7 +36,7 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 		temp.Where("tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Joins("Guru").Find(&kelas)
+	temp.Preload("Guru").Find(&kelas)
 
 	return kelas
 }
@@ -50,5 +53,42 @@ func (r *kelasRepository) UpdateKelas(ctx context.Context, kelas entity.Kelas) (
 
 func (r *kelasRepository) DeleteKelas(ctx context.Context, kelasID int) error {
 	err := r.db.Where("id = ?", kelasID).Delete(&entity.Kelas{}).Error
+	return err
+}
+
+func (r *kelasRepository) AddSiswaToKelas(ctx context.Context, kelasID int, siswaIDs []int) error {
+	var detailKelasInsert []entity.DetailKelas
+
+	var addedSiswaIDs []int
+
+	r.db.
+		Model(&entity.DetailKelas{}).
+		Where("kelas_id = ?", kelasID).
+		Where("siswa_id in ?", siswaIDs).
+		Pluck("siswa_id", &addedSiswaIDs)
+
+	for _, siswaID := range siswaIDs {
+		if !helper.IsInArray(addedSiswaIDs, siswaID) {
+			detailKelasInsert = append(detailKelasInsert, entity.DetailKelas{
+				KelasID: kelasID,
+				SiswaID: siswaID,
+			})
+		}
+	}
+
+	if len(detailKelasInsert) == 0 {
+		return nil
+	}
+
+	err := r.db.Create(&detailKelasInsert).Error
+	return err
+}
+
+func (r *kelasRepository) RemoveSiswaFromKelas(ctx context.Context, kelasID int, siswaIDs []int) error {
+	err := r.db.
+		Where("kelas_id = ?", kelasID).
+		Where("siswa_id in ?", siswaIDs).
+		Delete(&entity.DetailKelas{}).Error
+
 	return err
 }
