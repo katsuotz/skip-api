@@ -54,82 +54,82 @@ func (r *Router) Init() {
 	basePath := r.server.Group("/api")
 
 	basePath.GET("/", r.AuthController.Tes)
-	basePath.POST("/login", r.AuthController.Login)
 
-	basePath2 := basePath.Group("/", r.JWTService.GetUser)
+	guestPath := basePath.Group("/", r.JWTService.IsGuest)
 	{
-		basePath2.GET("/me", r.ProfileController.GetMyProfile)
+		guestPath.POST("/login", r.AuthController.Login)
 	}
 
-	profile := basePath.Group("/profile", r.JWTService.GetUser)
+	loggedPath := basePath.Group("/", r.JWTService.IsLoggedIn)
 	{
-		profile.PATCH("/", r.ProfileController.UpdateProfile)
-	}
+		loggedPath.GET("/me", r.ProfileController.GetMyProfile)
+		loggedPath.PATCH("/profile", r.ProfileController.UpdateProfile)
 
-	jurusan := basePath.Group("/jurusan", r.JWTService.GetUser)
-	{
-		jurusan.GET("/", r.JurusanController.GetJurusan)
-		jurusan.POST("/", r.JurusanController.CreateJurusan)
-		jurusan.PATCH("/:jurusan_id", r.JurusanController.UpdateJurusan)
-		jurusan.DELETE("/:jurusan_id", r.JurusanController.DeleteJurusan)
-	}
+		jurusan := loggedPath.Group("/jurusan", r.JWTService.IsAdmin)
+		{
+			jurusan.GET("/", r.JurusanController.GetJurusan)
+			jurusan.POST("/", r.JurusanController.CreateJurusan)
+			jurusan.PATCH("/:jurusan_id", r.JurusanController.UpdateJurusan)
+			jurusan.DELETE("/:jurusan_id", r.JurusanController.DeleteJurusan)
+		}
 
-	tahunAjar := basePath.Group("/tahun-ajar", r.JWTService.GetUser)
-	{
-		tahunAjar.GET("/", r.TahunAjarController.GetTahunAjar)
-		tahunAjar.POST("/", r.TahunAjarController.CreateTahunAjar)
-		tahunAjar.PATCH("/:tahun_ajar_id", r.TahunAjarController.UpdateTahunAjar)
-		tahunAjar.DELETE("/:tahun_ajar_id", r.TahunAjarController.DeleteTahunAjar)
-		tahunAjar.PATCH("/:tahun_ajar_id/set-active", r.TahunAjarController.SetActiveTahunAjar)
-	}
+		tahunAjar := loggedPath.Group("/tahun-ajar", r.JWTService.IsAdmin)
+		{
+			tahunAjar.GET("/", r.TahunAjarController.GetTahunAjar)
+			tahunAjar.POST("/", r.TahunAjarController.CreateTahunAjar)
+			tahunAjar.PATCH("/:tahun_ajar_id", r.TahunAjarController.UpdateTahunAjar)
+			tahunAjar.DELETE("/:tahun_ajar_id", r.TahunAjarController.DeleteTahunAjar)
+			tahunAjar.PATCH("/:tahun_ajar_id/set-active", r.TahunAjarController.SetActiveTahunAjar)
+		}
 
-	kelas := basePath.Group("/kelas", r.JWTService.GetUser)
-	{
-		kelas.GET("/", r.KelasController.GetKelas)
-		kelas.POST("/", r.KelasController.CreateKelas)
-		kelas.PATCH("/:kelas_id", r.KelasController.UpdateKelas)
-		kelas.DELETE("/:kelas_id", r.KelasController.DeleteKelas)
-		kelas.POST("/:kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
-		kelas.POST("/:kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
-	}
+		kelas := loggedPath.Group("/kelas", r.JWTService.IsAdmin)
+		{
+			kelas.GET("/", r.KelasController.GetKelas)
+			kelas.POST("/", r.KelasController.CreateKelas)
+			kelas.PATCH("/:kelas_id", r.KelasController.UpdateKelas)
+			kelas.DELETE("/:kelas_id", r.KelasController.DeleteKelas)
+			kelas.POST("/:kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
+			kelas.POST("/:kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
+		}
 
-	guru := basePath.Group("/guru", r.JWTService.GetUser)
-	{
-		guru.GET("/", r.GuruController.GetGuru)
-		guru.POST("/", r.GuruController.CreateGuru)
-		guru.PATCH("/:guru_id", r.GuruController.UpdateGuru)
-		guru.DELETE("/:guru_id", r.GuruController.DeleteGuru)
-	}
+		guru := loggedPath.Group("/guru", r.JWTService.IsAdmin)
+		{
+			guru.GET("/", r.GuruController.GetGuru)
+			guru.POST("/", r.GuruController.CreateGuru)
+			guru.PATCH("/:guru_id", r.GuruController.UpdateGuru)
+			guru.DELETE("/:guru_id", r.GuruController.DeleteGuru)
+		}
 
-	siswa := basePath.Group("/siswa", r.JWTService.GetUser)
-	{
-		siswa.GET("/", r.SiswaController.GetSiswa)
-		siswa.POST("/", r.SiswaController.CreateSiswa)
-		siswa.PATCH("/:siswa_id", r.SiswaController.UpdateSiswa)
-		siswa.DELETE("/:siswa_id", r.SiswaController.DeleteSiswa)
-	}
+		siswa := loggedPath.Group("/siswa", r.JWTService.IsAdmin)
+		{
+			siswa.GET("/", r.SiswaController.GetSiswa)
+			siswa.POST("/", r.SiswaController.CreateSiswa)
+			siswa.PATCH("/:siswa_id", r.SiswaController.UpdateSiswa)
+			siswa.DELETE("/:siswa_id", r.SiswaController.DeleteSiswa)
+		}
 
-	dataScore := basePath.Group("/data-score", r.JWTService.GetUser)
-	{
-		dataScore.GET("/", r.DataScoreController.GetDataScore)
-		dataScore.POST("/", r.DataScoreController.CreateDataScore)
-		dataScore.PATCH("/:data_score_id", r.DataScoreController.UpdateDataScore)
-		dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
-	}
+		dataScore := loggedPath.Group("/data-score", r.JWTService.IsAdmin)
+		{
+			dataScore.GET("/", r.DataScoreController.GetDataScore)
+			dataScore.POST("/", r.DataScoreController.CreateDataScore)
+			dataScore.PATCH("/:data_score_id", r.DataScoreController.UpdateDataScore)
+			dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
+		}
 
-	scoreSiswa := basePath.Group("/score", r.JWTService.GetUser)
-	{
-		//dataScore.GET("/", r.DataScoreController.GetDataScore)
-		scoreSiswa.POST("/", r.ScoreSiswaController.AddScoreSiswa)
-		scoreSiswa.PATCH("/log/:score_log_id", r.ScoreSiswaController.UpdateScoreSiswa)
-		scoreSiswa.DELETE("/log/:score_log_id", r.ScoreSiswaController.DeleteScoreSiswa)
-	}
+		scoreSiswa := loggedPath.Group("/score")
+		{
+			//dataScore.GET("/", r.DataScoreController.GetDataScore)
+			scoreSiswa.POST("/", r.ScoreSiswaController.AddScoreSiswa)
+			scoreSiswa.PATCH("/log/:score_log_id", r.ScoreSiswaController.UpdateScoreSiswa)
+			scoreSiswa.DELETE("/log/:score_log_id", r.ScoreSiswaController.DeleteScoreSiswa)
+		}
 
-	setting := basePath.Group("/setting", r.JWTService.GetUser)
-	{
-		setting.GET("/", r.SettingController.GetSetting)
-		setting.POST("/", r.SettingController.CreateSetting)
-		setting.PATCH("/:setting_id", r.SettingController.UpdateSetting)
-		setting.DELETE("/:setting_id", r.SettingController.DeleteSetting)
+		setting := loggedPath.Group("/setting", r.JWTService.IsAdmin)
+		{
+			setting.GET("/", r.SettingController.GetSetting)
+			setting.POST("/", r.SettingController.CreateSetting)
+			setting.PATCH("/:setting_id", r.SettingController.UpdateSetting)
+			setting.DELETE("/:setting_id", r.SettingController.DeleteSetting)
+		}
 	}
 }

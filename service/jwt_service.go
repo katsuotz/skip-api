@@ -14,7 +14,9 @@ import (
 type JWTService interface {
 	GenerateToken(ctx context.Context, request entity.User) string
 	ValidateToken(token string) (*jwt.Token, error)
-	GetUser(ctx *gin.Context)
+	IsLoggedIn(ctx *gin.Context)
+	IsGuest(ctx *gin.Context)
+	IsAdmin(ctx *gin.Context)
 }
 
 type jwtService struct {
@@ -56,7 +58,7 @@ func (s *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	})
 }
 
-func (s *jwtService) GetUser(ctx *gin.Context) {
+func (s *jwtService) IsLoggedIn(ctx *gin.Context) {
 	authorization := ctx.Request.Header["Authorization"]
 
 	if authorization != nil {
@@ -66,10 +68,48 @@ func (s *jwtService) GetUser(ctx *gin.Context) {
 			claims := aToken.Claims.(jwt.MapClaims)
 			if claims["user_id"] != nil {
 				ctx.Set("user_id", claims["user_id"])
+				ctx.Set("role", claims["role"])
 				ctx.Next()
 				return
 			}
 		}
+	}
+
+	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"error": "Unauthorized",
+	})
+	return
+}
+
+func (s *jwtService) IsGuest(ctx *gin.Context) {
+	authorization := ctx.Request.Header["Authorization"]
+
+	if authorization == nil {
+		ctx.Next()
+		return
+	}
+
+	token := strings.Split(authorization[0], " ")[1]
+	aToken, err := s.ValidateToken(token)
+	if err == nil {
+		claims := aToken.Claims.(jwt.MapClaims)
+		if claims["user_id"] == nil {
+			ctx.Next()
+			return
+		}
+	}
+
+	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"error": "Unauthorized",
+	})
+	return
+}
+
+func (s *jwtService) IsAdmin(ctx *gin.Context) {
+	role := ctx.MustGet("role")
+	if role == "admin" {
+		ctx.Next()
+		return
 	}
 
 	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
