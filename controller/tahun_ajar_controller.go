@@ -107,7 +107,7 @@ func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 		return
 	}
 
-	err = c.TahunAjarRepository.DeleteTahunAjar(ctx, int(tahunAjarID))
+	err = c.TahunAjarRepository.DeleteTahunAjar(ctx, tahunAjarID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -128,7 +128,7 @@ func (c *tahunAjarController) SetActiveTahunAjar(ctx *gin.Context) {
 		return
 	}
 
-	err = c.TahunAjarRepository.SetActiveTahunAjar(ctx, int(tahunAjarID))
+	err = c.TahunAjarRepository.SetActiveTahunAjar(ctx, tahunAjarID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)

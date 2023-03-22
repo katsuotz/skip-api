@@ -105,7 +105,7 @@ func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
 		return
 	}
 
-	err = c.JurusanRepository.DeleteJurusan(ctx, int(jurusanID))
+	err = c.JurusanRepository.DeleteJurusan(ctx, jurusanID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)

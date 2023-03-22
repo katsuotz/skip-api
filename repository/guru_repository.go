@@ -42,7 +42,7 @@ func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, sea
 	var totalItem int64
 	temp.Offset(-1).Limit(-1).Count(&totalItem)
 	result.Pagination.TotalItem = totalItem
-	result.Pagination.Page = int(page)
+	result.Pagination.Page = page
 	totalPage := totalItem / int64(perPage)
 	if totalItem%int64(perPage) > 0 {
 		totalPage++

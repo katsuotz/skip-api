@@ -103,7 +103,7 @@ func (c *siswaController) DeleteSiswa(ctx *gin.Context) {
 		return
 	}
 
-	err = c.SiswaRepository.DeleteSiswa(ctx, int(siswaID))
+	err = c.SiswaRepository.DeleteSiswa(ctx, siswaID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)

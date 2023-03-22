@@ -121,7 +121,7 @@ func (c *kelasController) DeleteKelas(ctx *gin.Context) {
 		return
 	}
 
-	err = c.KelasRepository.DeleteKelas(ctx, int(kelasID))
+	err = c.KelasRepository.DeleteKelas(ctx, kelasID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)

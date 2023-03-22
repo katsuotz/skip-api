@@ -101,7 +101,7 @@ func (c *guruController) DeleteGuru(ctx *gin.Context) {
 		return
 	}
 
-	err = c.GuruRepository.DeleteGuru(ctx, int(guruID))
+	err = c.GuruRepository.DeleteGuru(ctx, guruID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
