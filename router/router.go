@@ -17,6 +17,7 @@ type Router struct {
 	SiswaController      controller.SiswaController
 	DataScoreController  controller.DataScoreController
 	ScoreSiswaController controller.ScoreSiswaController
+	SettingController    controller.SettingController
 	JWTService           service.JWTService
 }
 
@@ -30,6 +31,7 @@ func NewRouter(server *gin.Engine,
 	siswaController controller.SiswaController,
 	dataScoreController controller.DataScoreController,
 	scoreSiswaController controller.ScoreSiswaController,
+	settingController controller.SettingController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -43,6 +45,7 @@ func NewRouter(server *gin.Engine,
 		siswaController,
 		dataScoreController,
 		scoreSiswaController,
+		settingController,
 		jwtService,
 	}
 }
@@ -120,5 +123,13 @@ func (r *Router) Init() {
 		scoreSiswa.POST("/", r.ScoreSiswaController.AddScoreSiswa)
 		scoreSiswa.PATCH("/log/:score_log_id", r.ScoreSiswaController.UpdateScoreSiswa)
 		scoreSiswa.DELETE("/log/:score_log_id", r.ScoreSiswaController.DeleteScoreSiswa)
+	}
+
+	setting := basePath.Group("/setting", r.JWTService.GetUser)
+	{
+		setting.GET("/", r.SettingController.GetSetting)
+		setting.POST("/", r.SettingController.CreateSetting)
+		setting.PATCH("/:setting_id", r.SettingController.UpdateSetting)
+		setting.DELETE("/:setting_id", r.SettingController.DeleteSetting)
 	}
 }

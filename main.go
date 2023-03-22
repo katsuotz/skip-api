@@ -22,6 +22,7 @@ func main() {
 	guruRepository := repository.NewGuruRepository(database)
 	dataScoreRepository := repository.NewDataScoreRepository(database)
 	scoreSiswaRepository := repository.NewScoreSiswaRepository(database)
+	settingRepository := repository.NewSettingRepository(database)
 
 	authController := controller.NewAuthController(userRepository, jwtService)
 	profileController := controller.NewProfileController(profileRepository)
@@ -32,6 +33,7 @@ func main() {
 	guruController := controller.NewGuruController(guruRepository)
 	dataScoreController := controller.NewDataScoreController(dataScoreRepository)
 	scoreSiswaController := controller.NewScoreSiswaController(scoreSiswaRepository)
+	settingController := controller.NewSettingController(settingRepository)
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -53,6 +55,7 @@ func main() {
 		siswaController,
 		dataScoreController,
 		scoreSiswaController,
+		settingController,
 		jwtService,
 	)
 

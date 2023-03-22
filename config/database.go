@@ -40,22 +40,14 @@ func SetupDatabaseConnection() *gorm.DB {
 		&entity.DataScore{},
 		&entity.ScoreSiswa{},
 		&entity.ScoreLog{},
+		&entity.Setting{},
 	)
 	if err != nil {
 		fmt.Println("Automigrate error")
 		fmt.Println(err.Error())
 	}
 
-	seeder.CreateUser(
-		db,
-		"admin",
-		"admin",
-		"admin",
-		"Administrator",
-		"Bandung",
-		"2000-01-01",
-		"L",
-	)
+	CallSeeder(db)
 
 	err = CreateTriggerAndFunction(db)
 	if err != nil {
@@ -73,15 +65,27 @@ func CloseDatabaseConnection(db *gorm.DB) {
 	dbSQL.Close()
 }
 
-func CreateTriggerAndFunction(db *gorm.DB) error {
-	// Check if the trigger already exists
-	//var count int64
-	//db.Raw("SELECT count(*) FROM pg_trigger WHERE tgname = 'siswa_kelas_insert_trigger'").Count(&count)
-	//if count > 0 {
-	//	Trigger already exists, do nothing
-	//return nil
-	//}
+func CallSeeder(db *gorm.DB) {
+	seeder.CreateUser(
+		db,
+		"admin",
+		"admin",
+		"admin",
+		"Administrator",
+		"Bandung",
+		"2000-01-01",
+		"L",
+	)
 
+	seeder.CreateSetting(
+		db,
+		"score_type",
+		`["Perlombaan", "Penghargaan", "Keaktifan", "Pelanggaran"]`,
+		false,
+	)
+}
+
+func CreateTriggerAndFunction(db *gorm.DB) error {
 	// Create the function
 	db.Exec("CREATE OR REPLACE FUNCTION siswa_kelas_insert() RETURNS TRIGGER AS $siswa_kelas_insert$ BEGIN " +
 		"INSERT INTO score_siswa (siswa_kelas_id, score, created_at, updated_at) VALUES (NEW.id, 50, NOW(), NOW())" +
