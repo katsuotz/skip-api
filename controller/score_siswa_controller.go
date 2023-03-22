@@ -43,6 +43,9 @@ func (c *scoreSiswaController) AddScoreSiswa(ctx *gin.Context) {
 		return
 	}
 
+	guruID := int(ctx.MustGet("guru_id").(float64))
+	req.GuruID = guruID
+
 	err := c.ScoreSiswaRepository.AddScoreSiswa(ctx, req)
 
 	if err != nil {

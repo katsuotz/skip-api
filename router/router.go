@@ -116,7 +116,7 @@ func (r *Router) Init() {
 			dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
 		}
 
-		scoreSiswa := loggedPath.Group("/score")
+		scoreSiswa := loggedPath.Group("/score", r.JWTService.IsGuru)
 		{
 			//dataScore.GET("/", r.DataScoreController.GetDataScore)
 			scoreSiswa.POST("/", r.ScoreSiswaController.AddScoreSiswa)

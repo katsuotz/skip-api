@@ -12,7 +12,7 @@ import (
 
 func main() {
 	database := config.SetupDatabaseConnection()
-	jwtService := service.NewJWTService()
+	jwtService := service.NewJWTService(database)
 	userRepository := repository.NewUserRepository(database)
 	profileRepository := repository.NewProfileRepository(database)
 	jurusanRepository := repository.NewJurusanRepository(database)
