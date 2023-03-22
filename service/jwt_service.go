@@ -34,11 +34,7 @@ func NewJWTService(db *gorm.DB) JWTService {
 }
 
 func getSecretKey() string {
-	secretKey := os.Getenv("JWT_SECRET")
-	if secretKey != "" {
-		secretKey = "PasarUdang V.02"
-	}
-	return secretKey
+	return os.Getenv("JWT_SECRET")
 }
 
 func (s *jwtService) GenerateToken(ctx context.Context, user entity.User) string {
