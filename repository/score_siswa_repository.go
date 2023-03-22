@@ -10,8 +10,8 @@ import (
 type ScoreSiswaRepository interface {
 	GetScoreSiswa(ctx context.Context) []entity.ScoreSiswa
 	AddScoreSiswa(ctx context.Context, req dto.ScoreSiswaRequest) error
-	UpdateScoreSiswa(ctx context.Context, scoreSiswa entity.ScoreSiswa) (entity.ScoreSiswa, error)
-	DeleteScoreSiswa(ctx context.Context, scoreSiswaID int) error
+	UpdateScoreSiswa(ctx context.Context, scoreLog entity.ScoreLog) error
+	DeleteScoreSiswa(ctx context.Context, scoreLogID int) error
 }
 
 type scoreSiswaRepository struct {
@@ -38,13 +38,10 @@ func (r *scoreSiswaRepository) AddScoreSiswa(ctx context.Context, req dto.ScoreS
 	}()
 
 	scoreSiswa := entity.ScoreSiswa{
-		Score:        50,
 		SiswaKelasID: req.SiswaKelasID,
 	}
 
-	err := tx.FirstOrCreate(&scoreSiswa, entity.ScoreSiswa{
-		SiswaKelasID: req.SiswaKelasID,
-	}).Error
+	err := tx.First(&scoreSiswa).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -78,12 +75,59 @@ func (r *scoreSiswaRepository) AddScoreSiswa(ctx context.Context, req dto.ScoreS
 	return tx.Commit().Error
 }
 
-func (r *scoreSiswaRepository) UpdateScoreSiswa(ctx context.Context, scoreSiswa entity.ScoreSiswa) (entity.ScoreSiswa, error) {
-	err := r.db.Updates(&scoreSiswa).Error
-	return scoreSiswa, err
+func (r *scoreSiswaRepository) UpdateScoreSiswa(ctx context.Context, scoreLog entity.ScoreLog) error {
+	err := r.db.Model(&entity.ScoreLog{}).
+		Where("id = ?", scoreLog.ID).
+		Update("description", scoreLog.Description).
+		Error
+	return err
 }
 
-func (r *scoreSiswaRepository) DeleteScoreSiswa(ctx context.Context, scoreSiswaID int) error {
-	err := r.db.Where("id = ?", scoreSiswaID).Delete(&entity.ScoreSiswa{}).Error
-	return err
+func (r *scoreSiswaRepository) DeleteScoreSiswa(ctx context.Context, scoreLogID int) error {
+	tx := r.db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	scoreLog := entity.ScoreLog{
+		ID: scoreLogID,
+	}
+
+	err := tx.First(&scoreLog).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	scoreSiswa := entity.ScoreSiswa{
+		SiswaKelasID: scoreLog.ScoreSiswaID,
+	}
+
+	err = tx.First(&scoreSiswa).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Model(&entity.ScoreSiswa{}).
+		Where("id = ?", scoreSiswa.ID).
+		Update("score", scoreSiswa.Score-scoreLog.Score).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Delete(&scoreLog).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
 }

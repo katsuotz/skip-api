@@ -8,3 +8,7 @@ type ScoreSiswaRequest struct {
 	GuruID       int     `json:"guru_id" binding:"required" form:"guru_id"`
 	SiswaKelasID int     `json:"siswa_kelas_id" binding:"required" form:"siswa_kelas_id"`
 }
+
+type UpdateScoreLogRequest struct {
+	Description string `json:"description" binding:"required" form:"description"`
+}

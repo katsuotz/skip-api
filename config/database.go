@@ -57,6 +57,11 @@ func SetupDatabaseConnection() *gorm.DB {
 		"L",
 	)
 
+	err = CreateTriggerAndFunction(db)
+	if err != nil {
+		return nil
+	}
+
 	return db
 }
 
@@ -66,4 +71,24 @@ func CloseDatabaseConnection(db *gorm.DB) {
 		fmt.Println("Failed disconnect database")
 	}
 	dbSQL.Close()
+}
+
+func CreateTriggerAndFunction(db *gorm.DB) error {
+	// Check if the trigger already exists
+	//var count int64
+	//db.Raw("SELECT count(*) FROM pg_trigger WHERE tgname = 'siswa_kelas_insert_trigger'").Count(&count)
+	//if count > 0 {
+	//	Trigger already exists, do nothing
+	//return nil
+	//}
+
+	// Create the function
+	db.Exec("CREATE OR REPLACE FUNCTION siswa_kelas_insert() RETURNS TRIGGER AS $siswa_kelas_insert$ BEGIN " +
+		"INSERT INTO score_siswa (siswa_kelas_id, score, created_at, updated_at) VALUES (NEW.id, 50, NOW(), NOW())" +
+		"; RETURN NEW; END; $siswa_kelas_insert$ LANGUAGE plpgsql;")
+
+	// Create the trigger
+	db.Exec("CREATE OR REPLACE TRIGGER siswa_kelas_insert_trigger AFTER INSERT ON siswa_kelas FOR EACH ROW EXECUTE FUNCTION siswa_kelas_insert();")
+
+	return nil
 }

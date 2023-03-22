@@ -117,8 +117,8 @@ func (r *Router) Init() {
 	scoreSiswa := basePath.Group("/score", r.JWTService.GetUser)
 	{
 		//dataScore.GET("/", r.DataScoreController.GetDataScore)
-		scoreSiswa.POST("/", r.ScoreSiswaController.CreateScoreSiswa)
-		//dataScore.PATCH("/:data_score_id", r.DataScoreController.UpdateDataScore)
-		//dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
+		scoreSiswa.POST("/", r.ScoreSiswaController.AddScoreSiswa)
+		scoreSiswa.PATCH("/log/:score_log_id", r.ScoreSiswaController.UpdateScoreSiswa)
+		scoreSiswa.DELETE("/log/:score_log_id", r.ScoreSiswaController.DeleteScoreSiswa)
 	}
 }

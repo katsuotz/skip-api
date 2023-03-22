@@ -12,7 +12,7 @@ import (
 
 type ScoreSiswaController interface {
 	GetScoreSiswa(ctx *gin.Context)
-	CreateScoreSiswa(ctx *gin.Context)
+	AddScoreSiswa(ctx *gin.Context)
 	UpdateScoreSiswa(ctx *gin.Context)
 	DeleteScoreSiswa(ctx *gin.Context)
 }
@@ -34,7 +34,7 @@ func (c *scoreSiswaController) GetScoreSiswa(ctx *gin.Context) {
 	return
 }
 
-func (c *scoreSiswaController) CreateScoreSiswa(ctx *gin.Context) {
+func (c *scoreSiswaController) AddScoreSiswa(ctx *gin.Context) {
 	req := dto.ScoreSiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
@@ -57,7 +57,7 @@ func (c *scoreSiswaController) CreateScoreSiswa(ctx *gin.Context) {
 }
 
 func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
-	req := dto.ScoreSiswaRequest{}
+	req := dto.UpdateScoreLogRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -65,21 +65,19 @@ func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
 		return
 	}
 
-	scoreSiswaID, err := strconv.Atoi(ctx.Param("data_score_id"))
-	if err != nil || scoreSiswaID == 0 {
+	scoreLogID, err := strconv.Atoi(ctx.Param("score_log_id"))
+	if err != nil || scoreLogID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	newScoreSiswa := entity.ScoreSiswa{
-		ID: scoreSiswaID,
-		//Title:       req.Title,
-		//Description: req.Description,
-		Score: req.Score,
+	scoreLog := entity.ScoreLog{
+		ID:          scoreLogID,
+		Description: req.Description,
 	}
 
-	_, err = c.ScoreSiswaRepository.UpdateScoreSiswa(ctx, newScoreSiswa)
+	err = c.ScoreSiswaRepository.UpdateScoreSiswa(ctx, scoreLog)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -93,14 +91,14 @@ func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
 }
 
 func (c *scoreSiswaController) DeleteScoreSiswa(ctx *gin.Context) {
-	scoreSiswaID, err := strconv.Atoi(ctx.Param("data_score_id"))
-	if err != nil || scoreSiswaID == 0 {
+	scoreLogID, err := strconv.Atoi(ctx.Param("score_log_id"))
+	if err != nil || scoreLogID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.ScoreSiswaRepository.DeleteScoreSiswa(ctx, scoreSiswaID)
+	err = c.ScoreSiswaRepository.DeleteScoreSiswa(ctx, scoreLogID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
