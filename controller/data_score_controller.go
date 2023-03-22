@@ -47,6 +47,7 @@ func (c *dataScoreController) CreateDataScore(ctx *gin.Context) {
 		Title:       req.Title,
 		Description: req.Description,
 		Score:       req.Score,
+		Type:        req.Type,
 	}
 
 	_, err := c.DataScoreRepository.CreateDataScore(ctx, dataScore)

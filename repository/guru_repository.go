@@ -107,10 +107,7 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) er
 		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
-
-	return nil
+	return tx.Commit().Error
 }
 
 func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, guruID int) error {
@@ -170,10 +167,7 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
-
-	return nil
+	return tx.Commit().Error
 }
 
 func (r *guruRepository) DeleteGuru(ctx context.Context, guruID int) error {
@@ -210,8 +204,5 @@ func (r *guruRepository) DeleteGuru(ctx context.Context, guruID int) error {
 		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
-
-	return nil
+	return tx.Commit().Error
 }

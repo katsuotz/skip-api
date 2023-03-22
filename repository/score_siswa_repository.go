@@ -75,8 +75,7 @@ func (r *scoreSiswaRepository) AddScoreSiswa(ctx context.Context, req dto.ScoreS
 		tx.Rollback()
 		return err
 	}
-
-	return nil
+	return tx.Commit().Error
 }
 
 func (r *scoreSiswaRepository) UpdateScoreSiswa(ctx context.Context, scoreSiswa entity.ScoreSiswa) (entity.ScoreSiswa, error) {

@@ -112,10 +112,7 @@ func (r *siswaRepository) CreateSiswa(ctx context.Context, req dto.SiswaRequest)
 		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
-
-	return nil
+	return tx.Commit().Error
 }
 
 func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest, siswaID int) error {
@@ -174,10 +171,7 @@ func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest,
 		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
-
-	return nil
+	return tx.Commit().Error
 }
 
 func (r *siswaRepository) DeleteSiswa(ctx context.Context, siswaID int) error {
