@@ -28,6 +28,22 @@ func NewSettingController(settingRepository repository.SettingRepository) Settin
 }
 
 func (c *settingController) GetSetting(ctx *gin.Context) {
+	key := ctx.DefaultQuery("key", "")
+
+	if key != "" {
+		setting := c.SettingRepository.GetSettingByKey(ctx, key)
+
+		if setting.ID == 0 {
+			response := helper.BuildErrorResponse("Data not found", nil, nil)
+			ctx.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
+		}
+
+		response := helper.BuildSuccessResponse("", setting)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
 	setting := c.SettingRepository.GetSetting(ctx)
 	response := helper.BuildSuccessResponse("", setting)
 	ctx.JSON(http.StatusOK, response)

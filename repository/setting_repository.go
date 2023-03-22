@@ -8,6 +8,7 @@ import (
 
 type SettingRepository interface {
 	GetSetting(ctx context.Context) []entity.Setting
+	GetSettingByKey(ctx context.Context, key string) entity.Setting
 	CreateSetting(ctx context.Context, setting entity.Setting) (entity.Setting, error)
 	UpdateSetting(ctx context.Context, setting entity.Setting) (entity.Setting, error)
 	DeleteSetting(ctx context.Context, settingID int) error
@@ -24,6 +25,12 @@ func NewSettingRepository(db *gorm.DB) SettingRepository {
 func (r *settingRepository) GetSetting(ctx context.Context) []entity.Setting {
 	var setting []entity.Setting
 	r.db.Find(&setting)
+	return setting
+}
+
+func (r *settingRepository) GetSettingByKey(ctx context.Context, key string) entity.Setting {
+	var setting entity.Setting
+	r.db.Where("key = ?", key).First(&setting)
 	return setting
 }
 
