@@ -26,7 +26,7 @@ func NewGuruRepository(db *gorm.DB) GuruRepository {
 func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, search string) dto.GuruPagination {
 	result := dto.GuruPagination{}
 	guru := entity.Guru{}
-	temp := r.db.Model(guru)
+	temp := r.db.Model(&guru)
 	if search != "" {
 		search = "%" + search + "%"
 		temp.Where("name ilike ?", search, search)

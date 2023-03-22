@@ -5,6 +5,7 @@ type DataScore struct {
 	Title       string  `gorm:"type:varchar(50)" json:"title"`
 	Description string  `gorm:"type:text" json:"description"`
 	Score       float64 `json:"score"`
+	Type        string  `gorm:"type:varchar(20)" json:"type"`
 	Base
 }
 

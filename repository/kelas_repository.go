@@ -57,30 +57,30 @@ func (r *kelasRepository) DeleteKelas(ctx context.Context, kelasID int) error {
 }
 
 func (r *kelasRepository) AddSiswaToKelas(ctx context.Context, kelasID int, siswaIDs []int) error {
-	var detailKelasInsert []entity.DetailKelas
+	var siswaKelasInsert []entity.SiswaKelas
 
 	var addedSiswaIDs []int
 
 	r.db.
-		Model(&entity.DetailKelas{}).
+		Model(&entity.SiswaKelas{}).
 		Where("kelas_id = ?", kelasID).
 		Where("siswa_id in ?", siswaIDs).
 		Pluck("siswa_id", &addedSiswaIDs)
 
 	for _, siswaID := range siswaIDs {
 		if !helper.IsInArray(addedSiswaIDs, siswaID) {
-			detailKelasInsert = append(detailKelasInsert, entity.DetailKelas{
+			siswaKelasInsert = append(siswaKelasInsert, entity.SiswaKelas{
 				KelasID: kelasID,
 				SiswaID: siswaID,
 			})
 		}
 	}
 
-	if len(detailKelasInsert) == 0 {
+	if len(siswaKelasInsert) == 0 {
 		return nil
 	}
 
-	err := r.db.Create(&detailKelasInsert).Error
+	err := r.db.Create(&siswaKelasInsert).Error
 	return err
 }
 
@@ -88,7 +88,7 @@ func (r *kelasRepository) RemoveSiswaFromKelas(ctx context.Context, kelasID int,
 	err := r.db.
 		Where("kelas_id = ?", kelasID).
 		Where("siswa_id in ?", siswaIDs).
-		Delete(&entity.DetailKelas{}).Error
+		Delete(&entity.SiswaKelas{}).Error
 
 	return err
 }

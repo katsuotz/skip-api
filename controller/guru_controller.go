@@ -5,7 +5,6 @@ import (
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gitlab.com/katsuotz/skip-api/repository"
-	"gitlab.com/katsuotz/skip-api/service"
 	"net/http"
 	"strconv"
 )
@@ -19,13 +18,11 @@ type GuruController interface {
 
 type guruController struct {
 	GuruRepository repository.GuruRepository
-	JWTService     service.JWTService
 }
 
-func NewGuruController(guruRepository repository.GuruRepository, jwtService service.JWTService) GuruController {
+func NewGuruController(guruRepository repository.GuruRepository) GuruController {
 	return &guruController{
 		guruRepository,
-		jwtService,
 	}
 }
 

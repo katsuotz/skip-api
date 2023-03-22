@@ -6,7 +6,6 @@ import (
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gitlab.com/katsuotz/skip-api/repository"
-	"gitlab.com/katsuotz/skip-api/service"
 	"net/http"
 	"strconv"
 )
@@ -20,13 +19,11 @@ type JurusanController interface {
 
 type jurusanController struct {
 	JurusanRepository repository.JurusanRepository
-	JWTService        service.JWTService
 }
 
-func NewJurusanController(jurusanRepository repository.JurusanRepository, jwtService service.JWTService) JurusanController {
+func NewJurusanController(jurusanRepository repository.JurusanRepository) JurusanController {
 	return &jurusanController{
 		jurusanRepository,
-		jwtService,
 	}
 }
 

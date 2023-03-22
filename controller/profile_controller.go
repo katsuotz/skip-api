@@ -6,7 +6,6 @@ import (
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gitlab.com/katsuotz/skip-api/repository"
-	"gitlab.com/katsuotz/skip-api/service"
 	"net/http"
 )
 
@@ -17,13 +16,11 @@ type ProfileController interface {
 
 type profileController struct {
 	ProfileRepository repository.ProfileRepository
-	JWTService        service.JWTService
 }
 
-func NewProfileController(profileRepository repository.ProfileRepository, jwtService service.JWTService) ProfileController {
+func NewProfileController(profileRepository repository.ProfileRepository) ProfileController {
 	return &profileController{
 		profileRepository,
-		jwtService,
 	}
 }
 

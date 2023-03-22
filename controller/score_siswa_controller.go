@@ -10,32 +10,32 @@ import (
 	"strconv"
 )
 
-type DataScoreController interface {
-	GetDataScore(ctx *gin.Context)
-	CreateDataScore(ctx *gin.Context)
-	UpdateDataScore(ctx *gin.Context)
-	DeleteDataScore(ctx *gin.Context)
+type ScoreSiswaController interface {
+	GetScoreSiswa(ctx *gin.Context)
+	CreateScoreSiswa(ctx *gin.Context)
+	UpdateScoreSiswa(ctx *gin.Context)
+	DeleteScoreSiswa(ctx *gin.Context)
 }
 
-type dataScoreController struct {
-	DataScoreRepository repository.DataScoreRepository
+type scoreSiswaController struct {
+	ScoreSiswaRepository repository.ScoreSiswaRepository
 }
 
-func NewDataScoreController(dataScoreRepository repository.DataScoreRepository) DataScoreController {
-	return &dataScoreController{
-		dataScoreRepository,
+func NewScoreSiswaController(scoreSiswaRepository repository.ScoreSiswaRepository) ScoreSiswaController {
+	return &scoreSiswaController{
+		scoreSiswaRepository,
 	}
 }
 
-func (c *dataScoreController) GetDataScore(ctx *gin.Context) {
-	dataScore := c.DataScoreRepository.GetDataScore(ctx)
-	response := helper.BuildSuccessResponse("", dataScore)
+func (c *scoreSiswaController) GetScoreSiswa(ctx *gin.Context) {
+	scoreSiswa := c.ScoreSiswaRepository.GetScoreSiswa(ctx)
+	response := helper.BuildSuccessResponse("", scoreSiswa)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *dataScoreController) CreateDataScore(ctx *gin.Context) {
-	req := dto.DataScoreRequest{}
+func (c *scoreSiswaController) CreateScoreSiswa(ctx *gin.Context) {
+	req := dto.ScoreSiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -43,13 +43,7 @@ func (c *dataScoreController) CreateDataScore(ctx *gin.Context) {
 		return
 	}
 
-	dataScore := entity.DataScore{
-		Title:       req.Title,
-		Description: req.Description,
-		Score:       req.Score,
-	}
-
-	_, err := c.DataScoreRepository.CreateDataScore(ctx, dataScore)
+	err := c.ScoreSiswaRepository.AddScoreSiswa(ctx, req)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -62,8 +56,8 @@ func (c *dataScoreController) CreateDataScore(ctx *gin.Context) {
 	return
 }
 
-func (c *dataScoreController) UpdateDataScore(ctx *gin.Context) {
-	req := dto.DataScoreRequest{}
+func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
+	req := dto.ScoreSiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -71,21 +65,21 @@ func (c *dataScoreController) UpdateDataScore(ctx *gin.Context) {
 		return
 	}
 
-	dataScoreID, err := strconv.Atoi(ctx.Param("data_score_id"))
-	if err != nil || dataScoreID == 0 {
+	scoreSiswaID, err := strconv.Atoi(ctx.Param("data_score_id"))
+	if err != nil || scoreSiswaID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	newDataScore := entity.DataScore{
-		ID:          dataScoreID,
-		Title:       req.Title,
-		Description: req.Description,
-		Score:       req.Score,
+	newScoreSiswa := entity.ScoreSiswa{
+		ID: scoreSiswaID,
+		//Title:       req.Title,
+		//Description: req.Description,
+		Score: req.Score,
 	}
 
-	_, err = c.DataScoreRepository.UpdateDataScore(ctx, newDataScore)
+	_, err = c.ScoreSiswaRepository.UpdateScoreSiswa(ctx, newScoreSiswa)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -98,15 +92,15 @@ func (c *dataScoreController) UpdateDataScore(ctx *gin.Context) {
 	return
 }
 
-func (c *dataScoreController) DeleteDataScore(ctx *gin.Context) {
-	dataScoreID, err := strconv.Atoi(ctx.Param("data_score_id"))
-	if err != nil || dataScoreID == 0 {
+func (c *scoreSiswaController) DeleteScoreSiswa(ctx *gin.Context) {
+	scoreSiswaID, err := strconv.Atoi(ctx.Param("data_score_id"))
+	if err != nil || scoreSiswaID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.DataScoreRepository.DeleteDataScore(ctx, dataScoreID)
+	err = c.ScoreSiswaRepository.DeleteScoreSiswa(ctx, scoreSiswaID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)

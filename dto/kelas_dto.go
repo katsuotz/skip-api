@@ -7,6 +7,6 @@ type KelasRequest struct {
 	GuruID      int    `json:"guru_id" binding:"required" form:"guru_id"`
 }
 
-type DetailKelasRequest struct {
+type SiswaKelasRequest struct {
 	SiswaID []int `json:"siswa_id" binding:"required" form:"siswa_id"`
 }

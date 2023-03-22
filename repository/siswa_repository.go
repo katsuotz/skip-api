@@ -26,7 +26,7 @@ func NewSiswaRepository(db *gorm.DB) SiswaRepository {
 func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID int) dto.SiswaPagination {
 	result := dto.SiswaPagination{}
 	siswa := entity.Siswa{}
-	temp := r.db.Model(siswa)
+	temp := r.db.Model(&siswa)
 	if search != "" {
 		search = "%" + search + "%"
 		temp.Where("name ilike ?", search, search)
@@ -37,8 +37,8 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp.Joins("join profiles on profiles.user_id = users.id")
 
 	if kelasID != 0 {
-		temp.Joins("join detail_kelas on detail_kelas.siswa_id = siswa.id")
-		temp.Where("detail_kelas.kelas_id = ?", kelasID)
+		temp.Joins("join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
+		temp.Where("siswa_kelas.kelas_id = ?", kelasID)
 	}
 
 	temp.Order("nama asc")

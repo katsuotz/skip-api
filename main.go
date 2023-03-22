@@ -21,15 +21,17 @@ func main() {
 	siswaRepository := repository.NewSiswaRepository(database)
 	guruRepository := repository.NewGuruRepository(database)
 	dataScoreRepository := repository.NewDataScoreRepository(database)
+	scoreSiswaRepository := repository.NewScoreSiswaRepository(database)
 
 	authController := controller.NewAuthController(userRepository, jwtService)
-	profileController := controller.NewProfileController(profileRepository, jwtService)
-	jurusanController := controller.NewJurusanController(jurusanRepository, jwtService)
-	tahunAjarController := controller.NewTahunAjarController(tahunAjarRepository, jwtService)
-	kelasController := controller.NewKelasController(kelasRepository, jwtService)
-	siswaController := controller.NewSiswaController(siswaRepository, jwtService)
-	guruController := controller.NewGuruController(guruRepository, jwtService)
-	dataScoreController := controller.NewDataScoreController(dataScoreRepository, jwtService)
+	profileController := controller.NewProfileController(profileRepository)
+	jurusanController := controller.NewJurusanController(jurusanRepository)
+	tahunAjarController := controller.NewTahunAjarController(tahunAjarRepository)
+	kelasController := controller.NewKelasController(kelasRepository)
+	siswaController := controller.NewSiswaController(siswaRepository)
+	guruController := controller.NewGuruController(guruRepository)
+	dataScoreController := controller.NewDataScoreController(dataScoreRepository)
+	scoreSiswaController := controller.NewScoreSiswaController(scoreSiswaRepository)
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -50,6 +52,7 @@ func main() {
 		guruController,
 		siswaController,
 		dataScoreController,
+		scoreSiswaController,
 		jwtService,
 	)
 

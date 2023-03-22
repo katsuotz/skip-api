@@ -5,7 +5,6 @@ import (
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gitlab.com/katsuotz/skip-api/repository"
-	"gitlab.com/katsuotz/skip-api/service"
 	"net/http"
 	"strconv"
 )
@@ -19,13 +18,11 @@ type SiswaController interface {
 
 type siswaController struct {
 	SiswaRepository repository.SiswaRepository
-	JWTService      service.JWTService
 }
 
-func NewSiswaController(siswaRepository repository.SiswaRepository, jwtService service.JWTService) SiswaController {
+func NewSiswaController(siswaRepository repository.SiswaRepository) SiswaController {
 	return &siswaController{
 		siswaRepository,
-		jwtService,
 	}
 }
 

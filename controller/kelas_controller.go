@@ -6,7 +6,6 @@ import (
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gitlab.com/katsuotz/skip-api/repository"
-	"gitlab.com/katsuotz/skip-api/service"
 	"net/http"
 	"strconv"
 )
@@ -22,13 +21,11 @@ type KelasController interface {
 
 type kelasController struct {
 	KelasRepository repository.KelasRepository
-	JWTService      service.JWTService
 }
 
-func NewKelasController(kelasRepository repository.KelasRepository, jwtService service.JWTService) KelasController {
+func NewKelasController(kelasRepository repository.KelasRepository) KelasController {
 	return &kelasController{
 		kelasRepository,
-		jwtService,
 	}
 }
 
@@ -135,7 +132,7 @@ func (c *kelasController) DeleteKelas(ctx *gin.Context) {
 }
 
 func (c *kelasController) AddSiswaToKelas(ctx *gin.Context) {
-	req := dto.DetailKelasRequest{}
+	req := dto.SiswaKelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -164,7 +161,7 @@ func (c *kelasController) AddSiswaToKelas(ctx *gin.Context) {
 }
 
 func (c *kelasController) RemoveSiswaFromKelas(ctx *gin.Context) {
-	req := dto.DetailKelasRequest{}
+	req := dto.SiswaKelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)

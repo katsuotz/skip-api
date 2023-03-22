@@ -7,16 +7,17 @@ import (
 )
 
 type Router struct {
-	server              *gin.Engine
-	AuthController      controller.AuthController
-	ProfileController   controller.ProfileController
-	JurusanController   controller.JurusanController
-	TahunAjarController controller.TahunAjarController
-	KelasController     controller.KelasController
-	GuruController      controller.GuruController
-	SiswaController     controller.SiswaController
-	DataScoreController controller.DataScoreController
-	JWTService          service.JWTService
+	server               *gin.Engine
+	AuthController       controller.AuthController
+	ProfileController    controller.ProfileController
+	JurusanController    controller.JurusanController
+	TahunAjarController  controller.TahunAjarController
+	KelasController      controller.KelasController
+	GuruController       controller.GuruController
+	SiswaController      controller.SiswaController
+	DataScoreController  controller.DataScoreController
+	ScoreSiswaController controller.ScoreSiswaController
+	JWTService           service.JWTService
 }
 
 func NewRouter(server *gin.Engine,
@@ -28,6 +29,7 @@ func NewRouter(server *gin.Engine,
 	guruController controller.GuruController,
 	siswaController controller.SiswaController,
 	dataScoreController controller.DataScoreController,
+	scoreSiswaController controller.ScoreSiswaController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -40,6 +42,7 @@ func NewRouter(server *gin.Engine,
 		guruController,
 		siswaController,
 		dataScoreController,
+		scoreSiswaController,
 		jwtService,
 	}
 }
@@ -109,5 +112,13 @@ func (r *Router) Init() {
 		dataScore.POST("/", r.DataScoreController.CreateDataScore)
 		dataScore.PATCH("/:data_score_id", r.DataScoreController.UpdateDataScore)
 		dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
+	}
+
+	scoreSiswa := basePath.Group("/score", r.JWTService.GetUser)
+	{
+		//dataScore.GET("/", r.DataScoreController.GetDataScore)
+		scoreSiswa.POST("/", r.ScoreSiswaController.CreateScoreSiswa)
+		//dataScore.PATCH("/:data_score_id", r.DataScoreController.UpdateDataScore)
+		//dataScore.DELETE("/:data_score_id", r.DataScoreController.DeleteDataScore)
 	}
 }
