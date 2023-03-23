@@ -82,14 +82,18 @@ func (r *Router) Init() {
 			tahunAjar.PATCH("/:tahun_ajar_id/set-active", r.TahunAjarController.SetActiveTahunAjar)
 		}
 
-		kelas := loggedPath.Group("/kelas", r.JWTService.IsAdmin)
+		kelas := loggedPath.Group("/kelas")
 		{
 			kelas.GET("/", r.KelasController.GetKelas)
-			kelas.POST("/", r.KelasController.CreateKelas)
-			kelas.PATCH("/:kelas_id", r.KelasController.UpdateKelas)
-			kelas.DELETE("/:kelas_id", r.KelasController.DeleteKelas)
-			kelas.POST("/:kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
-			kelas.POST("/:kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
+
+			kelasData := kelas.Group("/", r.JWTService.IsAdmin)
+			{
+				kelasData.POST("/", r.KelasController.CreateKelas)
+				kelasData.PATCH("/:kelas_id", r.KelasController.UpdateKelas)
+				kelasData.DELETE("/:kelas_id", r.KelasController.DeleteKelas)
+				kelasData.POST("/:kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
+				kelasData.POST("/:kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
+			}
 		}
 
 		guru := loggedPath.Group("/guru", r.JWTService.IsAdmin)
@@ -100,12 +104,16 @@ func (r *Router) Init() {
 			guru.DELETE("/:guru_id", r.GuruController.DeleteGuru)
 		}
 
-		siswa := loggedPath.Group("/siswa", r.JWTService.IsAdmin)
+		siswa := loggedPath.Group("/siswa")
 		{
 			siswa.GET("/", r.SiswaController.GetSiswa)
-			siswa.POST("/", r.SiswaController.CreateSiswa)
-			siswa.PATCH("/:siswa_id", r.SiswaController.UpdateSiswa)
-			siswa.DELETE("/:siswa_id", r.SiswaController.DeleteSiswa)
+
+			siswaData := siswa.Group("/", r.JWTService.IsAdmin)
+			{
+				siswaData.POST("/", r.JWTService.IsAdmin, r.SiswaController.CreateSiswa)
+				siswaData.PATCH("/:siswa_id", r.JWTService.IsAdmin, r.SiswaController.UpdateSiswa)
+				siswaData.DELETE("/:siswa_id", r.JWTService.IsAdmin, r.SiswaController.DeleteSiswa)
+			}
 		}
 
 		dataScore := loggedPath.Group("/data-score", r.JWTService.IsAdmin)
