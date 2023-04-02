@@ -2,12 +2,13 @@ package repository
 
 import (
 	"context"
+	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gorm.io/gorm"
 )
 
 type TahunAjarRepository interface {
-	GetTahunAjar(ctx context.Context) []entity.TahunAjar
+	GetTahunAjar(ctx context.Context, page int, perPage int, search string) dto.TahunAjarPagination
 	CreateTahunAjar(ctx context.Context, tahunAjar entity.TahunAjar) (entity.TahunAjar, error)
 	UpdateTahunAjar(ctx context.Context, tahunAjar entity.TahunAjar) (entity.TahunAjar, error)
 	DeleteTahunAjar(ctx context.Context, tahunAjarID int) error
@@ -22,10 +23,31 @@ func NewTahunAjarRepository(db *gorm.DB) TahunAjarRepository {
 	return &tahunAjarRepository{db: db}
 }
 
-func (r *tahunAjarRepository) GetTahunAjar(ctx context.Context) []entity.TahunAjar {
-	var tahunAjar []entity.TahunAjar
-	r.db.Find(&tahunAjar)
-	return tahunAjar
+func (r *tahunAjarRepository) GetTahunAjar(ctx context.Context, page int, perPage int, search string) dto.TahunAjarPagination {
+	result := dto.TahunAjarPagination{}
+	tahunAjar := entity.TahunAjar{}
+	temp := r.db.Model(&tahunAjar)
+	if search != "" {
+		search = "%" + search + "%"
+		temp.Where("tahun_ajar ilike ?", search, search)
+		//temp.Or("semester ilike ?", search, search)
+	}
+
+	temp.Order("tahun_ajar desc")
+	temp.Offset(perPage * (page - 1)).Limit(perPage)
+	temp.Find(&result.Data)
+
+	var totalItem int64
+	temp.Offset(-1).Limit(-1).Count(&totalItem)
+	result.Pagination.TotalItem = totalItem
+	result.Pagination.Page = page
+	totalPage := totalItem / int64(perPage)
+	if totalItem%int64(perPage) > 0 {
+		totalPage++
+	}
+	result.Pagination.TotalPage = totalPage
+
+	return result
 }
 
 func (r *tahunAjarRepository) CreateTahunAjar(ctx context.Context, tahunAjar entity.TahunAjar) (entity.TahunAjar, error) {

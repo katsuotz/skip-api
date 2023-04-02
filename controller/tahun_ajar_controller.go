@@ -29,7 +29,13 @@ func NewTahunAjarController(tahunAjarRepository repository.TahunAjarRepository) 
 }
 
 func (c *tahunAjarController) GetTahunAjar(ctx *gin.Context) {
-	tahunAjar := c.TahunAjarRepository.GetTahunAjar(ctx)
+	page := ctx.DefaultQuery("page", "1")
+	perPage := ctx.DefaultQuery("per_page", "10")
+	search := ctx.DefaultQuery("search", "")
+	pageInt, _ := strconv.Atoi(page)
+	perPageInt, _ := strconv.Atoi(perPage)
+
+	tahunAjar := c.TahunAjarRepository.GetTahunAjar(ctx, pageInt, perPageInt, search)
 	response := helper.BuildSuccessResponse("", tahunAjar)
 	ctx.JSON(http.StatusOK, response)
 	return
