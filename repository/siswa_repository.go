@@ -29,7 +29,7 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp := r.db.Model(&siswa)
 	if search != "" {
 		search = "%" + search + "%"
-		temp.Where("name ilike ?", search, search)
+		temp.Where("nama ilike ?", search, search)
 	}
 
 	temp.Select("siswa.id as id, siswa.user_id as user_id, nis, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
