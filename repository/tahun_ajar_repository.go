@@ -29,8 +29,8 @@ func (r *tahunAjarRepository) GetTahunAjar(ctx context.Context, page int, perPag
 	temp := r.db.Model(&tahunAjar)
 	if search != "" {
 		search = "%" + search + "%"
-		temp.Where("tahun_ajar ilike ?", search, search)
-		//temp.Or("semester ilike ?", search, search)
+		temp.Where("tahun_ajar ilike ?", search)
+		//temp.Or("semester ilike ?", search)
 	}
 
 	temp.Order("tahun_ajar desc")
@@ -46,6 +46,7 @@ func (r *tahunAjarRepository) GetTahunAjar(ctx context.Context, page int, perPag
 		totalPage++
 	}
 	result.Pagination.TotalPage = totalPage
+	result.Pagination.PerPage = perPage
 
 	return result
 }

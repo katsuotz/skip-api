@@ -23,7 +23,7 @@ func NewJurusanRepository(db *gorm.DB) JurusanRepository {
 
 func (r *jurusanRepository) GetJurusan(ctx context.Context) []entity.Jurusan {
 	var jurusan []entity.Jurusan
-	r.db.Find(&jurusan)
+	r.db.Order("nama_jurusan asc").Find(&jurusan)
 	return jurusan
 }
 

@@ -4,6 +4,7 @@ type Pagination struct {
 	TotalItem int64 `json:"total_item"`
 	TotalPage int64 `json:"total_page"`
 	Page      int   `json:"page,omitempty"`
+	PerPage   int   `json:"per_page,omitempty"`
 }
 
 type PaginationRequest struct {

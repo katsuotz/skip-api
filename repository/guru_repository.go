@@ -29,7 +29,7 @@ func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, sea
 	temp := r.db.Model(&guru)
 	if search != "" {
 		search = "%" + search + "%"
-		temp.Where("nama ilike ?", search, search)
+		temp.Where("nama ilike ?", search)
 	}
 
 	temp.Select("guru.id as id, guru.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
@@ -48,6 +48,7 @@ func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, sea
 		totalPage++
 	}
 	result.Pagination.TotalPage = totalPage
+	result.Pagination.PerPage = perPage
 
 	return result
 }
