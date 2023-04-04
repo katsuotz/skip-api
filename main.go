@@ -20,8 +20,8 @@ func main() {
 	kelasRepository := repository.NewKelasRepository(database)
 	siswaRepository := repository.NewSiswaRepository(database)
 	guruRepository := repository.NewGuruRepository(database)
-	dataScoreRepository := repository.NewDataScoreRepository(database)
-	scoreSiswaRepository := repository.NewScoreSiswaRepository(database)
+	dataPoinRepository := repository.NewDataPoinRepository(database)
+	poinSiswaRepository := repository.NewPoinSiswaRepository(database)
 	settingRepository := repository.NewSettingRepository(database)
 
 	authController := controller.NewAuthController(userRepository, jwtService)
@@ -31,8 +31,8 @@ func main() {
 	kelasController := controller.NewKelasController(kelasRepository)
 	siswaController := controller.NewSiswaController(siswaRepository)
 	guruController := controller.NewGuruController(guruRepository)
-	dataScoreController := controller.NewDataScoreController(dataScoreRepository)
-	scoreSiswaController := controller.NewScoreSiswaController(scoreSiswaRepository)
+	dataPoinController := controller.NewDataPoinController(dataPoinRepository)
+	poinSiswaController := controller.NewPoinSiswaController(poinSiswaRepository)
 	settingController := controller.NewSettingController(settingRepository)
 
 	app := gin.Default()
@@ -53,8 +53,8 @@ func main() {
 		kelasController,
 		guruController,
 		siswaController,
-		dataScoreController,
-		scoreSiswaController,
+		dataPoinController,
+		poinSiswaController,
 		settingController,
 		jwtService,
 	)

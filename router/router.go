@@ -7,18 +7,18 @@ import (
 )
 
 type Router struct {
-	server               *gin.Engine
-	AuthController       controller.AuthController
-	ProfileController    controller.ProfileController
-	JurusanController    controller.JurusanController
-	TahunAjarController  controller.TahunAjarController
-	KelasController      controller.KelasController
-	GuruController       controller.GuruController
-	SiswaController      controller.SiswaController
-	DataScoreController  controller.DataScoreController
-	ScoreSiswaController controller.ScoreSiswaController
-	SettingController    controller.SettingController
-	JWTService           service.JWTService
+	server              *gin.Engine
+	AuthController      controller.AuthController
+	ProfileController   controller.ProfileController
+	JurusanController   controller.JurusanController
+	TahunAjarController controller.TahunAjarController
+	KelasController     controller.KelasController
+	GuruController      controller.GuruController
+	SiswaController     controller.SiswaController
+	DataPoinController  controller.DataPoinController
+	PoinSiswaController controller.PoinSiswaController
+	SettingController   controller.SettingController
+	JWTService          service.JWTService
 }
 
 func NewRouter(server *gin.Engine,
@@ -29,8 +29,8 @@ func NewRouter(server *gin.Engine,
 	kelasController controller.KelasController,
 	guruController controller.GuruController,
 	siswaController controller.SiswaController,
-	dataScoreController controller.DataScoreController,
-	scoreSiswaController controller.ScoreSiswaController,
+	dataPoinController controller.DataPoinController,
+	poinSiswaController controller.PoinSiswaController,
 	settingController controller.SettingController,
 	jwtService service.JWTService,
 ) *Router {
@@ -43,8 +43,8 @@ func NewRouter(server *gin.Engine,
 		kelasController,
 		guruController,
 		siswaController,
-		dataScoreController,
-		scoreSiswaController,
+		dataPoinController,
+		poinSiswaController,
 		settingController,
 		jwtService,
 	}
@@ -116,20 +116,20 @@ func (r *Router) Init() {
 			}
 		}
 
-		dataScore := loggedPath.Group("data-score", r.JWTService.IsAdmin)
+		dataPoin := loggedPath.Group("data-poin", r.JWTService.IsAdmin)
 		{
-			dataScore.GET("", r.DataScoreController.GetDataScore)
-			dataScore.POST("", r.DataScoreController.CreateDataScore)
-			dataScore.PATCH(":data_score_id", r.DataScoreController.UpdateDataScore)
-			dataScore.DELETE(":data_score_id", r.DataScoreController.DeleteDataScore)
+			dataPoin.GET("", r.DataPoinController.GetDataPoin)
+			dataPoin.POST("", r.DataPoinController.CreateDataPoin)
+			dataPoin.PATCH(":data_poin_id", r.DataPoinController.UpdateDataPoin)
+			dataPoin.DELETE(":data_poin_id", r.DataPoinController.DeleteDataPoin)
 		}
 
-		scoreSiswa := loggedPath.Group("score", r.JWTService.IsGuru)
+		poinSiswa := loggedPath.Group("poin", r.JWTService.IsGuru)
 		{
-			//dataScore.GET("", r.DataScoreController.GetDataScore)
-			scoreSiswa.POST("", r.ScoreSiswaController.AddScoreSiswa)
-			scoreSiswa.PATCH("log/:score_log_id", r.ScoreSiswaController.UpdateScoreSiswa)
-			scoreSiswa.DELETE("log/:score_log_id", r.ScoreSiswaController.DeleteScoreSiswa)
+			//dataPoin.GET("", r.DataPoinController.GetDataPoin)
+			poinSiswa.POST("", r.PoinSiswaController.AddPoinSiswa)
+			poinSiswa.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
+			poinSiswa.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 		}
 
 		setting := loggedPath.Group("setting", r.JWTService.IsAdmin)

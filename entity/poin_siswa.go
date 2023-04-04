@@ -1,12 +1,12 @@
 package entity
 
-type ScoreSiswa struct {
+type PoinSiswa struct {
 	ID           int     `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
 	SiswaKelasID int     `gorm:"index" json:"siswa_kelas_id"`
-	Score        float64 `json:"score"`
+	Poin         float64 `json:"poin"`
 	Base
 }
 
-func (ScoreSiswa) TableName() string {
-	return "score_siswa"
+func (PoinSiswa) TableName() string {
+	return "poin_siswa"
 }

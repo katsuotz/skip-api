@@ -10,32 +10,32 @@ import (
 	"strconv"
 )
 
-type ScoreSiswaController interface {
-	GetScoreSiswa(ctx *gin.Context)
-	AddScoreSiswa(ctx *gin.Context)
-	UpdateScoreSiswa(ctx *gin.Context)
-	DeleteScoreSiswa(ctx *gin.Context)
+type PoinSiswaController interface {
+	GetPoinSiswa(ctx *gin.Context)
+	AddPoinSiswa(ctx *gin.Context)
+	UpdatePoinSiswa(ctx *gin.Context)
+	DeletePoinSiswa(ctx *gin.Context)
 }
 
-type scoreSiswaController struct {
-	ScoreSiswaRepository repository.ScoreSiswaRepository
+type poinSiswaController struct {
+	PoinSiswaRepository repository.PoinSiswaRepository
 }
 
-func NewScoreSiswaController(scoreSiswaRepository repository.ScoreSiswaRepository) ScoreSiswaController {
-	return &scoreSiswaController{
-		scoreSiswaRepository,
+func NewPoinSiswaController(poinSiswaRepository repository.PoinSiswaRepository) PoinSiswaController {
+	return &poinSiswaController{
+		poinSiswaRepository,
 	}
 }
 
-func (c *scoreSiswaController) GetScoreSiswa(ctx *gin.Context) {
-	scoreSiswa := c.ScoreSiswaRepository.GetScoreSiswa(ctx)
-	response := helper.BuildSuccessResponse("", scoreSiswa)
+func (c *poinSiswaController) GetPoinSiswa(ctx *gin.Context) {
+	poinSiswa := c.PoinSiswaRepository.GetPoinSiswa(ctx)
+	response := helper.BuildSuccessResponse("", poinSiswa)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *scoreSiswaController) AddScoreSiswa(ctx *gin.Context) {
-	req := dto.ScoreSiswaRequest{}
+func (c *poinSiswaController) AddPoinSiswa(ctx *gin.Context) {
+	req := dto.PoinSiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -46,7 +46,7 @@ func (c *scoreSiswaController) AddScoreSiswa(ctx *gin.Context) {
 	guruID := int(ctx.MustGet("guru_id").(float64))
 	req.GuruID = guruID
 
-	err := c.ScoreSiswaRepository.AddScoreSiswa(ctx, req)
+	err := c.PoinSiswaRepository.AddPoinSiswa(ctx, req)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -54,13 +54,13 @@ func (c *scoreSiswaController) AddScoreSiswa(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Score created successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin created successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
-	req := dto.UpdateScoreLogRequest{}
+func (c *poinSiswaController) UpdatePoinSiswa(ctx *gin.Context) {
+	req := dto.UpdatePoinLogRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -68,19 +68,19 @@ func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
 		return
 	}
 
-	scoreLogID, err := strconv.Atoi(ctx.Param("score_log_id"))
-	if err != nil || scoreLogID == 0 {
+	poinLogID, err := strconv.Atoi(ctx.Param("poin_log_id"))
+	if err != nil || poinLogID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	scoreLog := entity.ScoreLog{
-		ID:          scoreLogID,
+	poinLog := entity.PoinLog{
+		ID:          poinLogID,
 		Description: req.Description,
 	}
 
-	err = c.ScoreSiswaRepository.UpdateScoreSiswa(ctx, scoreLog)
+	err = c.PoinSiswaRepository.UpdatePoinSiswa(ctx, poinLog)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -88,20 +88,20 @@ func (c *scoreSiswaController) UpdateScoreSiswa(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Score updated successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin updated successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *scoreSiswaController) DeleteScoreSiswa(ctx *gin.Context) {
-	scoreLogID, err := strconv.Atoi(ctx.Param("score_log_id"))
-	if err != nil || scoreLogID == 0 {
+func (c *poinSiswaController) DeletePoinSiswa(ctx *gin.Context) {
+	poinLogID, err := strconv.Atoi(ctx.Param("poin_log_id"))
+	if err != nil || poinLogID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.ScoreSiswaRepository.DeleteScoreSiswa(ctx, scoreLogID)
+	err = c.PoinSiswaRepository.DeletePoinSiswa(ctx, poinLogID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -109,7 +109,7 @@ func (c *scoreSiswaController) DeleteScoreSiswa(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Score deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin deleted successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

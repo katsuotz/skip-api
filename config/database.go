@@ -37,9 +37,9 @@ func SetupDatabaseConnection() *gorm.DB {
 		&entity.Kelas{},
 		&entity.Guru{},
 		&entity.SiswaKelas{},
-		&entity.DataScore{},
-		&entity.ScoreSiswa{},
-		&entity.ScoreLog{},
+		&entity.DataPoin{},
+		&entity.PoinSiswa{},
+		&entity.PoinLog{},
 		&entity.Setting{},
 	)
 	if err != nil {
