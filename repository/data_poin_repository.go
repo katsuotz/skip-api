@@ -8,7 +8,7 @@ import (
 )
 
 type DataPoinRepository interface {
-	GetDataPoin(ctx context.Context, page int, perPage int, search string, poinType string) dto.DataPoinPagination
+	GetDataPoin(ctx context.Context, page int, perPage int, search string, poinType string, category string) dto.DataPoinPagination
 	CreateDataPoin(ctx context.Context, dataPoin entity.DataPoin) (entity.DataPoin, error)
 	UpdateDataPoin(ctx context.Context, dataPoin entity.DataPoin) (entity.DataPoin, error)
 	DeleteDataPoin(ctx context.Context, dataPoinID int) error
@@ -22,7 +22,7 @@ func NewDataPoinRepository(db *gorm.DB) DataPoinRepository {
 	return &dataPoinRepository{db: db}
 }
 
-func (r *dataPoinRepository) GetDataPoin(ctx context.Context, page int, perPage int, search string, poinType string) dto.DataPoinPagination {
+func (r *dataPoinRepository) GetDataPoin(ctx context.Context, page int, perPage int, search string, poinType string, category string) dto.DataPoinPagination {
 	result := dto.DataPoinPagination{}
 	dataPoin := entity.DataPoin{}
 	temp := r.db.Model(&dataPoin)
@@ -34,6 +34,10 @@ func (r *dataPoinRepository) GetDataPoin(ctx context.Context, page int, perPage 
 
 	if poinType != "" {
 		temp.Where("type = ?", poinType)
+	}
+
+	if category != "" {
+		temp.Where("category = ?", category)
 	}
 
 	temp.Order("title asc")

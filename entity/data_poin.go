@@ -5,7 +5,8 @@ type DataPoin struct {
 	Title       string  `gorm:"type:varchar(50)" json:"title"`
 	Description string  `gorm:"type:text" json:"description"`
 	Poin        float64 `json:"poin"`
-	Type        string  `gorm:"type:varchar(20)" json:"type"`
+	Type        string  `gorm:"type:varchar(25)" json:"type"`
+	Category    string  `gorm:"type:varchar(15)" json:"category"`
 	Base
 }
 

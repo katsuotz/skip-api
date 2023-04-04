@@ -32,10 +32,11 @@ func (c *dataPoinController) GetDataPoin(ctx *gin.Context) {
 	perPage := ctx.DefaultQuery("per_page", "10")
 	search := ctx.DefaultQuery("search", "")
 	poinType := ctx.DefaultQuery("type", "")
+	category := ctx.DefaultQuery("category", "")
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 
-	dataPoin := c.DataPoinRepository.GetDataPoin(ctx, pageInt, perPageInt, search, poinType)
+	dataPoin := c.DataPoinRepository.GetDataPoin(ctx, pageInt, perPageInt, search, poinType, category)
 	response := helper.BuildSuccessResponse("", dataPoin)
 	ctx.JSON(http.StatusOK, response)
 	return
@@ -55,6 +56,7 @@ func (c *dataPoinController) CreateDataPoin(ctx *gin.Context) {
 		Description: req.Description,
 		Poin:        req.Poin,
 		Type:        req.Type,
+		Category:    req.Category,
 	}
 
 	_, err := c.DataPoinRepository.CreateDataPoin(ctx, dataPoin)
