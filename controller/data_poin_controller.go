@@ -93,6 +93,8 @@ func (c *dataPoinController) UpdateDataPoin(ctx *gin.Context) {
 		Title:       req.Title,
 		Description: req.Description,
 		Poin:        req.Poin,
+		Type:        req.Type,
+		Category:    req.Category,
 	}
 
 	_, err = c.DataPoinRepository.UpdateDataPoin(ctx, newDataPoin)

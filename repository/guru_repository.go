@@ -71,7 +71,7 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) er
 	user := entity.User{
 		Username: req.Nip,
 		Password: helper.BirthDateToPassword(tanggalLahir),
-		Role:     "guru",
+		Role:     getGuruRole(req.TipeGuru),
 	}
 
 	err := tx.Create(&user).Error
@@ -134,6 +134,7 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 	user := entity.User{
 		Username: req.Nip,
 		Password: helper.BirthDateToPassword(tanggalLahir),
+		Role:     getGuruRole(req.TipeGuru),
 	}
 
 	err := tx.Where("id = ?", findGuru.UserID).Updates(&user).Error
@@ -206,4 +207,17 @@ func (r *guruRepository) DeleteGuru(ctx context.Context, guruID int) error {
 		return err
 	}
 	return tx.Commit().Error
+}
+
+func getGuruRole(tipeGuru string) string {
+	switch tipeGuru {
+	case "Staff ICT":
+		return "staff-ict"
+	case "Guru BK":
+		return "guru-bk"
+	case "Tata Usaha":
+		return "tata-usaha"
+	}
+
+	return "guru"
 }
