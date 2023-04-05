@@ -2,13 +2,14 @@ package repository
 
 import (
 	"context"
+	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gorm.io/gorm"
 )
 
 type KelasRepository interface {
-	GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []entity.Kelas
+	GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []dto.KelasResponse
 	CreateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	UpdateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	DeleteKelas(ctx context.Context, kelasID int) error
@@ -24,9 +25,9 @@ func NewKelasRepository(db *gorm.DB) KelasRepository {
 	return &kelasRepository{db: db}
 }
 
-func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []entity.Kelas {
-	var kelas []entity.Kelas
-	temp := r.db.Model(&kelas)
+func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []dto.KelasResponse {
+	var kelas []dto.KelasResponse
+	temp := r.db.Model(&entity.Kelas{})
 
 	if jurusanID != "" {
 		temp.Where("jurusan_id = ?", jurusanID)
@@ -36,7 +37,11 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 		temp.Where("tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Preload("Guru").Find(&kelas)
+	temp.Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, guru_id, nip, tipe_guru, nama")
+	temp.Joins("join guru on guru.id = kelas.guru_id")
+	temp.Joins("join users on users.id = guru.user_id")
+	temp.Joins("join profiles on profiles.user_id = users.id")
+	temp.Find(&kelas)
 
 	return kelas
 }

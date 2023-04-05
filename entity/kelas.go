@@ -6,6 +6,6 @@ type Kelas struct {
 	JurusanID   int    `json:"jurusan_id"`
 	TahunAjarID int    `json:"tahun_ajar_id"`
 	GuruID      int    `gorm:"index" json:"guru_id"`
-	Guru        Guru   `gorm:"foreignKey:guru_id" json:"guru"`
+	Guru        *Guru  `gorm:"foreignKey:guru_id" json:"guru,omitempty"`
 	Base
 }

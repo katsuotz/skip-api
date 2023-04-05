@@ -1,5 +1,7 @@
 package dto
 
+import "gitlab.com/katsuotz/skip-api/entity"
+
 type KelasRequest struct {
 	NamaKelas   string `json:"nama_kelas" binding:"required" form:"nama_kelas"`
 	JurusanID   int    `json:"jurusan_id" binding:"required" form:"jurusan_id"`
@@ -9,4 +11,10 @@ type KelasRequest struct {
 
 type SiswaKelasRequest struct {
 	SiswaID []int `json:"siswa_id" binding:"required" form:"siswa_id"`
+}
+
+type KelasResponse struct {
+	entity.Kelas
+	entity.Profile
+	entity.Guru
 }
