@@ -93,6 +93,7 @@ func (r *Router) Init() {
 				kelasData.PATCH(":kelas_id", r.KelasController.UpdateKelas)
 				kelasData.DELETE(":kelas_id", r.KelasController.DeleteKelas)
 				kelasData.POST(":kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
+				kelasData.POST(":kelas_id/naik-kelas", r.KelasController.SiswaNaikKelas)
 				kelasData.DELETE(":kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
 			}
 		}

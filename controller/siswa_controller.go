@@ -29,13 +29,12 @@ func NewSiswaController(siswaRepository repository.SiswaRepository) SiswaControl
 func (c *siswaController) GetSiswa(ctx *gin.Context) {
 	page := ctx.DefaultQuery("page", "1")
 	perPage := ctx.DefaultQuery("per_page", "10")
-	kelasID := ctx.DefaultQuery("kelas_id", "0")
+	kelasID := ctx.DefaultQuery("kelas_id", "")
 	search := ctx.DefaultQuery("search", "")
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
-	kelasIDInt, _ := strconv.Atoi(kelasID)
 
-	siswa := c.SiswaRepository.GetSiswa(ctx, pageInt, perPageInt, search, kelasIDInt)
+	siswa := c.SiswaRepository.GetSiswa(ctx, pageInt, perPageInt, search, kelasID)
 	response := helper.BuildSuccessResponse("", siswa)
 	ctx.JSON(http.StatusOK, response)
 	return

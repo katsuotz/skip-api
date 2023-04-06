@@ -17,6 +17,7 @@ type KelasController interface {
 	UpdateKelas(ctx *gin.Context)
 	DeleteKelas(ctx *gin.Context)
 	AddSiswaToKelas(ctx *gin.Context)
+	SiswaNaikKelas(ctx *gin.Context)
 	RemoveSiswaFromKelas(ctx *gin.Context)
 }
 
@@ -171,6 +172,35 @@ func (c *kelasController) AddSiswaToKelas(ctx *gin.Context) {
 	}
 
 	err = c.KelasRepository.AddSiswaToKelas(ctx, kelasID, req.SiswaID)
+
+	if err != nil {
+		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		ctx.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.BuildSuccessResponse("Siswa added successfully", nil)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
+func (c *kelasController) SiswaNaikKelas(ctx *gin.Context) {
+	req := dto.SiswaNaikKelasRequest{}
+	errDTO := ctx.ShouldBindJSON(&req)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = c.KelasRepository.SiswaNaikKelas(ctx, kelasID, req.SiswaKelasID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)

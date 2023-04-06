@@ -13,6 +13,10 @@ type SiswaKelasRequest struct {
 	SiswaID []int `json:"siswa_id" binding:"required" form:"siswa_id"`
 }
 
+type SiswaNaikKelasRequest struct {
+	SiswaKelasID []int `json:"siswa_kelas_id" binding:"required" form:"siswa_kelas_id"`
+}
+
 type KelasResponse struct {
 	ID int `json:"id"`
 	entity.Kelas

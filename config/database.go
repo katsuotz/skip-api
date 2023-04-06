@@ -23,7 +23,9 @@ func SetupDatabaseConnection() *gorm.DB {
 	dbZone := os.Getenv("DB_ZONE")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=%s", dbHost, dbUser, dbPass, dbName, dbPort, dbZone)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		//Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		fmt.Println("Failed connect database")
 	}
@@ -87,12 +89,12 @@ func CallSeeder(db *gorm.DB) {
 
 func CreateTriggerAndFunction(db *gorm.DB) error {
 	// Create the function
-	db.Exec("CREATE OR REPLACE FUNCTION siswa_kelas_insert() RETURNS TRIGGER AS $siswa_kelas_insert$ BEGIN " +
-		"INSERT INTO score_siswa (siswa_kelas_id, score, created_at, updated_at) VALUES (NEW.id, 50, NOW(), NOW())" +
-		"; RETURN NEW; END; $siswa_kelas_insert$ LANGUAGE plpgsql;")
+	//db.Exec("CREATE OR REPLACE FUNCTION siswa_kelas_insert() RETURNS TRIGGER AS $siswa_kelas_insert$ BEGIN " +
+	//	"INSERT INTO poin_siswa (siswa_kelas_id, poin, created_at, updated_at) VALUES (NEW.id, 200, NOW(), NOW())" +
+	//	"; RETURN NEW; END; $siswa_kelas_insert$ LANGUAGE plpgsql;")
 
 	// Create the trigger
-	db.Exec("CREATE OR REPLACE TRIGGER siswa_kelas_insert_trigger AFTER INSERT ON siswa_kelas FOR EACH ROW EXECUTE FUNCTION siswa_kelas_insert();")
+	//db.Exec("CREATE OR REPLACE TRIGGER siswa_kelas_insert_trigger AFTER INSERT ON siswa_kelas FOR EACH ROW EXECUTE FUNCTION siswa_kelas_insert();")
 
 	return nil
 }

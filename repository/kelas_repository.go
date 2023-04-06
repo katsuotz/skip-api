@@ -15,6 +15,7 @@ type KelasRepository interface {
 	UpdateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	DeleteKelas(ctx context.Context, kelasID int) error
 	AddSiswaToKelas(ctx context.Context, kelasID int, siswaIDs []int) error
+	SiswaNaikKelas(ctx context.Context, kelasID int, siswaKelasIDs []int) error
 	RemoveSiswaFromKelas(ctx context.Context, kelasID int, siswaIDs []int) error
 }
 
@@ -73,19 +74,46 @@ func (r *kelasRepository) UpdateKelas(ctx context.Context, kelas entity.Kelas) (
 
 func (r *kelasRepository) DeleteKelas(ctx context.Context, kelasID int) error {
 	err := r.db.Where("id = ?", kelasID).Delete(&entity.Kelas{}).Error
+
+	if err == nil {
+		err = r.db.Where("kelas_id = ?", kelasID).Delete(&entity.SiswaKelas{}).Error
+	}
+
 	return err
 }
 
 func (r *kelasRepository) AddSiswaToKelas(ctx context.Context, kelasID int, siswaIDs []int) error {
+	tx := r.db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
 	var siswaKelasInsert []entity.SiswaKelas
 
 	var addedSiswaIDs []int
+	var oldSiswa []int
 
-	r.db.
+	// to get added siswa to class
+	tx.
 		Model(&entity.SiswaKelas{}).
 		Where("kelas_id = ?", kelasID).
 		Where("siswa_id in ?", siswaIDs).
 		Pluck("siswa_id", &addedSiswaIDs)
+
+	// to get old siswa
+	tx.
+		Model(&entity.SiswaKelas{}).
+		Where("siswa_id in ?", siswaIDs).
+		Pluck("siswa_id", &oldSiswa)
+
+	addedSiswaIDs = append(addedSiswaIDs, oldSiswa...)
 
 	for _, siswaID := range siswaIDs {
 		if !helper.IsInArray(addedSiswaIDs, siswaID) {
@@ -100,8 +128,87 @@ func (r *kelasRepository) AddSiswaToKelas(ctx context.Context, kelasID int, sisw
 		return nil
 	}
 
-	err := r.db.Create(&siswaKelasInsert).Error
-	return err
+	err := tx.Create(&siswaKelasInsert).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	var poinSiswa []entity.PoinSiswa
+
+	for _, siswaKelas := range siswaKelasInsert {
+		poinSiswa = append(poinSiswa, entity.PoinSiswa{
+			SiswaKelasID: siswaKelas.ID,
+			Poin:         200,
+		})
+	}
+
+	err = tx.Create(&poinSiswa).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+func (r *kelasRepository) SiswaNaikKelas(ctx context.Context, kelasID int, siswaKelasIDs []int) error {
+	tx := r.db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	var siswaKelasInsert []entity.SiswaKelas
+
+	var oldSiswa []dto.SiswaKelasPoin
+
+	// get old poin of siswa
+	tx.Model(&entity.SiswaKelas{}).
+		Select("siswa_kelas_id, poin, siswa_id, kelas_id").
+		Where("siswa_kelas.id in ?", siswaKelasIDs).
+		Joins("join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id").
+		Find(&oldSiswa)
+
+	for _, siswa := range oldSiswa {
+		siswaKelasInsert = append(siswaKelasInsert, entity.SiswaKelas{
+			KelasID: kelasID,
+			SiswaID: siswa.SiswaID,
+		})
+	}
+
+	if len(siswaKelasInsert) == 0 {
+		return nil
+	}
+
+	err := tx.Create(&siswaKelasInsert).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	var poinSiswa []entity.PoinSiswa
+
+	for i, siswaKelas := range siswaKelasInsert {
+		poinSiswa = append(poinSiswa, entity.PoinSiswa{
+			SiswaKelasID: siswaKelas.ID,
+			Poin:         oldSiswa[i].Poin,
+		})
+	}
+
+	err = tx.Create(&poinSiswa).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (r *kelasRepository) RemoveSiswaFromKelas(ctx context.Context, kelasID int, siswaIDs []int) error {

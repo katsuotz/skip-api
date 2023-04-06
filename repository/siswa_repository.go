@@ -9,7 +9,7 @@ import (
 )
 
 type SiswaRepository interface {
-	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID int) dto.SiswaPagination
+	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string) dto.SiswaPagination
 	CreateSiswa(ctx context.Context, siswa dto.SiswaRequest) error
 	UpdateSiswa(ctx context.Context, siswa dto.SiswaRequest, siswaID int) error
 	DeleteSiswa(ctx context.Context, siswaID int) error
@@ -23,7 +23,7 @@ func NewSiswaRepository(db *gorm.DB) SiswaRepository {
 	return &siswaRepository{db: db}
 }
 
-func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID int) dto.SiswaPagination {
+func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string) dto.SiswaPagination {
 	result := dto.SiswaPagination{}
 	siswa := entity.Siswa{}
 	temp := r.db.Model(&siswa)
@@ -32,16 +32,27 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 		temp.Where("nama ilike ?", search)
 	}
 
-	temp.Select("siswa.id as id, siswa.user_id as user_id, nis, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
+	selectQuery := "siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, nama, jenis_kelamin, tanggal_lahir, tempat_lahir"
+
 	temp.Joins("join users on users.id = siswa.user_id")
 	temp.Joins("join profiles on profiles.user_id = users.id")
 
-	if kelasID != 0 {
-		temp.Joins("join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
-		temp.Where("siswa_kelas.kelas_id = ?", kelasID)
-		temp.Where("siswa_kelas.deleted_at is NULL")
+	if kelasID != "" {
+		temp.Joins("left join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
+
+		if kelasID != "0" {
+			temp.Where("siswa_kelas.deleted_at is NULL")
+			temp.Where("siswa_kelas.kelas_id = ?", kelasID)
+			temp.Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+			selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
+		} else {
+			temp.Preload("SiswaKelas")
+			//temp.Where(temp.Where("siswa_kelas.deleted_at is NOT NULL").Or("siswa_kelas.id is NULL"))
+			temp.Group("siswa_kelas.siswa_id, siswa.id, profiles.id")
+		}
 	}
 
+	temp.Select(selectQuery)
 	temp.Order("nama asc")
 	temp.Offset(perPage * (page - 1)).Limit(perPage)
 	temp.Find(&result.Data)
@@ -178,5 +189,10 @@ func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest,
 
 func (r *siswaRepository) DeleteSiswa(ctx context.Context, siswaID int) error {
 	err := r.db.Where("id = ?", siswaID).Delete(&entity.Siswa{}).Error
+
+	if err == nil {
+		err = r.db.Where("siswa_id = ?", siswaID).Delete(&entity.SiswaKelas{}).Error
+	}
+
 	return err
 }
