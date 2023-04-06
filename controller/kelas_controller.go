@@ -12,6 +12,7 @@ import (
 
 type KelasController interface {
 	GetKelas(ctx *gin.Context)
+	GetKelasByID(ctx *gin.Context)
 	CreateKelas(ctx *gin.Context)
 	UpdateKelas(ctx *gin.Context)
 	DeleteKelas(ctx *gin.Context)
@@ -40,6 +41,28 @@ func (c *kelasController) GetKelas(ctx *gin.Context) {
 	}
 
 	kelas := c.KelasRepository.GetKelas(ctx, jurusanID, tahunAjarID)
+	response := helper.BuildSuccessResponse("", kelas)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
+func (c *kelasController) GetKelasByID(ctx *gin.Context) {
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
+
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	kelas := c.KelasRepository.GetKelasByID(ctx, kelasID)
+
+	if kelas.ID == 0 {
+		response := helper.BuildErrorResponse("Not Found", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
+	}
+
 	response := helper.BuildSuccessResponse("", kelas)
 	ctx.JSON(http.StatusOK, response)
 	return

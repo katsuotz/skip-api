@@ -39,6 +39,7 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	if kelasID != 0 {
 		temp.Joins("join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
 		temp.Where("siswa_kelas.kelas_id = ?", kelasID)
+		temp.Where("siswa_kelas.deleted_at is NULL")
 	}
 
 	temp.Order("nama asc")

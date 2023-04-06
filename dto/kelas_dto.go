@@ -14,6 +14,7 @@ type SiswaKelasRequest struct {
 }
 
 type KelasResponse struct {
+	ID int `json:"id"`
 	entity.Kelas
 	entity.Profile
 	entity.Guru

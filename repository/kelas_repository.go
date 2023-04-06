@@ -10,6 +10,7 @@ import (
 
 type KelasRepository interface {
 	GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []dto.KelasResponse
+	GetKelasByID(ctx context.Context, kelasID int) dto.KelasResponse
 	CreateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	UpdateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	DeleteKelas(ctx context.Context, kelasID int) error
@@ -41,8 +42,22 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 	temp.Joins("join guru on guru.id = kelas.guru_id")
 	temp.Joins("join users on users.id = guru.user_id")
 	temp.Joins("join profiles on profiles.user_id = users.id")
+	temp.Order("nama_kelas asc")
 	temp.Find(&kelas)
 
+	return kelas
+}
+
+func (r *kelasRepository) GetKelasByID(ctx context.Context, kelasID int) dto.KelasResponse {
+	var kelas dto.KelasResponse
+	r.db.Model(&entity.Kelas{}).
+		Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, guru_id, nip, tipe_guru, nama").
+		Where("kelas.id = ?", kelasID).
+		Joins("join guru on guru.id = kelas.guru_id").
+		Joins("join users on users.id = guru.user_id").
+		Joins("join profiles on profiles.user_id = users.id").
+		Order("nama_kelas asc").
+		First(&kelas)
 	return kelas
 }
 
