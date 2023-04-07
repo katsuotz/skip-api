@@ -85,7 +85,7 @@ func (c *guruController) UpdateGuru(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Guru created successfully", nil)
+	response := helper.BuildSuccessResponse("Guru updated successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
