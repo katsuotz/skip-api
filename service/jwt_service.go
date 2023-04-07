@@ -135,9 +135,11 @@ func (s *jwtService) IsAdmin(ctx *gin.Context) {
 }
 
 func (s *jwtService) IsGuru(ctx *gin.Context) {
-	role := ctx.MustGet("role")
+	roles := []string{"guru", "staff-ict", "guru-bk", "tata-usaha"}
+
+	role := ctx.MustGet("role").(string)
 	guruID := int(ctx.MustGet("guru_id").(float64))
-	if role == "guru" && guruID != 0 {
+	if strings.Contains(strings.Join(roles, ","), role) && guruID != 0 {
 		ctx.Next()
 		return
 	}
