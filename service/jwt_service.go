@@ -149,3 +149,16 @@ func (s *jwtService) IsGuru(ctx *gin.Context) {
 	})
 	return
 }
+
+func (s *jwtService) IsRole(ctx *gin.Context, roles []string) {
+	role := ctx.MustGet("role").(string)
+	if strings.Contains(strings.Join(roles, ","), role) {
+		ctx.Next()
+		return
+	}
+
+	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"error": "Unauthorized",
+	})
+	return
+}

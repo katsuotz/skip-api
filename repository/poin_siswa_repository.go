@@ -5,16 +5,16 @@ import (
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gorm.io/gorm"
-	"sort"
 )
 
 type PoinSiswaRepository interface {
 	GetPoinSiswa(ctx context.Context, siswaKelasID int) dto.PoinSiswaResponse
-	GetPoinSiswaLog(ctx context.Context, page int, perPage int, siswaKelasID int) dto.PoinLogPagination
-	GetPoinLogSiswaByKelas(ctx context.Context, nis string) []dto.PoinLogSiswaByKelas
+	GetPoinKelas(ctx context.Context, kelasID int) dto.PoinKelasResponse
+	GetPoinJurusan(ctx context.Context, jurusanID int, tahunAjarID int) dto.PoinJurusanResponse
 	AddPoinSiswa(ctx context.Context, req dto.PoinSiswaRequest) error
 	UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error
 	DeletePoinSiswa(ctx context.Context, poinLogID int) error
+	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string) dto.PoinSiswaPagination
 }
 
 type poinSiswaRepository struct {
@@ -27,8 +27,8 @@ func NewPoinSiswaRepository(db *gorm.DB) PoinSiswaRepository {
 
 func (r *poinSiswaRepository) GetPoinSiswa(ctx context.Context, siswaKelasID int) dto.PoinSiswaResponse {
 	result := dto.PoinSiswaResponse{}
-	poinLog := entity.PoinSiswa{}
-	temp := r.db.Model(&poinLog)
+	poinSiswa := entity.PoinSiswa{}
+	temp := r.db.Model(&poinSiswa)
 
 	temp.Select("nis, nama, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at")
 	temp.Where("siswa_kelas.id = ?", siswaKelasID)
@@ -42,77 +42,36 @@ func (r *poinSiswaRepository) GetPoinSiswa(ctx context.Context, siswaKelasID int
 	return result
 }
 
-func (r *poinSiswaRepository) GetPoinSiswaLog(ctx context.Context, page int, perPage int, siswaKelasID int) dto.PoinLogPagination {
-	result := dto.PoinLogPagination{}
-	poinLog := entity.PoinLog{}
-	temp := r.db.Model(&poinLog)
+func (r *poinSiswaRepository) GetPoinKelas(ctx context.Context, kelasID int) dto.PoinKelasResponse {
+	result := dto.PoinKelasResponse{}
+	kelas := entity.Kelas{}
+	temp := r.db.Model(&kelas)
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at")
-	temp.Where("siswa_kelas.id = ?", siswaKelasID)
-	temp.Joins("join guru on guru.id = poin_log.guru_id")
-	temp.Joins("join users on users.id = guru.user_id")
-	temp.Joins("join profiles on profiles.user_id = users.id")
-	temp.Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id")
-	temp.Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id")
-	//temp.Joins("join siswa on siswa.id = siswa_kelas.siswa_id")
-	temp.Order("poin_log.created_at desc")
-	temp.Offset(perPage * (page - 1)).Limit(perPage)
-	temp.Find(&result.Data)
-
-	var totalItem int64
-	temp.Offset(-1).Limit(-1).Count(&totalItem)
-	result.Pagination.TotalItem = totalItem
-	result.Pagination.Page = page
-	totalPage := totalItem / int64(perPage)
-	if totalItem%int64(perPage) > 0 {
-		totalPage++
-	}
-	result.Pagination.TotalPage = totalPage
-	result.Pagination.PerPage = perPage
+	temp.Select("kelas.id, tahun_ajar.id as tahun_ajar_id, nama_kelas, tahun_ajar.tahun_ajar, avg(poin) as poin")
+	temp.Where("kelas.id = ?", kelasID)
+	temp.Joins("join siswa_kelas on siswa_kelas.kelas_id = kelas.id")
+	temp.Joins("join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+	temp.Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id")
+	temp.Group("kelas.id, tahun_ajar.id")
+	temp.First(&result)
 
 	return result
 }
 
-func (r *poinSiswaRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis string) []dto.PoinLogSiswaByKelas {
-	var result []dto.PoinLogSiswaByKelas
+func (r *poinSiswaRepository) GetPoinJurusan(ctx context.Context, jurusanID int, tahunAjarID int) dto.PoinJurusanResponse {
+	result := dto.PoinJurusanResponse{}
+	jurusan := entity.Jurusan{}
+	temp := r.db.Model(&jurusan)
 
-	var siswaKelas []entity.SiswaKelas
-	r.db.Model(&siswaKelas).
-		Where("siswa.nis = ?", nis).
-		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
-		Find(&siswaKelas)
-
-	for _, siswa := range siswaKelas {
-		data := dto.PoinLogSiswaByKelas{}
-
-		kelas := entity.Kelas{}
-
-		r.db.Model(&kelas).
-			Select("kelas.*, tahun_ajar.tahun_ajar").
-			Where("kelas.id = ?", siswa.KelasID).
-			Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id").
-			First(&data.Kelas)
-
-		poinLog := entity.PoinLog{}
-
-		r.db.Model(&poinLog).
-			Select("poin_log.id as id, title, description, poin_log.poin, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
-			Where("siswa_kelas.id = ?", siswa.ID).
-			Joins("join guru on guru.id = poin_log.guru_id").
-			Joins("join users on users.id = guru.user_id").
-			Joins("join profiles on profiles.user_id = users.id").
-			Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
-			Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
-			Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
-			Order("poin_log.created_at desc").
-			Find(&data.Data)
-
-		result = append(result, data)
-	}
-
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Kelas.TahunAjar > result[j].Kelas.TahunAjar
-	})
+	temp.Select("jurusan.id, tahun_ajar.id as tahun_ajar_id, nama_jurusan, tahun_ajar.tahun_ajar, avg(poin) as poin")
+	temp.Where("kelas.jurusan_id = ?", jurusanID)
+	temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	temp.Joins("join kelas on kelas.jurusan_id = jurusan.id")
+	temp.Joins("join siswa_kelas on siswa_kelas.kelas_id = kelas.id")
+	temp.Joins("join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+	temp.Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id")
+	temp.Group("jurusan.id, nama_jurusan, tahun_ajar.id")
+	temp.First(&result)
 
 	return result
 }
@@ -222,4 +181,41 @@ func (r *poinSiswaRepository) DeletePoinSiswa(ctx context.Context, poinLogID int
 		return err
 	}
 	return tx.Commit().Error
+}
+
+func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string) dto.PoinSiswaPagination {
+	result := dto.PoinSiswaPagination{}
+	poinSiswa := entity.PoinSiswa{}
+	temp := r.db.Model(&poinSiswa)
+	if search != "" {
+		search = "%" + search + "%"
+		temp.Where("nama ilike ? or nis ilike ?", search, search)
+	}
+
+	if tahunAjarID != "" {
+		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	temp.Select("nis, nama, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at").
+		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
+		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
+		Joins("join users on users.id = siswa.user_id").
+		Joins("join profiles on profiles.user_id = users.id").
+		Joins("join kelas on kelas.id = siswa_kelas.kelas_id").
+		Order(orderBy + " " + order)
+
+	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
+
+	var totalItem int64
+	temp.Offset(-1).Limit(-1).Count(&totalItem)
+	result.Pagination.TotalItem = totalItem
+	result.Pagination.Page = page
+	totalPage := totalItem / int64(perPage)
+	if totalItem%int64(perPage) > 0 {
+		totalPage++
+	}
+	result.Pagination.TotalPage = totalPage
+	result.Pagination.PerPage = perPage
+
+	return result
 }

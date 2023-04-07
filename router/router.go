@@ -18,6 +18,7 @@ type Router struct {
 	DataPoinController  controller.DataPoinController
 	PoinSiswaController controller.PoinSiswaController
 	SettingController   controller.SettingController
+	InfoController      controller.InfoController
 	JWTService          service.JWTService
 }
 
@@ -32,6 +33,7 @@ func NewRouter(server *gin.Engine,
 	dataPoinController controller.DataPoinController,
 	poinSiswaController controller.PoinSiswaController,
 	settingController controller.SettingController,
+	infoController controller.InfoController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -46,6 +48,7 @@ func NewRouter(server *gin.Engine,
 		dataPoinController,
 		poinSiswaController,
 		settingController,
+		infoController,
 		jwtService,
 	}
 }
@@ -128,9 +131,15 @@ func (r *Router) Init() {
 			dataPoin.DELETE(":data_poin_id", r.DataPoinController.DeleteDataPoin)
 		}
 
-		poinSiswaAdmin := loggedPath.Group("poin", r.JWTService.IsAdmin)
+		poinSiswaAdmin := loggedPath.Group("poin",
+			func(context *gin.Context) {
+				r.JWTService.IsAdmin(context)
+				return
+			})
 		{
 			poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
+			poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
+			poinSiswaAdmin.GET("jurusan/:jurusan_id/:tahun_ajar_id", r.PoinSiswaController.GetPoinJurusan)
 			poinSiswaAdmin.GET("log/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswaLog)
 		}
 
@@ -147,6 +156,12 @@ func (r *Router) Init() {
 			setting.POST("", r.SettingController.CreateSetting)
 			setting.PATCH(":setting_id", r.SettingController.UpdateSetting)
 			setting.DELETE(":setting_id", r.SettingController.DeleteSetting)
+		}
+
+		info := loggedPath.Group("info", r.JWTService.IsAdmin)
+		{
+			info.GET("poin/count", r.InfoController.CountPoin)
+			info.GET("poin/list", r.InfoController.ListPoin)
 		}
 	}
 }

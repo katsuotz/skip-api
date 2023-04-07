@@ -23,26 +23,19 @@ type PoinSiswaResponse struct {
 	entity.Base
 }
 
-type PoinLogResponse struct {
-	ID          int     `json:"id"`
+type PoinKelasResponse struct {
+	NamaKelas string  `json:"nama_kelas"`
+	TahunAjar string  `json:"tahun_ajar"`
+	Poin      float64 `json:"poin"`
+}
+
+type PoinJurusanResponse struct {
+	NamaJurusan string  `json:"nama_jurusan"`
+	TahunAjar   string  `json:"tahun_ajar"`
 	Poin        float64 `json:"poin"`
-	PoinBefore  float64 `json:"poin_before"`
-	PoinAfter   float64 `json:"poin_after"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Type        string  `json:"type"`
-	GuruID      int     `json:"guru_id"`
-	Nip         string  `json:"nip"`
-	NamaGuru    string  `json:"nama_guru"`
-	entity.Base
 }
 
-type PoinLogPagination struct {
-	Data       []PoinLogResponse `json:"data"`
-	Pagination Pagination        `json:"pagination"`
-}
-
-type PoinLogSiswaByKelas struct {
-	Kelas entity.Kelas      `json:"kelas"`
-	Data  []PoinLogResponse `json:"data"`
+type PoinSiswaPagination struct {
+	Data       []PoinSiswaResponse `json:"data"`
+	Pagination Pagination          `json:"pagination"`
 }

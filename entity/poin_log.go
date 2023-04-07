@@ -7,7 +7,7 @@ type PoinLog struct {
 	Poin        float64    `json:"poin"`
 	PoinBefore  float64    `json:"poin_before"`
 	PoinAfter   float64    `json:"poin_after"`
-	Type        string     `gorm:"type:varchar(20)" json:"type"`
+	Type        string     `gorm:"index;type:varchar(20)" json:"type"`
 	GuruID      int        `gorm:"index" json:"guru_id"`
 	Guru        *Guru      `gorm:"foreignKey:guru_id" json:"guru,omitempty"`
 	PoinSiswaID int        `gorm:"index" json:"poin_siswa_id"`

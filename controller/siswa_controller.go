@@ -18,17 +18,17 @@ type SiswaController interface {
 }
 
 type siswaController struct {
-	SiswaRepository     repository.SiswaRepository
-	PoinSiswaRepository repository.PoinSiswaRepository
+	SiswaRepository   repository.SiswaRepository
+	PoinLogRepository repository.PoinLogRepository
 }
 
 func NewSiswaController(
 	siswaRepository repository.SiswaRepository,
-	poinSiswaRepository repository.PoinSiswaRepository,
+	poinLogRepository repository.PoinLogRepository,
 ) SiswaController {
 	return &siswaController{
 		siswaRepository,
-		poinSiswaRepository,
+		poinLogRepository,
 	}
 }
 
@@ -58,7 +58,7 @@ func (c *siswaController) GetSiswaDetailByNIS(ctx *gin.Context) {
 	result := dto.SiswaDetailLog{}
 
 	result.Siswa = c.SiswaRepository.GetSiswaByNIS(ctx, nis)
-	result.Log = c.PoinSiswaRepository.GetPoinLogSiswaByKelas(ctx, nis)
+	result.Log = c.PoinLogRepository.GetPoinLogSiswaByKelas(ctx, nis)
 
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)

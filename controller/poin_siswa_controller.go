@@ -12,6 +12,8 @@ import (
 
 type PoinSiswaController interface {
 	GetPoinSiswa(ctx *gin.Context)
+	GetPoinKelas(ctx *gin.Context)
+	GetPoinJurusan(ctx *gin.Context)
 	GetPoinSiswaLog(ctx *gin.Context)
 	AddPoinSiswa(ctx *gin.Context)
 	UpdatePoinSiswa(ctx *gin.Context)
@@ -20,11 +22,16 @@ type PoinSiswaController interface {
 
 type poinSiswaController struct {
 	PoinSiswaRepository repository.PoinSiswaRepository
+	PoinLogRepository   repository.PoinLogRepository
 }
 
-func NewPoinSiswaController(poinSiswaRepository repository.PoinSiswaRepository) PoinSiswaController {
+func NewPoinSiswaController(
+	poinSiswaRepository repository.PoinSiswaRepository,
+	poinLogRepository repository.PoinLogRepository,
+) PoinSiswaController {
 	return &poinSiswaController{
 		poinSiswaRepository,
+		poinLogRepository,
 	}
 }
 
@@ -42,6 +49,41 @@ func (c *poinSiswaController) GetPoinSiswa(ctx *gin.Context) {
 	return
 }
 
+func (c *poinSiswaController) GetPoinKelas(ctx *gin.Context) {
+	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
+	if err != nil || kelasID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	poinSiswa := c.PoinSiswaRepository.GetPoinKelas(ctx, kelasID)
+	response := helper.BuildSuccessResponse("", poinSiswa)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
+func (c *poinSiswaController) GetPoinJurusan(ctx *gin.Context) {
+	jurusanID, err := strconv.Atoi(ctx.Param("jurusan_id"))
+	if err != nil || jurusanID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
+	if err != nil || tahunAjarID == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	poinSiswa := c.PoinSiswaRepository.GetPoinJurusan(ctx, jurusanID, tahunAjarID)
+	response := helper.BuildSuccessResponse("", poinSiswa)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
 func (c *poinSiswaController) GetPoinSiswaLog(ctx *gin.Context) {
 	page := ctx.DefaultQuery("page", "1")
 	perPage := ctx.DefaultQuery("per_page", "10")
@@ -54,7 +96,7 @@ func (c *poinSiswaController) GetPoinSiswaLog(ctx *gin.Context) {
 		return
 	}
 
-	poinSiswa := c.PoinSiswaRepository.GetPoinSiswaLog(ctx, pageInt, perPageInt, siswaKelasID)
+	poinSiswa := c.PoinLogRepository.GetPoinSiswaLog(ctx, pageInt, perPageInt, siswaKelasID)
 	response := helper.BuildSuccessResponse("", poinSiswa)
 	ctx.JSON(http.StatusOK, response)
 	return
