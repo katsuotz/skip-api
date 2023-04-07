@@ -52,11 +52,12 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 func (r *kelasRepository) GetKelasByID(ctx context.Context, kelasID int) dto.KelasResponse {
 	var kelas dto.KelasResponse
 	r.db.Model(&entity.Kelas{}).
-		Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, guru_id, nip, tipe_guru, nama").
+		Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, guru_id, nip, tipe_guru, nama").
 		Where("kelas.id = ?", kelasID).
 		Joins("join guru on guru.id = kelas.guru_id").
 		Joins("join users on users.id = guru.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
+		Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id").
 		Order("nama_kelas asc").
 		First(&kelas)
 	return kelas
