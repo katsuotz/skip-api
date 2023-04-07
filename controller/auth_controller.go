@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/katsuotz/skip-api/dto"
+	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gitlab.com/katsuotz/skip-api/repository"
 	"gitlab.com/katsuotz/skip-api/service"
@@ -41,12 +42,21 @@ func (c *authController) Login(ctx *gin.Context) {
 	user := c.UserRepository.FindByUsername(ctx, loginReq.Username)
 	match := helper.CheckPasswordHash(loginReq.Password, user.Password)
 	if !match || user.ID == 0 {
+		if user.ID != 0 {
+			log := entity.LoginLog{
+				UserID: user.ID,
+				Action: "Failed login attempt",
+			}
+			go c.UserRepository.LoginLog(ctx, log)
+		}
 		response := helper.BuildErrorResponse("Wrong username or password", nil, nil)
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
 	}
 	token := c.JWTService.GenerateToken(ctx, user)
 	if token != "" {
+		//go c.UserRepository.SuccessfulLoginLog(ctx, user.ID)
+
 		loginRes := dto.LoginResponse{}
 		loginRes.User = user
 		loginRes.Token = token

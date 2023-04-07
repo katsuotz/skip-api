@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"gitlab.com/katsuotz/skip-api/entity"
+	"gitlab.com/katsuotz/skip-api/helper"
 	"gorm.io/gorm"
 	"net/http"
 	"os"
@@ -43,7 +44,7 @@ func (s *jwtService) GenerateToken(ctx context.Context, user entity.User) string
 		"role":    user.Role,
 	}
 
-	if user.Role == "guru" {
+	if helper.IsGuru(user.Role) {
 		var guru entity.Guru
 		s.db.Where("user_id = ?", user.ID).First(&guru)
 		jwtData["guru_id"] = guru.ID
@@ -135,11 +136,9 @@ func (s *jwtService) IsAdmin(ctx *gin.Context) {
 }
 
 func (s *jwtService) IsGuru(ctx *gin.Context) {
-	roles := []string{"guru", "staff-ict", "guru-bk", "tata-usaha"}
-
 	role := ctx.MustGet("role").(string)
 	guruID := int(ctx.MustGet("guru_id").(float64))
-	if strings.Contains(strings.Join(roles, ","), role) && guruID != 0 {
+	if helper.IsGuru(role) && guruID != 0 {
 		ctx.Next()
 		return
 	}

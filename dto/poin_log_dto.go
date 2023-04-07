@@ -25,3 +25,23 @@ type PoinLogSiswaByKelas struct {
 	Kelas entity.Kelas      `json:"kelas"`
 	Data  []PoinLogResponse `json:"data"`
 }
+
+type PoinLogCountResponse struct {
+	Nama  string `json:"nama"`
+	Nis   string `json:"nis"`
+	Type  string `json:"type"`
+	Total *int   `json:"total,omitempty"`
+	entity.Base
+}
+
+type PoinLogCountPagination struct {
+	Data       []PoinLogCountResponse `json:"data"`
+	Pagination Pagination             `json:"pagination"`
+}
+
+type PoinLogCountGraphResponse struct {
+	Total *int `json:"total,omitempty"`
+	Month int  `json:"month"`
+	Year  int  `json:"year"`
+	entity.Base
+}

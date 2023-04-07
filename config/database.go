@@ -43,6 +43,7 @@ func SetupDatabaseConnection() *gorm.DB {
 		&entity.PoinSiswa{},
 		&entity.PoinLog{},
 		&entity.Setting{},
+		&entity.LoginLog{},
 	)
 	if err != nil {
 		fmt.Println("Automigrate error")

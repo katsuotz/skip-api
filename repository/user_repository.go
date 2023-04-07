@@ -2,12 +2,16 @@ package repository
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"gitlab.com/katsuotz/skip-api/entity"
+	"gitlab.com/katsuotz/skip-api/helper"
 	"gorm.io/gorm"
 )
 
 type UserRepository interface {
 	FindByUsername(ctx context.Context, email string) entity.User
+	LoginLog(ctx context.Context, log entity.LoginLog) error
+	SuccessfulLoginLog(ctx *gin.Context, userID int) error
 }
 
 type userRepository struct {
@@ -28,4 +32,22 @@ func (r *userRepository) FindByUsername(ctx context.Context, username string) en
 		}).
 		First(&user)
 	return user
+}
+
+func (r *userRepository) LoginLog(ctx context.Context, log entity.LoginLog) error {
+	err := r.db.Create(&log).Error
+	return err
+}
+
+func (r *userRepository) SuccessfulLoginLog(ctx *gin.Context, userID int) error {
+	location := helper.GetUserLocation(ctx)
+
+	log := entity.LoginLog{
+		UserID:    userID,
+		Action:    "Successful Login",
+		UserAgent: ctx.Request.UserAgent(),
+		Location:  location,
+	}
+
+	return r.LoginLog(ctx, log)
 }
