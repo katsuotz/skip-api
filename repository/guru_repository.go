@@ -32,12 +32,11 @@ func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, sea
 		temp.Where("nama ilike ?", search)
 	}
 
-	temp.Select("guru.id as id, guru.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
-	temp.Joins("join users on users.id = guru.user_id")
-	temp.Joins("join profiles on profiles.user_id = users.id")
-	temp.Order("nama asc")
-	temp.Offset(perPage * (page - 1)).Limit(perPage)
-	temp.Find(&result.Data)
+	temp.Select("guru.id as id, guru.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir").
+		Joins("join users on users.id = guru.user_id").
+		Joins("join profiles on profiles.user_id = users.id").
+		Order("nama asc")
+	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
 
 	var totalItem int64
 	temp.Offset(-1).Limit(-1).Count(&totalItem)

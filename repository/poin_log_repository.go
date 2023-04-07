@@ -32,17 +32,17 @@ func (r *poinLogRepository) GetPoinSiswaLog(ctx context.Context, page int, perPa
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at")
-	temp.Where("siswa_kelas.id = ?", siswaKelasID)
-	temp.Joins("join guru on guru.id = poin_log.guru_id")
-	temp.Joins("join users on users.id = guru.user_id")
-	temp.Joins("join profiles on profiles.user_id = users.id")
-	temp.Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id")
-	temp.Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id")
+	temp.Select("poin_log.id as id, title, description, poin_log.poin, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
+		Where("siswa_kelas.id = ?", siswaKelasID).
+		Joins("join guru on guru.id = poin_log.guru_id").
+		Joins("join users on users.id = guru.user_id").
+		Joins("join profiles on profiles.user_id = users.id").
+		Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
+		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
+		Order("poin_log.created_at desc")
 	//temp.Joins("join siswa on siswa.id = siswa_kelas.siswa_id")
-	temp.Order("poin_log.created_at desc")
-	temp.Offset(perPage * (page - 1)).Limit(perPage)
-	temp.Find(&result.Data)
+	temp.Offset(perPage * (page - 1)).Limit(perPage).
+		Find(&result.Data)
 
 	var totalItem int64
 	temp.Offset(-1).Limit(-1).Count(&totalItem)

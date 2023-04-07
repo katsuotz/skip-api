@@ -41,8 +41,7 @@ func (r *dataPoinRepository) GetDataPoin(ctx context.Context, page int, perPage 
 	}
 
 	temp.Order("title asc")
-	temp.Offset(perPage * (page - 1)).Limit(perPage)
-	temp.Find(&result.Data)
+	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
 
 	var totalItem int64
 	temp.Offset(-1).Limit(-1).Count(&totalItem)
