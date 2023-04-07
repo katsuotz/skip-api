@@ -8,9 +8,12 @@ import (
 	"gitlab.com/katsuotz/skip-api/repository"
 	"gitlab.com/katsuotz/skip-api/router"
 	"gitlab.com/katsuotz/skip-api/service"
+	"os"
 )
 
 func main() {
+	os.Setenv("TZ", "Asia/Jakarta")
+
 	database := config.SetupDatabaseConnection()
 	jwtService := service.NewJWTService(database)
 	userRepository := repository.NewUserRepository(database)
@@ -29,7 +32,7 @@ func main() {
 	jurusanController := controller.NewJurusanController(jurusanRepository)
 	tahunAjarController := controller.NewTahunAjarController(tahunAjarRepository)
 	kelasController := controller.NewKelasController(kelasRepository)
-	siswaController := controller.NewSiswaController(siswaRepository)
+	siswaController := controller.NewSiswaController(siswaRepository, poinSiswaRepository)
 	guruController := controller.NewGuruController(guruRepository)
 	dataPoinController := controller.NewDataPoinController(dataPoinRepository)
 	poinSiswaController := controller.NewPoinSiswaController(poinSiswaRepository)

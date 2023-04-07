@@ -26,10 +26,10 @@ func (r *dataPoinRepository) GetDataPoin(ctx context.Context, page int, perPage 
 	result := dto.DataPoinPagination{}
 	dataPoin := entity.DataPoin{}
 	temp := r.db.Model(&dataPoin)
+
 	if search != "" {
 		search = "%" + search + "%"
-		temp.Where("title ilike ?", search)
-		temp.Where("description ilike ?", search)
+		temp.Where("title ilike ? or description ilike ?", search, search)
 	}
 
 	if poinType != "" {

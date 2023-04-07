@@ -20,3 +20,8 @@ type SiswaPagination struct {
 	Data       []SiswaResponse `json:"data"`
 	Pagination Pagination      `json:"pagination"`
 }
+
+type SiswaDetailLog struct {
+	Siswa SiswaResponse         `json:"siswa"`
+	Log   []PoinLogSiswaByKelas `json:"log"`
+}

@@ -109,6 +109,7 @@ func (r *Router) Init() {
 		siswa := loggedPath.Group("siswa")
 		{
 			siswa.GET("", r.SiswaController.GetSiswa)
+			siswa.GET(":nis/log", r.SiswaController.GetSiswaDetailByNIS)
 
 			siswaData := siswa.Group("", r.JWTService.IsAdmin)
 			{
@@ -118,20 +119,26 @@ func (r *Router) Init() {
 			}
 		}
 
+		loggedPath.GET("data-poin", r.DataPoinController.GetDataPoin)
+
 		dataPoin := loggedPath.Group("data-poin", r.JWTService.IsAdmin)
 		{
-			dataPoin.GET("", r.DataPoinController.GetDataPoin)
 			dataPoin.POST("", r.DataPoinController.CreateDataPoin)
 			dataPoin.PATCH(":data_poin_id", r.DataPoinController.UpdateDataPoin)
 			dataPoin.DELETE(":data_poin_id", r.DataPoinController.DeleteDataPoin)
 		}
 
-		poinSiswa := loggedPath.Group("poin", r.JWTService.IsGuru)
+		poinSiswaAdmin := loggedPath.Group("poin", r.JWTService.IsAdmin)
 		{
-			//dataPoin.GET("", r.DataPoinController.GetDataPoin)
-			poinSiswa.POST("", r.PoinSiswaController.AddPoinSiswa)
-			poinSiswa.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
-			poinSiswa.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
+			poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
+			poinSiswaAdmin.GET("log/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswaLog)
+		}
+
+		poinSiswaGuru := loggedPath.Group("poin", r.JWTService.IsGuru)
+		{
+			poinSiswaGuru.POST("", r.PoinSiswaController.AddPoinSiswa)
+			poinSiswaGuru.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
+			poinSiswaGuru.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 		}
 
 		setting := loggedPath.Group("setting", r.JWTService.IsAdmin)

@@ -9,7 +9,8 @@ import (
 )
 
 type SiswaRepository interface {
-	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string) dto.SiswaPagination
+	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarActive string) dto.SiswaPagination
+	GetSiswaByNIS(ctx context.Context, nis string) dto.SiswaResponse
 	CreateSiswa(ctx context.Context, siswa dto.SiswaRequest) error
 	UpdateSiswa(ctx context.Context, siswa dto.SiswaRequest, siswaID int) error
 	DeleteSiswa(ctx context.Context, siswaID int) error
@@ -23,13 +24,13 @@ func NewSiswaRepository(db *gorm.DB) SiswaRepository {
 	return &siswaRepository{db: db}
 }
 
-func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string) dto.SiswaPagination {
+func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarActive string) dto.SiswaPagination {
 	result := dto.SiswaPagination{}
 	siswa := entity.Siswa{}
 	temp := r.db.Model(&siswa)
 	if search != "" {
 		search = "%" + search + "%"
-		temp.Where("nama ilike ?", search)
+		temp.Where(temp.Where("nama ilike ?", search).Or("nis ilike ?", search))
 	}
 
 	selectQuery := "siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, nama, jenis_kelamin, tanggal_lahir, tempat_lahir"
@@ -37,18 +38,35 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp.Joins("join users on users.id = siswa.user_id")
 	temp.Joins("join profiles on profiles.user_id = users.id")
 
-	if kelasID != "" {
-		temp.Joins("left join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
+	if tahunAjarActive == "true" {
+		activeTahunAjar := entity.TahunAjar{}
 
-		if kelasID != "0" {
-			temp.Where("siswa_kelas.deleted_at is NULL")
-			temp.Where("siswa_kelas.kelas_id = ?", kelasID)
-			temp.Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
-			selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
-		} else {
-			temp.Preload("SiswaKelas")
-			//temp.Where(temp.Where("siswa_kelas.deleted_at is NOT NULL").Or("siswa_kelas.id is NULL"))
-			temp.Group("siswa_kelas.siswa_id, siswa.id, profiles.id")
+		r.db.Where("is_active = ?", true).First(&activeTahunAjar)
+
+		if activeTahunAjar.ID == 0 {
+			return result
+		}
+
+		temp.Joins("right join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
+		temp.Joins("join kelas on kelas.id = siswa_kelas.kelas_id")
+		temp.Where("kelas.tahun_ajar_id = ?", activeTahunAjar.ID)
+
+		temp.Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+		selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
+	} else {
+		if kelasID != "" {
+			temp.Joins("left join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
+
+			if kelasID != "0" {
+				temp.Where("siswa_kelas.deleted_at is NULL")
+				temp.Where("siswa_kelas.kelas_id = ?", kelasID)
+				temp.Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+				selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
+			} else {
+				temp.Preload("SiswaKelas")
+				//temp.Where(temp.Where("siswa_kelas.deleted_at is NOT NULL").Or("siswa_kelas.id is NULL"))
+				temp.Group("siswa_kelas.siswa_id, siswa.id, profiles.id")
+			}
 		}
 	}
 
@@ -67,6 +85,20 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	}
 	result.Pagination.TotalPage = totalPage
 	result.Pagination.PerPage = perPage
+
+	return result
+}
+
+func (r *siswaRepository) GetSiswaByNIS(ctx context.Context, nis string) dto.SiswaResponse {
+	result := dto.SiswaResponse{}
+	siswa := entity.Siswa{}
+
+	temp := r.db.Model(&siswa)
+	temp.Select("siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, nama, jenis_kelamin, tanggal_lahir, tempat_lahir")
+	temp.Where("nis = ?", nis)
+	temp.Joins("join users on users.id = siswa.user_id")
+	temp.Joins("join profiles on profiles.user_id = users.id")
+	temp.First(&result)
 
 	return result
 }
