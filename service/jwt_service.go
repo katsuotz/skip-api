@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"gitlab.com/katsuotz/skip-api/entity"
+	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/helper"
 	"gorm.io/gorm"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 )
 
 type JWTService interface {
-	GenerateToken(ctx context.Context, user entity.User) string
+	GenerateToken(ctx context.Context, user dto.UserResponse) string
 	ValidateToken(token string) (*jwt.Token, error)
 	IsLoggedIn(ctx *gin.Context)
 	IsGuest(ctx *gin.Context)
@@ -38,22 +38,16 @@ func getSecretKey() string {
 	return os.Getenv("JWT_SECRET")
 }
 
-func (s *jwtService) GenerateToken(ctx context.Context, user entity.User) string {
+func (s *jwtService) GenerateToken(ctx context.Context, user dto.UserResponse) string {
 	jwtData := jwt.MapClaims{
 		"user_id": user.ID,
 		"role":    user.Role,
 	}
 
 	if helper.IsGuru(user.Role) {
-		var guru entity.Guru
-		s.db.Where("user_id = ?", user.ID).First(&guru)
-		jwtData["guru_id"] = guru.ID
-	}
-
-	if user.Role == "siswa" {
-		var siswa entity.Siswa
-		s.db.Where("user_id = ?", user.ID).First(&siswa)
-		jwtData["siswa_id"] = siswa.ID
+		jwtData["guru_id"] = user.GuruID
+	} else if user.Role == "siswa" {
+		jwtData["siswa_id"] = user.SiswaID
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtData)

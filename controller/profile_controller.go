@@ -59,6 +59,7 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 		JenisKelamin: req.JenisKelamin,
 		TempatLahir:  req.TempatLahir,
 		TanggalLahir: tanggalLahir,
+		Foto:         req.Foto,
 	}
 
 	_, err := c.ProfileRepository.UpdateProfile(ctx, newProfile)

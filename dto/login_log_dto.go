@@ -8,6 +8,7 @@ type LoginLogResponse struct {
 	Username string `json:"username"`
 	Nama     string `json:"nama"`
 	Role     string `json:"role"`
+	Foto     string `json:"foto"`
 	entity.LoginLog
 }
 

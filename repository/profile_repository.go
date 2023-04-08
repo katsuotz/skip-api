@@ -9,7 +9,7 @@ import (
 
 type ProfileRepository interface {
 	FindProfileByID(ctx context.Context, userID int) entity.Profile
-	FindProfileWithJoinByID(ctx context.Context, userID int) dto.ProfileResponse
+	FindProfileWithJoinByID(ctx context.Context, userID int) dto.UserResponse
 	UpdateProfile(ctx context.Context, profile entity.Profile) (entity.Profile, error)
 }
 
@@ -27,11 +27,11 @@ func (r *profileRepository) FindProfileByID(ctx context.Context, userID int) ent
 	return profile
 }
 
-func (r *profileRepository) FindProfileWithJoinByID(ctx context.Context, userID int) dto.ProfileResponse {
-	profile := dto.ProfileResponse{}
+func (r *profileRepository) FindProfileWithJoinByID(ctx context.Context, userID int) dto.UserResponse {
+	profile := dto.UserResponse{}
 	r.db.
 		Model(&entity.Profile{}).
-		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role").
+		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role, foto").
 		Where("profiles.user_id = ?", userID).
 		Joins("join users on users.id = profiles.user_id").
 		Joins("left join guru on guru.user_id = users.id").

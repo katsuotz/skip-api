@@ -57,6 +57,7 @@ func (c *authController) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
 	}
+
 	token := c.JWTService.GenerateToken(ctx, user)
 	go c.UserRepository.LoginLog(ctx, user.ID, "Successful Login")
 

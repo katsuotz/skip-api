@@ -146,7 +146,7 @@ func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, 
 		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.guru_id, nip, pg.nama as nama_guru, nis, ps.nama as nama, poin_log.created_at, poin_log.updated_at").
+	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.guru_id, nip, pg.nama as nama_guru, nis, ps.nama as nama, ps.foto as foto, poin_log.created_at, poin_log.updated_at").
 		Joins("join guru on guru.id = poin_log.guru_id").
 		Joins("join users ug on ug.id = guru.user_id").
 		Joins("join profiles pg on pg.user_id = ug.id").
