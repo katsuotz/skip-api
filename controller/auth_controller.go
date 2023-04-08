@@ -13,6 +13,7 @@ import (
 type AuthController interface {
 	Login(ctx *gin.Context)
 	GetLog(ctx *gin.Context)
+	UpdatePassword(ctx *gin.Context)
 	Tes(ctx *gin.Context)
 }
 
@@ -79,4 +80,46 @@ func (c *authController) GetLog(ctx *gin.Context) {
 	response := helper.BuildSuccessResponse("", guru)
 	ctx.JSON(http.StatusOK, response)
 	return
+}
+
+func (c *authController) UpdatePassword(ctx *gin.Context) {
+	req := dto.UpdatePasswordRequest{}
+	errDTO := ctx.ShouldBindJSON(&req)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	if req.Password != req.PasswordConfirmation {
+		response := helper.BuildErrorResponse("Password Confirmation is not correct", nil, nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	userID := int(ctx.MustGet("user_id").(float64))
+
+	user := c.UserRepository.FindByID(ctx, userID)
+	match := helper.CheckPasswordHash(req.OldPassword, user.Password)
+	if !match || user.ID == 0 {
+		go c.UserRepository.LoginLog(ctx, user.ID, "Change Password Attempt")
+
+		response := helper.BuildErrorResponse("Old Password is not match with Current Password", nil, nil)
+		ctx.JSON(http.StatusUnauthorized, response)
+		return
+	}
+
+	password, _ := helper.HashPassword(req.Password)
+
+	err := c.UserRepository.UpdatePassword(ctx, userID, password)
+
+	if err != nil {
+		response := helper.BuildErrorResponse("Internal Server Error", nil, nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	go c.UserRepository.LoginLog(ctx, user.ID, "Password Changed")
+	response := helper.BuildSuccessResponse("Password updated successfully", nil)
+	ctx.JSON(http.StatusOK, response)
 }

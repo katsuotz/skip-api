@@ -75,6 +75,7 @@ func (r *Router) Init() {
 	{
 		loggedPath.GET("me", r.ProfileController.GetMyProfile)
 		loggedPath.PATCH("profile", r.ProfileController.UpdateProfile)
+		loggedPath.PATCH("password", r.AuthController.UpdatePassword)
 
 		jurusan := loggedPath.Group("jurusan", r.JWTService.IsAdmin)
 		{

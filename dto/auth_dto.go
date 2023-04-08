@@ -24,3 +24,9 @@ type UserResponse struct {
 	entity.Siswa
 	entity.User
 }
+
+type UpdatePasswordRequest struct {
+	OldPassword          string `json:"old_password" binding:"required" form:"old_password"`
+	Password             string `json:"password" binding:"required" form:"password"`
+	PasswordConfirmation string `json:"password_confirmation" binding:"required" form:"password_confirmation"`
+}
