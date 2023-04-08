@@ -41,6 +41,7 @@ func main() {
 	poinLogController := controller.NewPoinLogController(poinLogRepository)
 	settingController := controller.NewSettingController(settingRepository)
 	infoController := controller.NewInfoController(poinLogRepository, poinSiswaRepository)
+	fileController := controller.NewFileController()
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -65,6 +66,7 @@ func main() {
 		poinLogController,
 		settingController,
 		infoController,
+		fileController,
 		jwtService,
 	)
 

@@ -20,6 +20,7 @@ type Router struct {
 	PoinLogController   controller.PoinLogController
 	SettingController   controller.SettingController
 	InfoController      controller.InfoController
+	FileController      controller.FileController
 	JWTService          service.JWTService
 }
 
@@ -36,6 +37,7 @@ func NewRouter(server *gin.Engine,
 	poinLogController controller.PoinLogController,
 	settingController controller.SettingController,
 	infoController controller.InfoController,
+	fileController controller.FileController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -52,11 +54,14 @@ func NewRouter(server *gin.Engine,
 		poinLogController,
 		settingController,
 		infoController,
+		fileController,
 		jwtService,
 	}
 }
 
 func (r *Router) Init() {
+	r.server.Static("/storage", "./storage")
+
 	basePath := r.server.Group("/api")
 
 	basePath.GET("", r.AuthController.Tes)
@@ -175,5 +180,7 @@ func (r *Router) Init() {
 			setting.PATCH(":setting_id", r.SettingController.UpdateSetting)
 			setting.DELETE(":setting_id", r.SettingController.DeleteSetting)
 		}
+
+		loggedPath.POST("upload", r.FileController.Upload)
 	}
 }
