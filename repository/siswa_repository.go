@@ -9,7 +9,7 @@ import (
 )
 
 type SiswaRepository interface {
-	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarActive string) dto.SiswaPagination
+	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarID string, jurusanID string, tahunAjarActive string) dto.SiswaPagination
 	GetSiswaByNIS(ctx context.Context, nis string) dto.SiswaResponse
 	CreateSiswa(ctx context.Context, siswa dto.SiswaRequest) error
 	UpdateSiswa(ctx context.Context, siswa dto.SiswaRequest, siswaID int) error
@@ -24,7 +24,7 @@ func NewSiswaRepository(db *gorm.DB) SiswaRepository {
 	return &siswaRepository{db: db}
 }
 
-func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarActive string) dto.SiswaPagination {
+func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarID string, jurusanID string, tahunAjarActive string) dto.SiswaPagination {
 	result := dto.SiswaPagination{}
 	siswa := entity.Siswa{}
 	temp := r.db.Model(&siswa)
@@ -54,18 +54,18 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 		selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
 	} else {
 		if kelasID != "" {
-			temp.Joins("left join siswa_kelas on siswa_kelas.siswa_id = siswa.id")
-
 			if kelasID != "0" {
-				temp.Where("siswa_kelas.deleted_at is NULL").
-					Where("siswa_kelas.kelas_id = ?", kelasID).
-					Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+				r.WhereSiswaKelas(temp, kelasID, tahunAjarID, jurusanID)
 				selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
 			} else {
-				temp.Preload("SiswaKelas").
+				temp.Joins("left join siswa_kelas on siswa_kelas.siswa_id = siswa.id").
+					Preload("SiswaKelas").
 					Group("siswa_kelas.siswa_id, siswa.id, profiles.id")
 				//temp.Where(temp.Where("siswa_kelas.deleted_at is NOT NULL").Or("siswa_kelas.id is NULL"))
 			}
+		} else if tahunAjarID != "" || jurusanID != "" {
+			r.WhereSiswaKelas(temp, kelasID, tahunAjarID, jurusanID)
+			selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
 		}
 	}
 
@@ -85,6 +85,24 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	result.Pagination.PerPage = perPage
 
 	return result
+}
+
+func (r *siswaRepository) WhereSiswaKelas(db *gorm.DB, kelasID string, tahunAjarID string, jurusanID string) {
+	db.Joins("left join siswa_kelas on siswa_kelas.siswa_id = siswa.id").
+		Joins("left join kelas on kelas.id = siswa_kelas.kelas_id")
+
+	db.Where("siswa_kelas.deleted_at is NULL").
+		Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+
+	if kelasID != "" {
+		db.Where("siswa_kelas.kelas_id = ?", kelasID)
+	}
+	if tahunAjarID != "" {
+		db.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+	if jurusanID != "" {
+		db.Where("kelas.jurusan_id = ?", jurusanID)
+	}
 }
 
 func (r *siswaRepository) GetSiswaByNIS(ctx context.Context, nis string) dto.SiswaResponse {

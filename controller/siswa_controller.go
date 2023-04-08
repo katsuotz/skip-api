@@ -36,12 +36,14 @@ func (c *siswaController) GetSiswa(ctx *gin.Context) {
 	page := ctx.DefaultQuery("page", "1")
 	perPage := ctx.DefaultQuery("per_page", "10")
 	kelasID := ctx.DefaultQuery("kelas_id", "")
+	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
+	jurusanID := ctx.DefaultQuery("jurusan_id", "")
 	search := ctx.DefaultQuery("search", "")
 	tahunAjarActive := ctx.DefaultQuery("tahun_ajar_active", "")
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 
-	siswa := c.SiswaRepository.GetSiswa(ctx, pageInt, perPageInt, search, kelasID, tahunAjarActive)
+	siswa := c.SiswaRepository.GetSiswa(ctx, pageInt, perPageInt, search, kelasID, tahunAjarID, jurusanID, tahunAjarActive)
 	response := helper.BuildSuccessResponse("", siswa)
 	ctx.JSON(http.StatusOK, response)
 	return
