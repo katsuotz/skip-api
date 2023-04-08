@@ -13,9 +13,9 @@ import (
 type PoinLogRepository interface {
 	GetPoinSiswaLog(ctx context.Context, page int, perPage int, siswaKelasID int) dto.PoinLogPagination
 	GetPoinLogSiswaByKelas(ctx context.Context, nis string) []dto.PoinLogSiswaByKelas
-	CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string) dto.CountResponse
+	CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse
 	GetPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string) dto.PoinLogPagination
-	GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string, poinType string) dto.PoinLogCountPagination
+	GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string) dto.PoinLogCountPagination
 	GetCountPoinLogPaginationByMonth(ctx context.Context, tahunAjarID string, poinType string) []dto.PoinLogCountGraphResponse
 }
 
@@ -102,7 +102,7 @@ func (r *poinLogRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis stri
 	return result
 }
 
-func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string) dto.CountResponse {
+func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse {
 	result := dto.CountResponse{}
 
 	temp := r.db.Model(&entity.PoinLog{}).
@@ -114,6 +114,10 @@ func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kela
 
 	if kelasID != "" {
 		temp.Where("kelas.id = ?", kelasID)
+	}
+
+	if tahunAjarID != "" {
+		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
 	}
 
 	if jurusanID != "" {
@@ -142,13 +146,16 @@ func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, 
 		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
+	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.guru_id, nip, pg.nama as nama_guru, nis, ps.nama as nama, poin_log.created_at, poin_log.updated_at").
 		Joins("join guru on guru.id = poin_log.guru_id").
-		Joins("join users on users.id = guru.user_id").
-		Joins("join profiles on profiles.user_id = users.id").
+		Joins("join users ug on ug.id = guru.user_id").
+		Joins("join profiles pg on pg.user_id = ug.id").
 		Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
 		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
 		Joins("join kelas on kelas.id = siswa_kelas.kelas_id").
+		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
+		Joins("join users us on us.id = siswa.user_id").
+		Joins("join profiles ps on ps.user_id = us.id").
 		Order("poin_log." + orderBy + " " + order)
 
 	temp.Offset(perPage * (page - 1)).Limit(perPage).
@@ -168,7 +175,7 @@ func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, 
 	return result
 }
 
-func (r *poinLogRepository) GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string, poinType string) dto.PoinLogCountPagination {
+func (r *poinLogRepository) GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string) dto.PoinLogCountPagination {
 	result := dto.PoinLogCountPagination{}
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
@@ -184,13 +191,29 @@ func (r *poinLogRepository) GetCountPoinLogPagination(ctx context.Context, page 
 	temp.
 		Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
 		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
-		Joins("join kelas on kelas.id = siswa_kelas.kelas_id").
-		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
-		Joins("join users on users.id = siswa.user_id").
-		Joins("join profiles on profiles.user_id = users.id").
-		Group("poin_log.poin_siswa_id, poin_log.type, profiles.nama, nis")
+		Joins("join kelas on kelas.id = siswa_kelas.kelas_id")
 
-	temp.Select("count(*) as total, nama, nis, type").
+	groupQuery := ""
+	selectQuery := "count(*) as total, type"
+
+	if groupBy == "siswa" {
+		groupQuery += "poin_log.poin_siswa_id, profiles.nama, nis"
+		selectQuery += ", nama, nis"
+		temp.
+			Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
+			Joins("join users on users.id = siswa.user_id").
+			Joins("join profiles on profiles.user_id = users.id")
+	} else if groupBy == "type" {
+		groupQuery += "poin_log.title"
+		selectQuery += ", poin_log.title"
+	}
+
+	groupQuery += ", poin_log.type"
+
+	temp.
+		Group(groupQuery)
+
+	temp.Select(selectQuery).
 		Order(orderBy + " " + order).Offset(perPage * (page - 1)).Limit(perPage).
 		Find(&result.Data)
 

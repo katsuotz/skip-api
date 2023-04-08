@@ -13,6 +13,8 @@ type PoinLogResponse struct {
 	GuruID      int     `json:"guru_id"`
 	Nip         string  `json:"nip"`
 	NamaGuru    string  `json:"nama_guru"`
+	Nama        *string `json:"nama,omitempty"`
+	Nis         *string `json:"nis,omitempty"`
 	entity.Base
 }
 
@@ -27,10 +29,11 @@ type PoinLogSiswaByKelas struct {
 }
 
 type PoinLogCountResponse struct {
-	Nama  string `json:"nama"`
-	Nis   string `json:"nis"`
-	Type  string `json:"type"`
-	Total *int   `json:"total,omitempty"`
+	Nama  *string `json:"nama,omitempty"`
+	Title *string `json:"title,omitempty"`
+	Nis   *string `json:"nis,omitempty"`
+	Type  string  `json:"type"`
+	Total *int    `json:"total,omitempty"`
 	entity.Base
 }
 

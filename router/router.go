@@ -17,6 +17,7 @@ type Router struct {
 	SiswaController     controller.SiswaController
 	DataPoinController  controller.DataPoinController
 	PoinSiswaController controller.PoinSiswaController
+	PoinLogController   controller.PoinLogController
 	SettingController   controller.SettingController
 	InfoController      controller.InfoController
 	JWTService          service.JWTService
@@ -32,6 +33,7 @@ func NewRouter(server *gin.Engine,
 	siswaController controller.SiswaController,
 	dataPoinController controller.DataPoinController,
 	poinSiswaController controller.PoinSiswaController,
+	poinLogController controller.PoinLogController,
 	settingController controller.SettingController,
 	infoController controller.InfoController,
 	jwtService service.JWTService,
@@ -47,6 +49,7 @@ func NewRouter(server *gin.Engine,
 		siswaController,
 		dataPoinController,
 		poinSiswaController,
+		poinLogController,
 		settingController,
 		infoController,
 		jwtService,
@@ -140,7 +143,6 @@ func (r *Router) Init() {
 			poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
 			poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
 			poinSiswaAdmin.GET("jurusan/:jurusan_id/:tahun_ajar_id", r.PoinSiswaController.GetPoinJurusan)
-			poinSiswaAdmin.GET("log/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswaLog)
 		}
 
 		poinSiswaGuru := loggedPath.Group("poin", r.JWTService.IsGuru)
@@ -150,21 +152,28 @@ func (r *Router) Init() {
 			poinSiswaGuru.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 		}
 
-		setting := loggedPath.Group("setting", r.JWTService.IsAdmin)
+		poinLog := loggedPath.Group("poin/log", r.JWTService.IsAdmin)
 		{
-			setting.GET("", r.SettingController.GetSetting)
-			setting.POST("", r.SettingController.CreateSetting)
-			setting.PATCH(":setting_id", r.SettingController.UpdateSetting)
-			setting.DELETE(":setting_id", r.SettingController.DeleteSetting)
+			poinLog.GET("", r.PoinLogController.GetPoinLog)
+			poinLog.GET(":siswa_kelas_id", r.PoinLogController.GetPoinSiswaLog)
 		}
 
 		info := loggedPath.Group("info", r.JWTService.IsAdmin)
 		{
 			info.GET("poin/count", r.InfoController.CountPoin)
 			info.GET("poin/list", r.InfoController.ListPoinSiswa)
-			info.GET("poin/list/log", r.InfoController.ListPoinLog)
 			info.GET("poin/list/count", r.InfoController.ListCountPoinLog)
 			info.GET("poin/graph/count", r.InfoController.GraphCountPoinLog)
+
+			info.GET("login", r.AuthController.GetLog)
+		}
+
+		setting := loggedPath.Group("setting", r.JWTService.IsAdmin)
+		{
+			setting.GET("", r.SettingController.GetSetting)
+			setting.POST("", r.SettingController.CreateSetting)
+			setting.PATCH(":setting_id", r.SettingController.UpdateSetting)
+			setting.DELETE(":setting_id", r.SettingController.DeleteSetting)
 		}
 	}
 }

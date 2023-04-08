@@ -26,9 +26,10 @@ func main() {
 	dataPoinRepository := repository.NewDataPoinRepository(database)
 	poinSiswaRepository := repository.NewPoinSiswaRepository(database)
 	poinLogRepository := repository.NewPoinLogRepository(database)
+	loginLogRepository := repository.NewLoginLogRepository(database)
 	settingRepository := repository.NewSettingRepository(database)
 
-	authController := controller.NewAuthController(userRepository, jwtService)
+	authController := controller.NewAuthController(userRepository, loginLogRepository, jwtService)
 	profileController := controller.NewProfileController(profileRepository)
 	jurusanController := controller.NewJurusanController(jurusanRepository)
 	tahunAjarController := controller.NewTahunAjarController(tahunAjarRepository)
@@ -37,6 +38,7 @@ func main() {
 	guruController := controller.NewGuruController(guruRepository)
 	dataPoinController := controller.NewDataPoinController(dataPoinRepository)
 	poinSiswaController := controller.NewPoinSiswaController(poinSiswaRepository, poinLogRepository)
+	poinLogController := controller.NewPoinLogController(poinLogRepository)
 	settingController := controller.NewSettingController(settingRepository)
 	infoController := controller.NewInfoController(poinLogRepository, poinSiswaRepository)
 
@@ -60,6 +62,7 @@ func main() {
 		siswaController,
 		dataPoinController,
 		poinSiswaController,
+		poinLogController,
 		settingController,
 		infoController,
 		jwtService,

@@ -35,8 +35,9 @@ func (c *infoController) CountPoin(ctx *gin.Context) {
 	poinType := ctx.DefaultQuery("type", "")
 	kelasID := ctx.DefaultQuery("kelas_id", "")
 	jurusanID := ctx.DefaultQuery("jurusan_id", "")
+	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
 
-	result := c.PoinLogRepository.CountPoin(ctx, poinType, kelasID, jurusanID)
+	result := c.PoinLogRepository.CountPoin(ctx, poinType, kelasID, jurusanID, tahunAjarID)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
@@ -78,12 +79,13 @@ func (c *infoController) ListCountPoinLog(ctx *gin.Context) {
 	perPage := ctx.DefaultQuery("per_page", "10")
 	order := ctx.DefaultQuery("order", "asc")
 	orderBy := ctx.DefaultQuery("order_by", "nama")
+	groupBy := ctx.DefaultQuery("group_by", "siswa")
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
 	poinType := ctx.DefaultQuery("type", "")
 
-	result := c.PoinLogRepository.GetCountPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, tahunAjarID, poinType)
+	result := c.PoinLogRepository.GetCountPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, groupBy, tahunAjarID, poinType)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
