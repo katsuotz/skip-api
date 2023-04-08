@@ -19,6 +19,7 @@ type PoinSiswaResponse struct {
 	Nis       string  `json:"nis"`
 	Nama      string  `json:"nama"`
 	NamaKelas string  `json:"nama_kelas"`
+	Foto      string  `json:"foto"`
 	Poin      float64 `json:"poin"`
 	entity.Base
 }
