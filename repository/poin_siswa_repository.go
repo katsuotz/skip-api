@@ -96,7 +96,13 @@ func (r *poinSiswaRepository) AddPoinSiswa(ctx context.Context, req dto.PoinSisw
 	}
 
 	poinBefore := poinSiswa.Poin
-	poinAfter := poinBefore + req.Poin
+	poinAfter := poinBefore
+
+	if req.Type == "Pelanggaran" {
+		poinAfter -= req.Poin
+	} else if req.Type == "Penghargaan" {
+		poinAfter += req.Poin
+	}
 
 	err = tx.Model(&entity.PoinSiswa{}).
 		Where("id = ?", poinSiswa.ID).
