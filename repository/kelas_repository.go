@@ -39,10 +39,11 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 		temp.Where("tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, guru_id, nip, tipe_guru, nama").
+	temp.Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, guru_id, nip, tipe_guru, nama").
 		Joins("join guru on guru.id = kelas.guru_id").
 		Joins("join users on users.id = guru.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
+		Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id").
 		Order("nama_kelas asc").
 		Find(&kelas)
 

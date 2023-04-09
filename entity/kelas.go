@@ -5,7 +5,7 @@ type Kelas struct {
 	NamaKelas   string `gorm:"type:varchar(20)" json:"nama_kelas"`
 	JurusanID   int    `gorm:"index;index:tahun_jurusan_idx" json:"jurusan_id"`
 	TahunAjarID int    `gorm:"index;index:tahun_jurusan_idx" json:"tahun_ajar_id"`
-	TahunAjar   string `gorm:"-:migration" json:"tahun_ajar"`
+	TahunAjar   string `gorm:"->;-:migration" json:"tahun_ajar,omitempty"`
 	GuruID      int    `gorm:"index" json:"guru_id"`
 	Guru        *Guru  `gorm:"foreignKey:guru_id" json:"guru,omitempty"`
 	Base
