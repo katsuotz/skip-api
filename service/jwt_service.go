@@ -20,6 +20,7 @@ type JWTService interface {
 	IsGuest(ctx *gin.Context)
 	IsAdmin(ctx *gin.Context)
 	IsGuru(ctx *gin.Context)
+	IsRole(ctx *gin.Context, roles string)
 }
 
 type jwtService struct {
@@ -118,7 +119,7 @@ func (s *jwtService) IsGuest(ctx *gin.Context) {
 
 func (s *jwtService) IsAdmin(ctx *gin.Context) {
 	role := ctx.MustGet("role")
-	if role == "admin" {
+	if role == "admin" || role == "staff-ict" {
 		ctx.Next()
 		return
 	}
@@ -143,9 +144,9 @@ func (s *jwtService) IsGuru(ctx *gin.Context) {
 	return
 }
 
-func (s *jwtService) IsRole(ctx *gin.Context, roles []string) {
+func (s *jwtService) IsRole(ctx *gin.Context, roles string) {
 	role := ctx.MustGet("role").(string)
-	if strings.Contains(strings.Join(roles, ","), role) {
+	if strings.Contains(roles, role) {
 		ctx.Next()
 		return
 	}
