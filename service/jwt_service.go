@@ -20,6 +20,7 @@ type JWTService interface {
 	IsGuest(ctx *gin.Context)
 	IsAdmin(ctx *gin.Context)
 	IsGuru(ctx *gin.Context)
+	IsNotSiswa(ctx *gin.Context)
 	IsRole(ctx *gin.Context, roles string)
 }
 
@@ -134,6 +135,19 @@ func (s *jwtService) IsGuru(ctx *gin.Context) {
 	role := ctx.MustGet("role").(string)
 	guruID := int(ctx.MustGet("guru_id").(float64))
 	if helper.IsGuru(role) && guruID != 0 {
+		ctx.Next()
+		return
+	}
+
+	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"error": "Unauthorized",
+	})
+	return
+}
+
+func (s *jwtService) IsNotSiswa(ctx *gin.Context) {
+	role := ctx.MustGet("role")
+	if role != "siswa" {
 		ctx.Next()
 		return
 	}

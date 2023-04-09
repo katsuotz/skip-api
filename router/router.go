@@ -140,7 +140,7 @@ func (r *Router) Init() {
 
 			siswa := authorized.Group("siswa")
 			{
-				siswa.GET("", r.SiswaController.GetSiswa)
+				siswa.GET("", r.JWTService.IsNotSiswa, r.SiswaController.GetSiswa)
 				siswa.GET(":nis/log", r.SiswaController.GetSiswaDetailByNIS)
 
 				siswaAdmin := siswa.Group("", r.JWTService.IsAdmin)
@@ -203,10 +203,7 @@ func (r *Router) Init() {
 
 				/* Info Poin Siswa & Log */
 
-				infoMetrics := info.Group("", func(context *gin.Context) {
-					r.JWTService.IsRole(context, "admin,guru,staff-ict,guru-bk")
-					return
-				})
+				infoMetrics := info.Group("", r.JWTService.IsNotSiswa)
 				{
 					infoMetrics.GET("poin/count", r.InfoController.CountPoin)
 					infoMetrics.GET("poin/max", r.InfoController.MaxPoin)
