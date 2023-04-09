@@ -167,6 +167,9 @@ func (r *Router) Init() {
 		info := loggedPath.Group("info", r.JWTService.IsAdmin)
 		{
 			info.GET("poin/count", r.InfoController.CountPoin)
+			info.GET("poin/max", r.InfoController.MaxPoin)
+			info.GET("poin/min", r.InfoController.MinPoin)
+			info.GET("poin/avg", r.InfoController.AvgPoin)
 			info.GET("poin/list", r.InfoController.ListPoinSiswa)
 			info.GET("poin/list/count", r.InfoController.ListCountPoinLog)
 			info.GET("poin/graph/count", r.InfoController.GraphCountPoinLog)

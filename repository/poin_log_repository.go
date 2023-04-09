@@ -81,7 +81,7 @@ func (r *poinLogRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis stri
 		poinLog := entity.PoinLog{}
 
 		r.db.Model(&poinLog).
-			Select("poin_log.id as id, title, description, poin_log.poin, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
+			Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
 			Where("siswa_kelas.id = ?", siswa.ID).
 			Joins("join guru on guru.id = poin_log.guru_id").
 			Joins("join users on users.id = guru.user_id").

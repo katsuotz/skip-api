@@ -15,6 +15,7 @@ type PoinSiswaRepository interface {
 	UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error
 	DeletePoinSiswa(ctx context.Context, poinLogID int) error
 	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string) dto.PoinSiswaPagination
+	CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse
 }
 
 type poinSiswaRepository struct {
@@ -216,6 +217,43 @@ func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page i
 	}
 	result.Pagination.TotalPage = totalPage
 	result.Pagination.PerPage = perPage
+
+	return result
+}
+
+func (r *poinSiswaRepository) CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse {
+	result := dto.CountResponse{}
+
+	temp := r.db.Model(&entity.PoinSiswa{})
+
+	if countType == "max" {
+		temp.Select("max(poin_siswa.poin)")
+	} else if countType == "min" {
+		temp.Select("min(poin_siswa.poin)")
+	} else if countType == "avg" {
+		temp.Select("avg(poin_siswa.poin)")
+	}
+
+	if kelasID != "" {
+		temp.Where("kelas.id = ?", kelasID)
+	}
+
+	if tahunAjarID != "" {
+		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	if jurusanID != "" {
+		temp.Where("kelas.jurusan_id = ?", jurusanID)
+	}
+
+	temp.
+		Where("poin_siswa.deleted_at is NULL").
+		Where("siswa_kelas.deleted_at is NULL").
+		Where("kelas.deleted_at is NULL").
+		Joins("left join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
+		Joins("left join kelas on kelas.id = siswa_kelas.kelas_id")
+
+	temp.Scan(&result.Total)
 
 	return result
 }
