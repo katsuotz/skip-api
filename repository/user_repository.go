@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/mssola/useragent"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gorm.io/gorm"
@@ -60,10 +61,18 @@ func (r *userRepository) UpdatePassword(ctx context.Context, userID int, passwor
 func (r *userRepository) LoginLog(ctx *gin.Context, userID int, message string) error {
 	//location := helper.GetUserLocation(ctx)
 
+	uaString := ctx.Request.UserAgent()
+	ua := useragent.New(uaString)
+	os := ua.OS()
+
+	browser, version := ua.Browser()
+
 	log := entity.LoginLog{
 		UserID:    userID,
 		Action:    message,
-		UserAgent: ctx.Request.UserAgent(),
+		UserAgent: uaString,
+		OS:        os,
+		Browser:   browser + " " + version,
 		Location:  "",
 	}
 
