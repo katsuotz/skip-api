@@ -16,8 +16,8 @@ type UserResponse struct {
 	ID       int     `json:"-"`
 	Nip      *string `json:"nip,omitempty"`
 	Nis      *string `json:"nis,omitempty"`
-	GuruID   *string `json:"-"`
-	SiswaID  *string `json:"-"`
+	GuruID   int     `json:"-"`
+	SiswaID  int     `json:"-"`
 	TipeGuru *string `json:"tipe_guru,omitempty"`
 	entity.Profile
 	entity.Guru

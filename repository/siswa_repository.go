@@ -110,7 +110,7 @@ func (r *siswaRepository) GetSiswaByNIS(ctx context.Context, nis string) dto.Sis
 	siswa := entity.Siswa{}
 
 	temp := r.db.Model(&siswa)
-	temp.Select("siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, nama, jenis_kelamin, tanggal_lahir, tempat_lahir").
+	temp.Select("siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, foto").
 		Where("nis = ?", nis).
 		Joins("join users on users.id = siswa.user_id").
 		Joins("join profiles on profiles.user_id = users.id").

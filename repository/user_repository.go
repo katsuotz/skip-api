@@ -27,7 +27,7 @@ func (r *userRepository) FindByUsername(ctx context.Context, username string) dt
 	user := dto.UserResponse{}
 	r.db.
 		Model(&entity.User{}).
-		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role, password, foto").
+		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role, password, foto, guru.id as guru_id, siswa.id as siswa_id").
 		Where("username = ?", username).
 		Joins("left join profiles on profiles.user_id = users.id").
 		Joins("left join guru on guru.user_id = users.id").
