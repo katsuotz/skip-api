@@ -60,6 +60,19 @@ func (c *siswaController) GetSiswaDetailByNIS(ctx *gin.Context) {
 	result := dto.SiswaDetailLog{}
 
 	result.Siswa = c.SiswaRepository.GetSiswaByNIS(ctx, nis)
+
+	role := ctx.MustGet("role")
+
+	if role == "siswa" {
+		siswaID := int(ctx.MustGet("siswa_id").(float64))
+
+		if siswaID != result.Siswa.ID {
+			response := helper.BuildErrorResponse("Unauthorized", nil, nil)
+			ctx.JSON(http.StatusUnauthorized, response)
+			return
+		}
+	}
+
 	result.Log = c.PoinLogRepository.GetPoinLogSiswaByKelas(ctx, nis)
 
 	response := helper.BuildSuccessResponse("", result)
