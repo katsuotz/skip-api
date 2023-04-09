@@ -60,131 +60,184 @@ func NewRouter(server *gin.Engine,
 }
 
 func (r *Router) Init() {
+
+	/* Static files from storage dir */
+
 	r.server.Static("/storage", "./storage")
 
-	basePath := r.server.Group("/api")
-
-	basePath.GET("", r.AuthController.Tes)
-
-	guestPath := basePath.Group("", r.JWTService.IsGuest)
+	base := r.server.Group("/api")
 	{
-		guestPath.POST("login", r.AuthController.Login)
-	}
+		base.GET("", r.AuthController.Tes)
 
-	loggedPath := basePath.Group("", r.JWTService.IsLoggedIn)
-	{
-		loggedPath.GET("me", r.ProfileController.GetMyProfile)
-		loggedPath.PATCH("profile", r.ProfileController.UpdateProfile)
-		loggedPath.PATCH("password", r.AuthController.UpdatePassword)
+		/* Guest User Only */
 
-		jurusan := loggedPath.Group("jurusan", r.JWTService.IsAdmin)
+		guest := base.Group("", r.JWTService.IsGuest)
 		{
-			jurusan.GET("", r.JurusanController.GetJurusan)
-			jurusan.POST("", r.JurusanController.CreateJurusan)
-			jurusan.PATCH(":jurusan_id", r.JurusanController.UpdateJurusan)
-			jurusan.DELETE(":jurusan_id", r.JurusanController.DeleteJurusan)
+			guest.POST("login", r.AuthController.Login)
 		}
 
-		tahunAjar := loggedPath.Group("tahun-ajar", r.JWTService.IsAdmin)
-		{
-			tahunAjar.GET("", r.TahunAjarController.GetTahunAjar)
-			tahunAjar.POST("", r.TahunAjarController.CreateTahunAjar)
-			tahunAjar.PATCH(":tahun_ajar_id", r.TahunAjarController.UpdateTahunAjar)
-			tahunAjar.DELETE(":tahun_ajar_id", r.TahunAjarController.DeleteTahunAjar)
-			tahunAjar.PATCH(":tahun_ajar_id/set-active", r.TahunAjarController.SetActiveTahunAjar)
-		}
+		/* Authorized User Only */
 
-		kelas := loggedPath.Group("kelas")
+		authorized := base.Group("", r.JWTService.IsLoggedIn)
 		{
-			kelas.GET("", r.KelasController.GetKelas)
-			kelas.GET(":kelas_id", r.KelasController.GetKelasByID)
+			/* Auth & Profile API */
 
-			kelasData := kelas.Group("", r.JWTService.IsAdmin)
+			authorized.GET("me", r.ProfileController.GetMyProfile)
+			authorized.PATCH("profile", r.ProfileController.UpdateProfile)
+			authorized.PATCH("password", r.AuthController.UpdatePassword)
+
+			/* Jurusan CRUD */
+
+			jurusan := authorized.Group("jurusan", r.JWTService.IsAdmin)
 			{
-				kelasData.POST("", r.KelasController.CreateKelas)
-				kelasData.PATCH(":kelas_id", r.KelasController.UpdateKelas)
-				kelasData.DELETE(":kelas_id", r.KelasController.DeleteKelas)
-				kelasData.POST(":kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
-				kelasData.POST(":kelas_id/naik-kelas", r.KelasController.SiswaNaikKelas)
-				kelasData.DELETE(":kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
+				jurusan.GET("", r.JurusanController.GetJurusan)
+				jurusan.POST("", r.JurusanController.CreateJurusan)
+				jurusan.PATCH(":jurusan_id", r.JurusanController.UpdateJurusan)
+				jurusan.DELETE(":jurusan_id", r.JurusanController.DeleteJurusan)
 			}
-		}
 
-		guru := loggedPath.Group("guru", r.JWTService.IsAdmin)
-		{
-			guru.GET("", r.GuruController.GetGuru)
-			guru.POST("", r.GuruController.CreateGuru)
-			guru.PATCH(":guru_id", r.GuruController.UpdateGuru)
-			guru.DELETE(":guru_id", r.GuruController.DeleteGuru)
-		}
+			/* Tahun Ajar CRUD */
 
-		siswa := loggedPath.Group("siswa")
-		{
-			siswa.GET("", r.SiswaController.GetSiswa)
-			siswa.GET(":nis/log", r.SiswaController.GetSiswaDetailByNIS)
+			authorized.GET("tahun-ajar", r.TahunAjarController.GetTahunAjar)
 
-			siswaData := siswa.Group("", r.JWTService.IsAdmin)
+			tahunAjar := authorized.Group("tahun-ajar", r.JWTService.IsAdmin)
 			{
-				siswaData.POST("", r.JWTService.IsAdmin, r.SiswaController.CreateSiswa)
-				siswaData.PATCH(":siswa_id", r.JWTService.IsAdmin, r.SiswaController.UpdateSiswa)
-				siswaData.DELETE(":siswa_id", r.JWTService.IsAdmin, r.SiswaController.DeleteSiswa)
+				tahunAjar.POST("", r.TahunAjarController.CreateTahunAjar)
+				tahunAjar.PATCH(":tahun_ajar_id", r.TahunAjarController.UpdateTahunAjar)
+				tahunAjar.DELETE(":tahun_ajar_id", r.TahunAjarController.DeleteTahunAjar)
+				tahunAjar.PATCH(":tahun_ajar_id/set-active", r.TahunAjarController.SetActiveTahunAjar)
 			}
+
+			/* Kelas CRUD */
+
+			kelas := authorized.Group("kelas")
+			{
+				kelas.GET("", r.KelasController.GetKelas)
+				kelas.GET(":kelas_id", r.KelasController.GetKelasByID)
+
+				kelasAdmin := kelas.Group("", r.JWTService.IsAdmin)
+				{
+					kelasAdmin.POST("", r.KelasController.CreateKelas)
+					kelasAdmin.PATCH(":kelas_id", r.KelasController.UpdateKelas)
+					kelasAdmin.DELETE(":kelas_id", r.KelasController.DeleteKelas)
+					kelasAdmin.POST(":kelas_id/add-siswa", r.KelasController.AddSiswaToKelas)
+					kelasAdmin.POST(":kelas_id/naik-kelas", r.KelasController.SiswaNaikKelas)
+					kelasAdmin.DELETE(":kelas_id/remove-siswa", r.KelasController.RemoveSiswaFromKelas)
+				}
+			}
+
+			/* Guru CRUD */
+
+			guru := authorized.Group("guru", r.JWTService.IsAdmin)
+			{
+				guru.GET("", r.GuruController.GetGuru)
+				guru.POST("", r.GuruController.CreateGuru)
+				guru.PATCH(":guru_id", r.GuruController.UpdateGuru)
+				guru.DELETE(":guru_id", r.GuruController.DeleteGuru)
+			}
+
+			/* Siswa CRUD */
+
+			siswa := authorized.Group("siswa")
+			{
+				siswa.GET("", r.SiswaController.GetSiswa)
+				siswa.GET(":nis/log", r.SiswaController.GetSiswaDetailByNIS)
+
+				siswaAdmin := siswa.Group("", r.JWTService.IsAdmin)
+				{
+					siswaAdmin.POST("", r.JWTService.IsAdmin, r.SiswaController.CreateSiswa)
+					siswaAdmin.PATCH(":siswa_id", r.JWTService.IsAdmin, r.SiswaController.UpdateSiswa)
+					siswaAdmin.DELETE(":siswa_id", r.JWTService.IsAdmin, r.SiswaController.DeleteSiswa)
+				}
+			}
+
+			/* Data Poin CRUD */
+
+			dataPoin := authorized.Group("data-poin")
+			{
+				dataPoin.GET("", r.DataPoinController.GetDataPoin)
+
+				dataPoinAdmin := dataPoin.Group("", r.JWTService.IsAdmin)
+				{
+					dataPoinAdmin.POST("", r.DataPoinController.CreateDataPoin)
+					dataPoinAdmin.PATCH(":data_poin_id", r.DataPoinController.UpdateDataPoin)
+					dataPoinAdmin.DELETE(":data_poin_id", r.DataPoinController.DeleteDataPoin)
+				}
+			}
+
+			/* Poin Siswa & Log API */
+
+			poinSiswa := authorized.Group("poin")
+			{
+				/* Get Poin Result of Siswa, Kelas, Jurusan - Only for Admin */
+
+				poinSiswaAdmin := poinSiswa.Group("poin", r.JWTService.IsAdmin)
+				{
+					poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
+					poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
+					poinSiswaAdmin.GET("jurusan/:jurusan_id/:tahun_ajar_id", r.PoinSiswaController.GetPoinJurusan)
+				}
+
+				/* Poin Siswa Transaction - Only for Guru */
+
+				poinSiswaGuru := authorized.Group("poin", r.JWTService.IsGuru)
+				{
+					poinSiswaGuru.POST("", r.PoinSiswaController.AddPoinSiswa)
+					poinSiswaGuru.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
+					poinSiswaGuru.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
+				}
+
+				/* Poin Log API - Only for Admin */
+
+				poinSiswaLog := poinSiswa.Group("log", r.JWTService.IsAdmin)
+				{
+					poinSiswaLog.GET("", r.PoinLogController.GetPoinLog)
+					poinSiswaLog.GET(":siswa_kelas_id", r.PoinLogController.GetPoinSiswaLog)
+				}
+			}
+
+			/* Info API - For statistics & metrics */
+
+			info := authorized.Group("info", r.JWTService.IsAdmin)
+			{
+
+				/* Info Poin Siswa & Log */
+
+				infoMetrics := info.Group("", func(context *gin.Context) {
+					r.JWTService.IsRole(context, "admin,guru,staff-ict,guru-bk")
+					return
+				})
+				{
+					infoMetrics.GET("poin/count", r.InfoController.CountPoin)
+					infoMetrics.GET("poin/max", r.InfoController.MaxPoin)
+					infoMetrics.GET("poin/min", r.InfoController.MinPoin)
+					infoMetrics.GET("poin/avg", r.InfoController.AvgPoin)
+					infoMetrics.GET("poin/list", r.InfoController.ListPoinSiswa)
+					infoMetrics.GET("poin/list/count", r.InfoController.ListCountPoinLog)
+					infoMetrics.GET("poin/graph/count", r.InfoController.GraphCountPoinLog)
+				}
+
+				/* Info Auth */
+
+				infoAdmin := info.Group("", r.JWTService.IsAdmin)
+				{
+					infoAdmin.GET("login", r.AuthController.GetLog)
+				}
+			}
+
+			/* Setting CRUD - unused, maybe later */
+
+			setting := authorized.Group("setting", r.JWTService.IsAdmin)
+			{
+				setting.GET("", r.SettingController.GetSetting)
+				setting.POST("", r.SettingController.CreateSetting)
+				setting.PATCH(":setting_id", r.SettingController.UpdateSetting)
+				setting.DELETE(":setting_id", r.SettingController.DeleteSetting)
+			}
+
+			/* Upload File API */
+
+			authorized.POST("upload", r.FileController.Upload)
 		}
-
-		loggedPath.GET("data-poin", r.DataPoinController.GetDataPoin)
-
-		dataPoin := loggedPath.Group("data-poin", r.JWTService.IsAdmin)
-		{
-			dataPoin.POST("", r.DataPoinController.CreateDataPoin)
-			dataPoin.PATCH(":data_poin_id", r.DataPoinController.UpdateDataPoin)
-			dataPoin.DELETE(":data_poin_id", r.DataPoinController.DeleteDataPoin)
-		}
-
-		poinSiswaAdmin := loggedPath.Group("poin",
-			func(context *gin.Context) {
-				r.JWTService.IsAdmin(context)
-				return
-			})
-		{
-			poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
-			poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
-			poinSiswaAdmin.GET("jurusan/:jurusan_id/:tahun_ajar_id", r.PoinSiswaController.GetPoinJurusan)
-		}
-
-		poinSiswaGuru := loggedPath.Group("poin", r.JWTService.IsGuru)
-		{
-			poinSiswaGuru.POST("", r.PoinSiswaController.AddPoinSiswa)
-			poinSiswaGuru.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
-			poinSiswaGuru.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
-		}
-
-		poinLog := loggedPath.Group("poin/log", r.JWTService.IsAdmin)
-		{
-			poinLog.GET("", r.PoinLogController.GetPoinLog)
-			poinLog.GET(":siswa_kelas_id", r.PoinLogController.GetPoinSiswaLog)
-		}
-
-		info := loggedPath.Group("info", r.JWTService.IsAdmin)
-		{
-			info.GET("poin/count", r.InfoController.CountPoin)
-			info.GET("poin/max", r.InfoController.MaxPoin)
-			info.GET("poin/min", r.InfoController.MinPoin)
-			info.GET("poin/avg", r.InfoController.AvgPoin)
-			info.GET("poin/list", r.InfoController.ListPoinSiswa)
-			info.GET("poin/list/count", r.InfoController.ListCountPoinLog)
-			info.GET("poin/graph/count", r.InfoController.GraphCountPoinLog)
-
-			info.GET("login", r.AuthController.GetLog)
-		}
-
-		setting := loggedPath.Group("setting", r.JWTService.IsAdmin)
-		{
-			setting.GET("", r.SettingController.GetSetting)
-			setting.POST("", r.SettingController.CreateSetting)
-			setting.PATCH(":setting_id", r.SettingController.UpdateSetting)
-			setting.DELETE(":setting_id", r.SettingController.DeleteSetting)
-		}
-
-		loggedPath.POST("upload", r.FileController.Upload)
 	}
 }
