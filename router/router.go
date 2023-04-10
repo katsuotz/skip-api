@@ -145,9 +145,9 @@ func (r *Router) Init() {
 
 				siswaAdmin := siswa.Group("", r.JWTService.IsAdmin)
 				{
-					siswaAdmin.POST("", r.JWTService.IsAdmin, r.SiswaController.CreateSiswa)
-					siswaAdmin.PATCH(":siswa_id", r.JWTService.IsAdmin, r.SiswaController.UpdateSiswa)
-					siswaAdmin.DELETE(":siswa_id", r.JWTService.IsAdmin, r.SiswaController.DeleteSiswa)
+					siswaAdmin.POST("", r.SiswaController.CreateSiswa)
+					siswaAdmin.PATCH(":siswa_id", r.SiswaController.UpdateSiswa)
+					siswaAdmin.DELETE(":siswa_id", r.SiswaController.DeleteSiswa)
 				}
 			}
 
@@ -157,7 +157,7 @@ func (r *Router) Init() {
 			{
 				dataPoin.GET("", r.DataPoinController.GetDataPoin)
 
-				dataPoinAdmin := dataPoin.Group("", r.JWTService.IsAdmin)
+				dataPoinAdmin := dataPoin.Group("", r.JWTService.IsStaff)
 				{
 					dataPoinAdmin.POST("", r.DataPoinController.CreateDataPoin)
 					dataPoinAdmin.PATCH(":data_poin_id", r.DataPoinController.UpdateDataPoin)
@@ -171,7 +171,7 @@ func (r *Router) Init() {
 			{
 				/* Get Poin Result of Siswa, Kelas, Jurusan - Only for Admin */
 
-				poinSiswaAdmin := poinSiswa.Group("", r.JWTService.IsAdmin)
+				poinSiswaAdmin := poinSiswa.Group("", r.JWTService.IsStaff)
 				{
 					poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
 					poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
@@ -189,7 +189,7 @@ func (r *Router) Init() {
 
 				/* Poin Log API - Only for Admin */
 
-				poinSiswaLog := poinSiswa.Group("log", r.JWTService.IsAdmin)
+				poinSiswaLog := poinSiswa.Group("log", r.JWTService.IsStaff)
 				{
 					poinSiswaLog.GET("", r.PoinLogController.GetPoinLog)
 					poinSiswaLog.GET(":siswa_kelas_id", r.PoinLogController.GetPoinSiswaLog)
@@ -198,12 +198,12 @@ func (r *Router) Init() {
 
 			/* Info API - For statistics & metrics */
 
-			info := authorized.Group("info", r.JWTService.IsAdmin)
+			info := authorized.Group("info", r.JWTService.IsStaff)
 			{
 
 				/* Info Poin Siswa & Log */
 
-				infoMetrics := info.Group("", r.JWTService.IsNotSiswa)
+				infoMetrics := info.Group("")
 				{
 					infoMetrics.GET("poin/count", r.InfoController.CountPoin)
 					infoMetrics.GET("poin/max", r.InfoController.MaxPoin)
