@@ -28,7 +28,7 @@ func (r *loginLogRepository) GetLog(ctx context.Context, page int, perPage int, 
 		temp.Where("nama ilike ?", search)
 	}
 
-	temp.Select("nama, foto, role, username, action, user_agent, location, login_logs.created_at").
+	temp.Select("nama, foto, role, username, action, user_agent, browser, os, location, login_logs.created_at").
 		Joins("join users on users.id = login_logs.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Order("login_logs.created_at desc")
