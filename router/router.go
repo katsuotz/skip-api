@@ -171,7 +171,7 @@ func (r *Router) Init() {
 			{
 				/* Get Poin Result of Siswa, Kelas, Jurusan - Only for Admin */
 
-				poinSiswaAdmin := poinSiswa.Group("poin", r.JWTService.IsAdmin)
+				poinSiswaAdmin := poinSiswa.Group("", r.JWTService.IsAdmin)
 				{
 					poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
 					poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
@@ -180,7 +180,7 @@ func (r *Router) Init() {
 
 				/* Poin Siswa Transaction - Only for Guru */
 
-				poinSiswaGuru := authorized.Group("poin", r.JWTService.IsGuru)
+				poinSiswaGuru := authorized.Group("", r.JWTService.IsGuru)
 				{
 					poinSiswaGuru.POST("", r.PoinSiswaController.AddPoinSiswa)
 					poinSiswaGuru.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
