@@ -175,7 +175,7 @@ func (r *Router) Init() {
 				{
 					poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
 					poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
-					poinSiswaAdmin.GET("jurusan/:jurusan_id/:tahun_ajar_id", r.PoinSiswaController.GetPoinJurusan)
+					poinSiswaAdmin.GET("jurusan/:jurusan_id", r.PoinSiswaController.GetPoinJurusan)
 				}
 
 				/* Poin Siswa Transaction - Only for Guru */

@@ -5,12 +5,13 @@ import (
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gorm.io/gorm"
+	"math"
 )
 
 type PoinSiswaRepository interface {
 	GetPoinSiswa(ctx context.Context, siswaKelasID int) dto.PoinSiswaResponse
 	GetPoinKelas(ctx context.Context, kelasID int) dto.PoinKelasResponse
-	GetPoinJurusan(ctx context.Context, jurusanID int, tahunAjarID int) dto.PoinJurusanResponse
+	GetPoinJurusan(ctx context.Context, jurusanID string, tahunAjarID string) dto.PoinJurusanWithKelasResponse
 	AddPoinSiswa(ctx context.Context, req dto.PoinSiswaRequest) error
 	UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error
 	DeletePoinSiswa(ctx context.Context, poinLogID int) error
@@ -59,20 +60,39 @@ func (r *poinSiswaRepository) GetPoinKelas(ctx context.Context, kelasID int) dto
 	return result
 }
 
-func (r *poinSiswaRepository) GetPoinJurusan(ctx context.Context, jurusanID int, tahunAjarID int) dto.PoinJurusanResponse {
-	result := dto.PoinJurusanResponse{}
-	jurusan := entity.Jurusan{}
-	temp := r.db.Model(&jurusan)
+func (r *poinSiswaRepository) GetPoinJurusan(ctx context.Context, jurusanID string, tahunAjarID string) dto.PoinJurusanWithKelasResponse {
+	result := dto.PoinJurusanWithKelasResponse{}
 
-	temp.Select("jurusan.id, tahun_ajar.id as tahun_ajar_id, nama_jurusan, tahun_ajar.tahun_ajar, avg(poin) as poin").
+	r.db.Model(&entity.Jurusan{}).
+		Select("nama_jurusan").
+		Where("id = ?", jurusanID).
+		First(&result.Jurusan)
+
+	tahunAjar := entity.TahunAjar{}
+
+	r.db.Model(&tahunAjar).
+		Where("id = ?", tahunAjarID).
+		First(&tahunAjar)
+
+	result.Jurusan.TahunAjar = tahunAjar.TahunAjar
+
+	r.db.Model(&entity.Kelas{}).Select("kelas.id, nama_kelas, avg(poin) as poin").
 		Where("kelas.jurusan_id = ?", jurusanID).
 		Where("kelas.tahun_ajar_id = ?", tahunAjarID).
-		Joins("join kelas on kelas.jurusan_id = jurusan.id").
 		Joins("join siswa_kelas on siswa_kelas.kelas_id = kelas.id").
 		Joins("join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id").
-		Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id").
-		Group("jurusan.id, nama_jurusan, tahun_ajar.id").
-		First(&result)
+		Order("nama_kelas").
+		Group("kelas.id").
+		Find(&result.Data)
+
+	var poin float64 = 0
+
+	for i, _ := range result.Data {
+		result.Data[i].Poin = math.Round(result.Data[i].Poin*100) / 100
+		poin += result.Data[i].Poin
+	}
+
+	result.Jurusan.Poin = poin
 
 	return result
 }

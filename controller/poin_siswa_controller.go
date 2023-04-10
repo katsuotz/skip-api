@@ -63,15 +63,15 @@ func (c *poinSiswaController) GetPoinKelas(ctx *gin.Context) {
 }
 
 func (c *poinSiswaController) GetPoinJurusan(ctx *gin.Context) {
-	jurusanID, err := strconv.Atoi(ctx.Param("jurusan_id"))
-	if err != nil || jurusanID == 0 {
+	jurusanID := ctx.Param("jurusan_id")
+	if jurusanID == "" {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
-	if err != nil || tahunAjarID == 0 {
+	tahunAjarID := ctx.Query("tahun_ajar_id")
+	if tahunAjarID == "" {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return

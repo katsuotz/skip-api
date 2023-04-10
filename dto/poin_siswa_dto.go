@@ -26,7 +26,6 @@ type PoinSiswaResponse struct {
 
 type PoinKelasResponse struct {
 	NamaKelas string  `json:"nama_kelas"`
-	TahunAjar string  `json:"tahun_ajar"`
 	Poin      float64 `json:"poin"`
 }
 
@@ -34,6 +33,11 @@ type PoinJurusanResponse struct {
 	NamaJurusan string  `json:"nama_jurusan"`
 	TahunAjar   string  `json:"tahun_ajar"`
 	Poin        float64 `json:"poin"`
+}
+
+type PoinJurusanWithKelasResponse struct {
+	Jurusan PoinJurusanResponse `json:"jurusan"`
+	Data    []PoinKelasResponse `json:"data"`
 }
 
 type PoinSiswaPagination struct {
