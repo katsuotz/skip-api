@@ -5,7 +5,8 @@ RUN go build -o account_api .
 
 #Build
 FROM ubuntu:latest
-WORKDIR /
-COPY --from=build /app/account_api /account_api
-EXPOSE 9100
-CMD ["/account_api"]
+WORKDIR /app
+COPY --from=build /app/.env /app
+COPY --from=build /app/account_api /app/account_api
+
+CMD ["/app/account_api"]

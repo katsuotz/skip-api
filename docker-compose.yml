@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - ../${APP_NAME}-db:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:${EXPOSE_DB_PORT}:5432"
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9200:9200"
+    volumes:
+      - ../${APP_NAME}-upload-data:/app/storage
+  frontend:
+    build:
+      context: ../SKIP-FE
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:${EXPOSE_FE_PORT}:2400
