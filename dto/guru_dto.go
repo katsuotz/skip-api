@@ -5,6 +5,8 @@ import "gitlab.com/katsuotz/skip-api/entity"
 type GuruRequest struct {
 	Nip      string `json:"nip" binding:"required" form:"nip"`
 	TipeGuru string `json:"tipe_guru" binding:"required" form:"tipe_guru"`
+	Username string `json:"username" binding:"required" form:"username"`
+	Password string `json:"password" binding:"required" form:"password"`
 	ProfileRequest
 }
 

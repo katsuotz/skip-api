@@ -133,10 +133,11 @@ func (r *siswaRepository) CreateSiswa(ctx context.Context, req dto.SiswaRequest)
 	}
 
 	tanggalLahir, _ := helper.StringToDate(req.TanggalLahir)
+	password, _ := helper.HashPassword(req.Nis)
 
 	user := entity.User{
 		Username: req.Nis,
-		Password: helper.BirthDateToPassword(tanggalLahir),
+		Password: password,
 		Role:     "siswa",
 	}
 

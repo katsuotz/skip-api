@@ -66,10 +66,11 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) er
 	}
 
 	tanggalLahir, _ := helper.StringToDate(req.TanggalLahir)
+	password, _ := helper.HashPassword(req.Password)
 
 	user := entity.User{
-		Username: req.Nip,
-		Password: helper.BirthDateToPassword(tanggalLahir),
+		Username: req.Username,
+		Password: password,
 		Role:     getGuruRole(req.TipeGuru),
 	}
 
