@@ -1,0 +1,13 @@
+variables:
+  GIT_STRATEGY: none
+
+deploy:
+  stage: deploy
+  script:
+    - cd /home/ict/www/skip-project/skip-api
+    - git pull origin main
+    - cat $env > .env
+    - docker-compose build api
+    - docker-compose up -d api
+  tags:
+    - eschool
