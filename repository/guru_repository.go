@@ -25,14 +25,13 @@ func NewGuruRepository(db *gorm.DB) GuruRepository {
 
 func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, search string) dto.GuruPagination {
 	result := dto.GuruPagination{}
-	guru := entity.Guru{}
-	temp := r.db.Model(&guru)
+	temp := r.db.Model(&entity.Guru{})
 	if search != "" {
 		search = "%" + search + "%"
 		temp.Where("nama ilike ?", search)
 	}
 
-	temp.Select("guru.id as id, guru.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir").
+	temp.Select("guru.id as id, guru.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, username").
 		Joins("join users on users.id = guru.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Order("nama asc")
@@ -125,6 +124,7 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 	}
 
 	tanggalLahir, _ := helper.StringToDate(req.TanggalLahir)
+	password, _ := helper.HashPassword(req.Password)
 
 	findGuru := entity.Guru{
 		ID: guruID,
@@ -132,8 +132,8 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 	tx.Find(&findGuru)
 
 	user := entity.User{
-		Username: req.Nip,
-		Password: helper.BirthDateToPassword(tanggalLahir),
+		Username: req.Username,
+		Password: password,
 		Role:     getGuruRole(req.TipeGuru),
 	}
 

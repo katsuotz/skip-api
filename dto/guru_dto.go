@@ -11,8 +11,9 @@ type GuruRequest struct {
 }
 
 type GuruResponse struct {
-	ID     int `json:"id"`
-	UserID int `json:"user_id"`
+	ID       int    `json:"id"`
+	UserID   int    `json:"user_id"`
+	Username string `json:"username"`
 	entity.Guru
 	entity.Profile
 }
