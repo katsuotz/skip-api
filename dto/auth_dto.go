@@ -13,14 +13,14 @@ type LoginResponse struct {
 }
 
 type UserResponse struct {
-	ID       int     `json:"-"`
-	Nip      *string `json:"nip,omitempty"`
-	Nis      *string `json:"nis,omitempty"`
-	GuruID   int     `json:"-"`
-	SiswaID  int     `json:"-"`
-	TipeGuru *string `json:"tipe_guru,omitempty"`
+	ID          int     `json:"-"`
+	Nip         *string `json:"nip,omitempty"`
+	Nis         *string `json:"nis,omitempty"`
+	PegawaiID   int     `json:"-"`
+	SiswaID     int     `json:"-"`
+	TipePegawai *string `json:"tipe_pegawai,omitempty"`
 	entity.Profile
-	entity.Guru
+	entity.Pegawai
 	entity.Siswa
 	entity.User
 }

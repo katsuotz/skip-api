@@ -10,9 +10,9 @@ type PoinLogResponse struct {
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
 	Type        string  `json:"type"`
-	GuruID      int     `json:"guru_id"`
+	PegawaiID   int     `json:"pegawai_id"`
 	Nip         string  `json:"nip"`
-	NamaGuru    string  `json:"nama_guru"`
+	NamaPegawai string  `json:"nama_pegawai"`
 	Nama        *string `json:"nama,omitempty"`
 	Nis         *string `json:"nis,omitempty"`
 	Foto        *string `json:"foto,omitempty"`

@@ -15,7 +15,7 @@ func IsInArray(arr []int, val int) bool {
 	return false
 }
 
-func IsGuru(role string) bool {
+func IsPegawai(role string) bool {
 	roles := []string{"guru", "staff-ict", "guru-bk", "tata-usaha"}
 	return strings.Contains(strings.Join(roles, ","), role)
 }

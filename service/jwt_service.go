@@ -19,7 +19,7 @@ type JWTService interface {
 	IsLoggedIn(ctx *gin.Context)
 	IsGuest(ctx *gin.Context)
 	IsAdmin(ctx *gin.Context)
-	IsGuru(ctx *gin.Context)
+	IsPegawai(ctx *gin.Context)
 	IsStaff(ctx *gin.Context)
 	IsNotSiswa(ctx *gin.Context)
 	IsRole(ctx *gin.Context, roles string)
@@ -47,8 +47,8 @@ func (s *jwtService) GenerateToken(ctx context.Context, user dto.UserResponse) s
 		"role":    user.Role,
 	}
 
-	if helper.IsGuru(user.Role) {
-		jwtData["guru_id"] = user.GuruID
+	if helper.IsPegawai(user.Role) {
+		jwtData["pegawai_id"] = user.PegawaiID
 	} else if user.Role == "siswa" {
 		jwtData["siswa_id"] = user.SiswaID
 	}
@@ -81,7 +81,7 @@ func (s *jwtService) IsLoggedIn(ctx *gin.Context) {
 			if claims["user_id"] != nil {
 				ctx.Set("user_id", claims["user_id"])
 				ctx.Set("role", claims["role"])
-				ctx.Set("guru_id", claims["guru_id"])
+				ctx.Set("pegawai_id", claims["pegawai_id"])
 				ctx.Set("siswa_id", claims["siswa_id"])
 				ctx.Next()
 				return
@@ -132,10 +132,10 @@ func (s *jwtService) IsAdmin(ctx *gin.Context) {
 	return
 }
 
-func (s *jwtService) IsGuru(ctx *gin.Context) {
+func (s *jwtService) IsPegawai(ctx *gin.Context) {
 	role := ctx.MustGet("role").(string)
-	guruID := int(ctx.MustGet("guru_id").(float64))
-	if helper.IsGuru(role) && guruID != 0 {
+	pegawaiID := int(ctx.MustGet("pegawai_id").(float64))
+	if helper.IsPegawai(role) && pegawaiID != 0 {
 		ctx.Next()
 		return
 	}

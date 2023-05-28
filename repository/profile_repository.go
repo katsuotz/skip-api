@@ -34,7 +34,7 @@ func (r *profileRepository) FindProfileWithJoinByID(ctx context.Context, userID 
 		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role, foto").
 		Where("profiles.user_id = ?", userID).
 		Joins("join users on users.id = profiles.user_id").
-		Joins("left join guru on guru.user_id = users.id").
+		Joins("left join pegawai on pegawai.user_id = users.id").
 		Joins("left join siswa on siswa.user_id = users.id").
 		First(&profile)
 	return profile

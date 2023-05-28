@@ -76,8 +76,8 @@ func (c *authController) GetLog(ctx *gin.Context) {
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 
-	guru := c.LoginLogRepository.GetLog(ctx, pageInt, perPageInt, search)
-	response := helper.BuildSuccessResponse("", guru)
+	pegawai := c.LoginLogRepository.GetLog(ctx, pageInt, perPageInt, search)
+	response := helper.BuildSuccessResponse("", pegawai)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

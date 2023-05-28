@@ -82,7 +82,7 @@ func (c *kelasController) CreateKelas(ctx *gin.Context) {
 		NamaKelas:   req.NamaKelas,
 		JurusanID:   req.JurusanID,
 		TahunAjarID: req.TahunAjarID,
-		GuruID:      req.GuruID,
+		PegawaiID:   req.PegawaiID,
 	}
 
 	_, err := c.KelasRepository.CreateKelas(ctx, kelas)

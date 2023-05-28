@@ -140,7 +140,7 @@ func (r *poinSiswaRepository) AddPoinSiswa(ctx context.Context, req dto.PoinSisw
 		Poin:        req.Poin,
 		PoinBefore:  poinBefore,
 		PoinAfter:   poinAfter,
-		GuruID:      req.GuruID,
+		PegawaiID:   req.PegawaiID,
 		PoinSiswaID: poinSiswa.ID,
 	}
 

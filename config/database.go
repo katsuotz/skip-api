@@ -37,7 +37,7 @@ func SetupDatabaseConnection() *gorm.DB {
 		&entity.TahunAjar{},
 		&entity.Jurusan{},
 		&entity.Kelas{},
-		&entity.Guru{},
+		&entity.Pegawai{},
 		&entity.SiswaKelas{},
 		&entity.DataPoin{},
 		&entity.PoinSiswa{},

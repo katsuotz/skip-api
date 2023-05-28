@@ -6,7 +6,7 @@ type KelasRequest struct {
 	NamaKelas   string `json:"nama_kelas" binding:"required" form:"nama_kelas"`
 	JurusanID   int    `json:"jurusan_id" binding:"required" form:"jurusan_id"`
 	TahunAjarID int    `json:"tahun_ajar_id" binding:"required" form:"tahun_ajar_id"`
-	GuruID      int    `json:"guru_id" binding:"required" form:"guru_id"`
+	PegawaiID   int    `json:"pegawai_id" binding:"required" form:"pegawai_id"`
 }
 
 type SiswaKelasRequest struct {
@@ -21,5 +21,5 @@ type KelasResponse struct {
 	ID int `json:"id"`
 	entity.Kelas
 	entity.Profile
-	entity.Guru
+	entity.Pegawai
 }

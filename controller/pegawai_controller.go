@@ -9,38 +9,38 @@ import (
 	"strconv"
 )
 
-type GuruController interface {
-	GetGuru(ctx *gin.Context)
-	CreateGuru(ctx *gin.Context)
-	UpdateGuru(ctx *gin.Context)
-	DeleteGuru(ctx *gin.Context)
+type PegawaiController interface {
+	GetPegawai(ctx *gin.Context)
+	CreatePegawai(ctx *gin.Context)
+	UpdatePegawai(ctx *gin.Context)
+	DeletePegawai(ctx *gin.Context)
 }
 
-type guruController struct {
-	GuruRepository repository.GuruRepository
+type pegawaiController struct {
+	PegawaiRepository repository.PegawaiRepository
 }
 
-func NewGuruController(guruRepository repository.GuruRepository) GuruController {
-	return &guruController{
-		guruRepository,
+func NewPegawaiController(pegawaiRepository repository.PegawaiRepository) PegawaiController {
+	return &pegawaiController{
+		pegawaiRepository,
 	}
 }
 
-func (c *guruController) GetGuru(ctx *gin.Context) {
+func (c *pegawaiController) GetPegawai(ctx *gin.Context) {
 	page := ctx.DefaultQuery("page", "1")
 	perPage := ctx.DefaultQuery("per_page", "10")
 	search := ctx.DefaultQuery("search", "")
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 
-	guru := c.GuruRepository.GetGuru(ctx, pageInt, perPageInt, search)
-	response := helper.BuildSuccessResponse("", guru)
+	pegawai := c.PegawaiRepository.GetPegawai(ctx, pageInt, perPageInt, search)
+	response := helper.BuildSuccessResponse("", pegawai)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *guruController) CreateGuru(ctx *gin.Context) {
-	req := dto.GuruRequest{}
+func (c *pegawaiController) CreatePegawai(ctx *gin.Context) {
+	req := dto.PegawaiRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -48,7 +48,7 @@ func (c *guruController) CreateGuru(ctx *gin.Context) {
 		return
 	}
 
-	err := c.GuruRepository.CreateGuru(ctx, req)
+	err := c.PegawaiRepository.CreatePegawai(ctx, req)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -56,13 +56,13 @@ func (c *guruController) CreateGuru(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Guru created successfully", nil)
+	response := helper.BuildSuccessResponse("Pegawai created successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *guruController) UpdateGuru(ctx *gin.Context) {
-	req := dto.GuruRequest{}
+func (c *pegawaiController) UpdatePegawai(ctx *gin.Context) {
+	req := dto.PegawaiRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
@@ -70,14 +70,14 @@ func (c *guruController) UpdateGuru(ctx *gin.Context) {
 		return
 	}
 
-	guruID, err := strconv.Atoi(ctx.Param("guru_id"))
-	if err != nil || guruID == 0 {
+	pegawaiID, err := strconv.Atoi(ctx.Param("pegawai_id"))
+	if err != nil || pegawaiID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.GuruRepository.UpdateGuru(ctx, req, guruID)
+	err = c.PegawaiRepository.UpdatePegawai(ctx, req, pegawaiID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -85,20 +85,20 @@ func (c *guruController) UpdateGuru(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Guru updated successfully", nil)
+	response := helper.BuildSuccessResponse("Pegawai updated successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *guruController) DeleteGuru(ctx *gin.Context) {
-	guruID, err := strconv.Atoi(ctx.Param("guru_id"))
-	if err != nil || guruID == 0 {
+func (c *pegawaiController) DeletePegawai(ctx *gin.Context) {
+	pegawaiID, err := strconv.Atoi(ctx.Param("pegawai_id"))
+	if err != nil || pegawaiID == 0 {
 		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = c.GuruRepository.DeleteGuru(ctx, guruID)
+	err = c.PegawaiRepository.DeletePegawai(ctx, pegawaiID)
 
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed to process request", err, nil)
@@ -106,7 +106,7 @@ func (c *guruController) DeleteGuru(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Guru deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Pegawai deleted successfully", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

@@ -32,10 +32,10 @@ func (r *poinLogRepository) GetPoinSiswaLog(ctx context.Context, page int, perPa
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
+	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at").
 		Where("siswa_kelas.id = ?", siswaKelasID).
-		Joins("join guru on guru.id = poin_log.guru_id").
-		Joins("join users on users.id = guru.user_id").
+		Joins("join pegawai on pegawai.id = poin_log.pegawai_id").
+		Joins("join users on users.id = pegawai.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
 		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
@@ -81,10 +81,10 @@ func (r *poinLogRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis stri
 		poinLog := entity.PoinLog{}
 
 		r.db.Model(&poinLog).
-			Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, guru_id, nip, profiles.nama as nama_guru, poin_log.created_at, poin_log.updated_at").
+			Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at").
 			Where("siswa_kelas.id = ?", siswa.ID).
-			Joins("join guru on guru.id = poin_log.guru_id").
-			Joins("join users on users.id = guru.user_id").
+			Joins("join pegawai on pegawai.id = poin_log.pegawai_id").
+			Joins("join users on users.id = pegawai.user_id").
 			Joins("join profiles on profiles.user_id = users.id").
 			Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
 			Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
@@ -146,9 +146,9 @@ func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, 
 		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.guru_id, nip, pg.nama as nama_guru, nis, ps.nama as nama, ps.foto as foto, poin_log.created_at, poin_log.updated_at").
-		Joins("join guru on guru.id = poin_log.guru_id").
-		Joins("join users ug on ug.id = guru.user_id").
+	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.pegawai_id, nip, pg.nama as nama_pegawai, nis, ps.nama as nama, ps.foto as foto, poin_log.created_at, poin_log.updated_at").
+		Joins("join pegawai on pegawai.id = poin_log.pegawai_id").
+		Joins("join users ug on ug.id = pegawai.user_id").
 		Joins("join profiles pg on pg.user_id = ug.id").
 		Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
 		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").

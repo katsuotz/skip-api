@@ -92,8 +92,8 @@ func (c *poinSiswaController) AddPoinSiswa(ctx *gin.Context) {
 		return
 	}
 
-	guruID := int(ctx.MustGet("guru_id").(float64))
-	req.GuruID = guruID
+	pegawaiID := int(ctx.MustGet("pegawai_id").(float64))
+	req.PegawaiID = pegawaiID
 
 	err := c.PoinSiswaRepository.AddPoinSiswa(ctx, req)
 

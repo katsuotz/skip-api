@@ -13,7 +13,7 @@ type Router struct {
 	JurusanController   controller.JurusanController
 	TahunAjarController controller.TahunAjarController
 	KelasController     controller.KelasController
-	GuruController      controller.GuruController
+	PegawaiController   controller.PegawaiController
 	SiswaController     controller.SiswaController
 	DataPoinController  controller.DataPoinController
 	PoinSiswaController controller.PoinSiswaController
@@ -30,7 +30,7 @@ func NewRouter(server *gin.Engine,
 	jurusanController controller.JurusanController,
 	tahunAjarController controller.TahunAjarController,
 	kelasController controller.KelasController,
-	guruController controller.GuruController,
+	pegawaiController controller.PegawaiController,
 	siswaController controller.SiswaController,
 	dataPoinController controller.DataPoinController,
 	poinSiswaController controller.PoinSiswaController,
@@ -47,7 +47,7 @@ func NewRouter(server *gin.Engine,
 		jurusanController,
 		tahunAjarController,
 		kelasController,
-		guruController,
+		pegawaiController,
 		siswaController,
 		dataPoinController,
 		poinSiswaController,
@@ -124,14 +124,14 @@ func (r *Router) Init() {
 			}
 		}
 
-		/* Guru CRUD */
+		/* Pegawai CRUD */
 
-		guru := authorized.Group("guru", r.JWTService.IsAdmin)
+		pegawai := authorized.Group("pegawai", r.JWTService.IsAdmin)
 		{
-			guru.GET("", r.GuruController.GetGuru)
-			guru.POST("", r.GuruController.CreateGuru)
-			guru.PATCH(":guru_id", r.GuruController.UpdateGuru)
-			guru.DELETE(":guru_id", r.GuruController.DeleteGuru)
+			pegawai.GET("", r.PegawaiController.GetPegawai)
+			pegawai.POST("", r.PegawaiController.CreatePegawai)
+			pegawai.PATCH(":pegawai_id", r.PegawaiController.UpdatePegawai)
+			pegawai.DELETE(":pegawai_id", r.PegawaiController.DeletePegawai)
 		}
 
 		/* Siswa CRUD */
@@ -176,13 +176,13 @@ func (r *Router) Init() {
 				poinSiswaAdmin.GET("jurusan/:jurusan_id", r.PoinSiswaController.GetPoinJurusan)
 			}
 
-			/* Poin Siswa Transaction - Only for Guru */
+			/* Poin Siswa Transaction - Only for Pegawai */
 
-			poinSiswaGuru := authorized.Group("", r.JWTService.IsGuru)
+			poinSiswaPegawai := authorized.Group("", r.JWTService.IsPegawai)
 			{
-				poinSiswaGuru.POST("", r.PoinSiswaController.AddPoinSiswa)
-				poinSiswaGuru.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
-				poinSiswaGuru.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
+				poinSiswaPegawai.POST("", r.PoinSiswaController.AddPoinSiswa)
+				poinSiswaPegawai.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
+				poinSiswaPegawai.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 			}
 
 			/* Poin Log API - Only for Admin */

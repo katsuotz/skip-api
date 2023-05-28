@@ -39,9 +39,9 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 		temp.Where("tahun_ajar_id = ?", tahunAjarID)
 	}
 
-	temp.Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, guru_id, nip, tipe_guru, nama").
-		Joins("join guru on guru.id = kelas.guru_id").
-		Joins("join users on users.id = guru.user_id").
+	temp.Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, pegawai_id, nip, tipe_pegawai, nama").
+		Joins("join pegawai on pegawai.id = kelas.pegawai_id").
+		Joins("join users on users.id = pegawai.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id").
 		Order("nama_kelas asc").
@@ -53,10 +53,10 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 func (r *kelasRepository) GetKelasByID(ctx context.Context, kelasID int) dto.KelasResponse {
 	var kelas dto.KelasResponse
 	r.db.Model(&entity.Kelas{}).
-		Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, guru_id, nip, tipe_guru, nama").
+		Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, pegawai_id, nip, tipe_pegawai, nama").
 		Where("kelas.id = ?", kelasID).
-		Joins("join guru on guru.id = kelas.guru_id").
-		Joins("join users on users.id = guru.user_id").
+		Joins("join pegawai on pegawai.id = kelas.pegawai_id").
+		Joins("join users on users.id = pegawai.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Joins("join tahun_ajar on tahun_ajar.id = kelas.tahun_ajar_id").
 		Order("nama_kelas asc").

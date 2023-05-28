@@ -8,31 +8,31 @@ import (
 	"gorm.io/gorm"
 )
 
-type GuruRepository interface {
-	GetGuru(ctx context.Context, page int, perPage int, search string) dto.GuruPagination
-	CreateGuru(ctx context.Context, guru dto.GuruRequest) error
-	UpdateGuru(ctx context.Context, guru dto.GuruRequest, guruID int) error
-	DeleteGuru(ctx context.Context, guruID int) error
+type PegawaiRepository interface {
+	GetPegawai(ctx context.Context, page int, perPage int, search string) dto.PegawaiPagination
+	CreatePegawai(ctx context.Context, pegawai dto.PegawaiRequest) error
+	UpdatePegawai(ctx context.Context, pegawai dto.PegawaiRequest, pegawaiID int) error
+	DeletePegawai(ctx context.Context, pegawaiID int) error
 }
 
-type guruRepository struct {
+type pegawaiRepository struct {
 	db *gorm.DB
 }
 
-func NewGuruRepository(db *gorm.DB) GuruRepository {
-	return &guruRepository{db: db}
+func NewPegawaiRepository(db *gorm.DB) PegawaiRepository {
+	return &pegawaiRepository{db: db}
 }
 
-func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, search string) dto.GuruPagination {
-	result := dto.GuruPagination{}
-	temp := r.db.Model(&entity.Guru{})
+func (r *pegawaiRepository) GetPegawai(ctx context.Context, page int, perPage int, search string) dto.PegawaiPagination {
+	result := dto.PegawaiPagination{}
+	temp := r.db.Model(&entity.Pegawai{})
 	if search != "" {
 		search = "%" + search + "%"
 		temp.Where("nama ilike ?", search)
 	}
 
-	temp.Select("guru.id as id, guru.user_id as user_id, nip, tipe_guru, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, username").
-		Joins("join users on users.id = guru.user_id").
+	temp.Select("pegawai.id as id, pegawai.user_id as user_id, nip, tipe_pegawai, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, username").
+		Joins("join users on users.id = pegawai.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Order("nama asc")
 	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
@@ -51,7 +51,7 @@ func (r *guruRepository) GetGuru(ctx context.Context, page int, perPage int, sea
 	return result
 }
 
-func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) error {
+func (r *pegawaiRepository) CreatePegawai(ctx context.Context, req dto.PegawaiRequest) error {
 	tx := r.db.Begin()
 
 	defer func() {
@@ -70,7 +70,7 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) er
 	user := entity.User{
 		Username: req.Username,
 		Password: password,
-		Role:     getGuruRole(req.TipeGuru),
+		Role:     getPegawaiRole(req.TipePegawai),
 	}
 
 	err := tx.Create(&user).Error
@@ -80,13 +80,13 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) er
 		return err
 	}
 
-	guru := entity.Guru{
-		Nip:      req.Nip,
-		TipeGuru: req.TipeGuru,
-		UserID:   user.ID,
+	pegawai := entity.Pegawai{
+		Nip:         req.Nip,
+		TipePegawai: req.TipePegawai,
+		UserID:      user.ID,
 	}
 
-	err = tx.Create(&guru).Error
+	err = tx.Create(&pegawai).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -110,7 +110,7 @@ func (r *guruRepository) CreateGuru(ctx context.Context, req dto.GuruRequest) er
 	return tx.Commit().Error
 }
 
-func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, guruID int) error {
+func (r *pegawaiRepository) UpdatePegawai(ctx context.Context, req dto.PegawaiRequest, pegawaiID int) error {
 	tx := r.db.Begin()
 
 	defer func() {
@@ -126,30 +126,30 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 	tanggalLahir, _ := helper.StringToDate(req.TanggalLahir)
 	password, _ := helper.HashPassword(req.Password)
 
-	findGuru := entity.Guru{
-		ID: guruID,
+	findPegawai := entity.Pegawai{
+		ID: pegawaiID,
 	}
-	tx.Find(&findGuru)
+	tx.Find(&findPegawai)
 
 	user := entity.User{
 		Username: req.Username,
 		Password: password,
-		Role:     getGuruRole(req.TipeGuru),
+		Role:     getPegawaiRole(req.TipePegawai),
 	}
 
-	err := tx.Where("id = ?", findGuru.UserID).Updates(&user).Error
+	err := tx.Where("id = ?", findPegawai.UserID).Updates(&user).Error
 
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	guru := entity.Guru{
-		Nip:      req.Nip,
-		TipeGuru: req.TipeGuru,
+	pegawai := entity.Pegawai{
+		Nip:         req.Nip,
+		TipePegawai: req.TipePegawai,
 	}
 
-	err = tx.Where("id = ?", findGuru.ID).Updates(&guru).Error
+	err = tx.Where("id = ?", findPegawai.ID).Updates(&pegawai).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -163,7 +163,7 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 		TempatLahir:  req.TempatLahir,
 	}
 
-	err = tx.Where("user_id = ?", findGuru.UserID).Updates(&profile).Error
+	err = tx.Where("user_id = ?", findPegawai.UserID).Updates(&profile).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -172,7 +172,7 @@ func (r *guruRepository) UpdateGuru(ctx context.Context, req dto.GuruRequest, gu
 	return tx.Commit().Error
 }
 
-func (r *guruRepository) DeleteGuru(ctx context.Context, guruID int) error {
+func (r *pegawaiRepository) DeletePegawai(ctx context.Context, pegawaiID int) error {
 	tx := r.db.Begin()
 
 	defer func() {
@@ -181,26 +181,26 @@ func (r *guruRepository) DeleteGuru(ctx context.Context, guruID int) error {
 		}
 	}()
 
-	findGuru := entity.Guru{
-		ID: guruID,
+	findPegawai := entity.Pegawai{
+		ID: pegawaiID,
 	}
-	tx.Find(&findGuru)
+	tx.Find(&findPegawai)
 
-	err := tx.Where("id = ?", findGuru.ID).Delete(&entity.Guru{}).Error
+	err := tx.Where("id = ?", findPegawai.ID).Delete(&entity.Pegawai{}).Error
 
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	err = tx.Where("user_id = ?", findGuru.UserID).Delete(&entity.Profile{}).Error
+	err = tx.Where("user_id = ?", findPegawai.UserID).Delete(&entity.Profile{}).Error
 
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	err = tx.Where("id = ?", findGuru.UserID).Delete(&entity.User{}).Error
+	err = tx.Where("id = ?", findPegawai.UserID).Delete(&entity.User{}).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -209,8 +209,8 @@ func (r *guruRepository) DeleteGuru(ctx context.Context, guruID int) error {
 	return tx.Commit().Error
 }
 
-func getGuruRole(tipeGuru string) string {
-	switch tipeGuru {
+func getPegawaiRole(tipePegawai string) string {
+	switch tipePegawai {
 	case "Staff ICT":
 		return "staff-ict"
 	case "Guru BK":
