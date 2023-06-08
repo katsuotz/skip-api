@@ -46,7 +46,7 @@ func (c *dataPoinController) CreateDataPoin(ctx *gin.Context) {
 	req := dto.DataPoinRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -62,12 +62,12 @@ func (c *dataPoinController) CreateDataPoin(ctx *gin.Context) {
 	_, err := c.DataPoinRepository.CreateDataPoin(ctx, dataPoin)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Poin created successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -76,14 +76,14 @@ func (c *dataPoinController) UpdateDataPoin(ctx *gin.Context) {
 	req := dto.DataPoinRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	dataPoinID, err := strconv.Atoi(ctx.Param("data_poin_id"))
 	if err != nil || dataPoinID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -100,12 +100,12 @@ func (c *dataPoinController) UpdateDataPoin(ctx *gin.Context) {
 	_, err = c.DataPoinRepository.UpdateDataPoin(ctx, newDataPoin)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Poin updated successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -113,7 +113,7 @@ func (c *dataPoinController) UpdateDataPoin(ctx *gin.Context) {
 func (c *dataPoinController) DeleteDataPoin(ctx *gin.Context) {
 	dataPoinID, err := strconv.Atoi(ctx.Param("data_poin_id"))
 	if err != nil || dataPoinID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -121,12 +121,12 @@ func (c *dataPoinController) DeleteDataPoin(ctx *gin.Context) {
 	err = c.DataPoinRepository.DeleteDataPoin(ctx, dataPoinID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Poin deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

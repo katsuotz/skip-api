@@ -38,7 +38,7 @@ func (c *jurusanController) CreateJurusan(ctx *gin.Context) {
 	req := dto.JurusanRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -50,12 +50,12 @@ func (c *jurusanController) CreateJurusan(ctx *gin.Context) {
 	_, err := c.JurusanRepository.CreateJurusan(ctx, jurusan)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Jurusan created successfully", nil)
+	response := helper.BuildSuccessResponse("Jurusan berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -64,14 +64,14 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 	req := dto.JurusanRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	jurusanID, err := strconv.Atoi(ctx.Param("jurusan_id"))
 	if err != nil || jurusanID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -84,12 +84,12 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 	_, err = c.JurusanRepository.UpdateJurusan(ctx, newJurusan)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Jurusan updated successfully", nil)
+	response := helper.BuildSuccessResponse("Jurusan berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -97,7 +97,7 @@ func (c *jurusanController) UpdateJurusan(ctx *gin.Context) {
 func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
 	jurusanID, err := strconv.Atoi(ctx.Param("jurusan_id"))
 	if err != nil || jurusanID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -105,12 +105,12 @@ func (c *jurusanController) DeleteJurusan(ctx *gin.Context) {
 	err = c.JurusanRepository.DeleteJurusan(ctx, jurusanID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Jurusan deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Jurusan berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

@@ -52,7 +52,7 @@ func (c *siswaController) GetSiswa(ctx *gin.Context) {
 func (c *siswaController) GetSiswaDetailByNIS(ctx *gin.Context) {
 	nis := ctx.Param("nis")
 	if nis == "" {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -84,7 +84,7 @@ func (c *siswaController) CreateSiswa(ctx *gin.Context) {
 	req := dto.SiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -92,12 +92,12 @@ func (c *siswaController) CreateSiswa(ctx *gin.Context) {
 	err := c.SiswaRepository.CreateSiswa(ctx, req)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Siswa created successfully", nil)
+	response := helper.BuildSuccessResponse("Siswa berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -106,14 +106,14 @@ func (c *siswaController) UpdateSiswa(ctx *gin.Context) {
 	req := dto.SiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	siswaID, err := strconv.Atoi(ctx.Param("siswa_id"))
 	if err != nil || siswaID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -121,12 +121,12 @@ func (c *siswaController) UpdateSiswa(ctx *gin.Context) {
 	err = c.SiswaRepository.UpdateSiswa(ctx, req, siswaID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Siswa created successfully", nil)
+	response := helper.BuildSuccessResponse("Siswa berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -134,7 +134,7 @@ func (c *siswaController) UpdateSiswa(ctx *gin.Context) {
 func (c *siswaController) DeleteSiswa(ctx *gin.Context) {
 	siswaID, err := strconv.Atoi(ctx.Param("siswa_id"))
 	if err != nil || siswaID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -142,12 +142,12 @@ func (c *siswaController) DeleteSiswa(ctx *gin.Context) {
 	err = c.SiswaRepository.DeleteSiswa(ctx, siswaID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Siswa deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Siswa berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

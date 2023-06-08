@@ -51,7 +51,7 @@ func (c *kelasController) GetKelasByID(ctx *gin.Context) {
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -73,7 +73,7 @@ func (c *kelasController) CreateKelas(ctx *gin.Context) {
 	req := dto.KelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -88,12 +88,12 @@ func (c *kelasController) CreateKelas(ctx *gin.Context) {
 	_, err := c.KelasRepository.CreateKelas(ctx, kelas)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Kelas created successfully", nil)
+	response := helper.BuildSuccessResponse("Kelas berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -102,14 +102,14 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 	req := dto.KelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -124,12 +124,12 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 	_, err = c.KelasRepository.UpdateKelas(ctx, newKelas)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Kelas updated successfully", nil)
+	response := helper.BuildSuccessResponse("Kelas berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -137,7 +137,7 @@ func (c *kelasController) UpdateKelas(ctx *gin.Context) {
 func (c *kelasController) DeleteKelas(ctx *gin.Context) {
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -145,12 +145,12 @@ func (c *kelasController) DeleteKelas(ctx *gin.Context) {
 	err = c.KelasRepository.DeleteKelas(ctx, kelasID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Kelas deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Kelas berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -159,14 +159,14 @@ func (c *kelasController) AddSiswaToKelas(ctx *gin.Context) {
 	req := dto.SiswaKelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -174,7 +174,7 @@ func (c *kelasController) AddSiswaToKelas(ctx *gin.Context) {
 	err = c.KelasRepository.AddSiswaToKelas(ctx, kelasID, req.SiswaID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -188,14 +188,14 @@ func (c *kelasController) SiswaNaikKelas(ctx *gin.Context) {
 	req := dto.SiswaNaikKelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -203,7 +203,7 @@ func (c *kelasController) SiswaNaikKelas(ctx *gin.Context) {
 	err = c.KelasRepository.SiswaNaikKelas(ctx, kelasID, req.SiswaKelasID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -217,14 +217,14 @@ func (c *kelasController) RemoveSiswaFromKelas(ctx *gin.Context) {
 	req := dto.SiswaKelasRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -232,7 +232,7 @@ func (c *kelasController) RemoveSiswaFromKelas(ctx *gin.Context) {
 	err = c.KelasRepository.RemoveSiswaFromKelas(ctx, kelasID, req.SiswaID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}

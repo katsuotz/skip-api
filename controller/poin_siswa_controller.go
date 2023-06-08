@@ -37,7 +37,7 @@ func NewPoinSiswaController(
 func (c *poinSiswaController) GetPoinSiswa(ctx *gin.Context) {
 	siswaKelasID, err := strconv.Atoi(ctx.Param("siswa_kelas_id"))
 	if err != nil || siswaKelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -51,7 +51,7 @@ func (c *poinSiswaController) GetPoinSiswa(ctx *gin.Context) {
 func (c *poinSiswaController) GetPoinKelas(ctx *gin.Context) {
 	kelasID, err := strconv.Atoi(ctx.Param("kelas_id"))
 	if err != nil || kelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -65,14 +65,14 @@ func (c *poinSiswaController) GetPoinKelas(ctx *gin.Context) {
 func (c *poinSiswaController) GetPoinJurusan(ctx *gin.Context) {
 	jurusanID := ctx.Param("jurusan_id")
 	if jurusanID == "" {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
 	tahunAjarID := ctx.Query("tahun_ajar_id")
 	if tahunAjarID == "" {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -87,7 +87,7 @@ func (c *poinSiswaController) AddPoinSiswa(ctx *gin.Context) {
 	req := dto.PoinSiswaRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -98,12 +98,12 @@ func (c *poinSiswaController) AddPoinSiswa(ctx *gin.Context) {
 	err := c.PoinSiswaRepository.AddPoinSiswa(ctx, req)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Poin created successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -112,14 +112,14 @@ func (c *poinSiswaController) UpdatePoinSiswa(ctx *gin.Context) {
 	req := dto.UpdatePoinLogRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	poinLogID, err := strconv.Atoi(ctx.Param("poin_log_id"))
 	if err != nil || poinLogID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -132,12 +132,12 @@ func (c *poinSiswaController) UpdatePoinSiswa(ctx *gin.Context) {
 	err = c.PoinSiswaRepository.UpdatePoinSiswa(ctx, poinLog)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Poin updated successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -145,7 +145,7 @@ func (c *poinSiswaController) UpdatePoinSiswa(ctx *gin.Context) {
 func (c *poinSiswaController) DeletePoinSiswa(ctx *gin.Context) {
 	poinLogID, err := strconv.Atoi(ctx.Param("poin_log_id"))
 	if err != nil || poinLogID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -153,12 +153,12 @@ func (c *poinSiswaController) DeletePoinSiswa(ctx *gin.Context) {
 	err = c.PoinSiswaRepository.DeletePoinSiswa(ctx, poinLogID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Data Poin deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Data Poin berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

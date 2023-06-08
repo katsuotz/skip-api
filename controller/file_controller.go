@@ -29,7 +29,7 @@ func NewFileController() FileController {
 func (c *fileController) Upload(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -38,7 +38,7 @@ func (c *fileController) Upload(ctx *gin.Context) {
 
 	err = ctx.ShouldBind(&formData)
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}

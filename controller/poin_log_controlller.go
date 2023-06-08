@@ -47,7 +47,7 @@ func (c *poinLogController) GetPoinSiswaLog(ctx *gin.Context) {
 	perPageInt, _ := strconv.Atoi(perPage)
 	siswaKelasID, err := strconv.Atoi(ctx.Param("siswa_kelas_id"))
 	if err != nil || siswaKelasID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}

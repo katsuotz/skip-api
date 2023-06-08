@@ -37,7 +37,7 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 	req := dto.ProfileRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -65,12 +65,12 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 	_, err := c.ProfileRepository.UpdateProfile(ctx, newProfile)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Profile updated successfully", nil)
+	response := helper.BuildSuccessResponse("Profile berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

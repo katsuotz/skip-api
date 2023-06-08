@@ -45,7 +45,7 @@ func (c *tahunAjarController) CreateTahunAjar(ctx *gin.Context) {
 	req := dto.TahunAjarRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -58,12 +58,12 @@ func (c *tahunAjarController) CreateTahunAjar(ctx *gin.Context) {
 	_, err := c.TahunAjarRepository.CreateTahunAjar(ctx, tahunAjar)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Tahun Ajar created successfully", nil)
+	response := helper.BuildSuccessResponse("Tahun Ajar berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -72,14 +72,14 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 	req := dto.TahunAjarRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
 	if err != nil || tahunAjarID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -92,12 +92,12 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 	_, err = c.TahunAjarRepository.UpdateTahunAjar(ctx, newTahunAjar)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Tahun Ajar updated successfully", nil)
+	response := helper.BuildSuccessResponse("Tahun Ajar berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -105,7 +105,7 @@ func (c *tahunAjarController) UpdateTahunAjar(ctx *gin.Context) {
 func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
 	if err != nil || tahunAjarID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -113,12 +113,12 @@ func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 	err = c.TahunAjarRepository.DeleteTahunAjar(ctx, tahunAjarID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Tahun Ajar deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Tahun Ajar berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -126,7 +126,7 @@ func (c *tahunAjarController) DeleteTahunAjar(ctx *gin.Context) {
 func (c *tahunAjarController) SetActiveTahunAjar(ctx *gin.Context) {
 	tahunAjarID, err := strconv.Atoi(ctx.Param("tahun_ajar_id"))
 	if err != nil || tahunAjarID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -134,12 +134,12 @@ func (c *tahunAjarController) SetActiveTahunAjar(ctx *gin.Context) {
 	err = c.TahunAjarRepository.SetActiveTahunAjar(ctx, tahunAjarID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Tahun Ajar updated successfully", nil)
+	response := helper.BuildSuccessResponse("Tahun Ajar berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

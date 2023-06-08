@@ -54,7 +54,7 @@ func (c *settingController) CreateSetting(ctx *gin.Context) {
 	req := dto.SettingRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -67,12 +67,12 @@ func (c *settingController) CreateSetting(ctx *gin.Context) {
 	_, err := c.SettingRepository.CreateSetting(ctx, setting)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Setting created successfully", nil)
+	response := helper.BuildSuccessResponse("Setting berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -81,14 +81,14 @@ func (c *settingController) UpdateSetting(ctx *gin.Context) {
 	req := dto.SettingRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	settingID, err := strconv.Atoi(ctx.Param("setting_id"))
 	if err != nil || settingID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -102,12 +102,12 @@ func (c *settingController) UpdateSetting(ctx *gin.Context) {
 	_, err = c.SettingRepository.UpdateSetting(ctx, newSetting)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Setting updated successfully", nil)
+	response := helper.BuildSuccessResponse("Setting berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -115,7 +115,7 @@ func (c *settingController) UpdateSetting(ctx *gin.Context) {
 func (c *settingController) DeleteSetting(ctx *gin.Context) {
 	settingID, err := strconv.Atoi(ctx.Param("setting_id"))
 	if err != nil || settingID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -123,12 +123,12 @@ func (c *settingController) DeleteSetting(ctx *gin.Context) {
 	err = c.SettingRepository.DeleteSetting(ctx, settingID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Setting deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Setting berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

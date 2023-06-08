@@ -43,7 +43,7 @@ func (c *pegawaiController) CreatePegawai(ctx *gin.Context) {
 	req := dto.PegawaiRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -51,12 +51,12 @@ func (c *pegawaiController) CreatePegawai(ctx *gin.Context) {
 	err := c.PegawaiRepository.CreatePegawai(ctx, req)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Pegawai created successfully", nil)
+	response := helper.BuildSuccessResponse("Pegawai berhasil dibuat", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -65,14 +65,14 @@ func (c *pegawaiController) UpdatePegawai(ctx *gin.Context) {
 	req := dto.PegawaiRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	pegawaiID, err := strconv.Atoi(ctx.Param("pegawai_id"))
 	if err != nil || pegawaiID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -80,12 +80,12 @@ func (c *pegawaiController) UpdatePegawai(ctx *gin.Context) {
 	err = c.PegawaiRepository.UpdatePegawai(ctx, req, pegawaiID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Pegawai updated successfully", nil)
+	response := helper.BuildSuccessResponse("Pegawai berhasil diubah", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
@@ -93,7 +93,7 @@ func (c *pegawaiController) UpdatePegawai(ctx *gin.Context) {
 func (c *pegawaiController) DeletePegawai(ctx *gin.Context) {
 	pegawaiID, err := strconv.Atoi(ctx.Param("pegawai_id"))
 	if err != nil || pegawaiID == 0 {
-		response := helper.BuildErrorResponse("Failed to process request", nil, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -101,12 +101,12 @@ func (c *pegawaiController) DeletePegawai(ctx *gin.Context) {
 	err = c.PegawaiRepository.DeletePegawai(ctx, pegawaiID)
 
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed to process request", err, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", err, nil)
 		ctx.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.BuildSuccessResponse("Pegawai deleted successfully", nil)
+	response := helper.BuildSuccessResponse("Pegawai berhasil dihapus", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }

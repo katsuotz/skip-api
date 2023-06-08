@@ -44,7 +44,7 @@ func (c *authController) Login(ctx *gin.Context) {
 	loginReq := dto.LoginRequest{}
 	errDTO := ctx.ShouldBindJSON(&loginReq)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -54,7 +54,7 @@ func (c *authController) Login(ctx *gin.Context) {
 		if user.ID != 0 {
 			go c.UserRepository.LoginLog(ctx, user.ID, "Failed Login Attempt")
 		}
-		response := helper.BuildErrorResponse("Wrong username or password", nil, nil)
+		response := helper.BuildErrorResponse("Username atau password tidak sesuai", nil, nil)
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
 	}
@@ -65,7 +65,7 @@ func (c *authController) Login(ctx *gin.Context) {
 	loginRes := dto.LoginResponse{}
 	loginRes.User = user
 	loginRes.Token = token
-	response := helper.BuildSuccessResponse("Login Success", loginRes)
+	response := helper.BuildSuccessResponse("Berhasil melakukan Login", loginRes)
 	ctx.JSON(http.StatusOK, response)
 }
 
@@ -86,13 +86,13 @@ func (c *authController) UpdatePassword(ctx *gin.Context) {
 	req := dto.UpdatePasswordRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
-		response := helper.BuildErrorResponse("Failed to process request", errDTO, nil)
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if req.Password != req.PasswordConfirmation {
-		response := helper.BuildErrorResponse("Password Confirmation is not correct", nil, nil)
+		response := helper.BuildErrorResponse("Konfirmasi Password tidak sesuai", nil, nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -104,7 +104,7 @@ func (c *authController) UpdatePassword(ctx *gin.Context) {
 	if !match || user.ID == 0 {
 		go c.UserRepository.LoginLog(ctx, user.ID, "Change Password Attempt")
 
-		response := helper.BuildErrorResponse("Old Password is not match with Current Password", nil, nil)
+		response := helper.BuildErrorResponse("Kolom Password Lama tidak sesuai dengan Password saat ini", nil, nil)
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
 	}
@@ -120,6 +120,6 @@ func (c *authController) UpdatePassword(ctx *gin.Context) {
 	}
 
 	go c.UserRepository.LoginLog(ctx, user.ID, "Password Changed")
-	response := helper.BuildSuccessResponse("Password updated successfully", nil)
+	response := helper.BuildSuccessResponse("Berhasil mengubah Password", nil)
 	ctx.JSON(http.StatusOK, response)
 }
