@@ -4,7 +4,7 @@ import "gitlab.com/katsuotz/skip-api/entity"
 
 type PegawaiRequest struct {
 	Nip         string `json:"nip" binding:"required" form:"nip"`
-	TipePegawai string `json:"tipe_pegawai " binding:"required" form:"tipe_pegawai"`
+	TipePegawai string `json:"tipe_pegawai" binding:"required" form:"tipe_pegawai"`
 	Username    string `json:"username" binding:"required" form:"username"`
 	Password    string `json:"password" binding:"required" form:"password"`
 	ProfileRequest
