@@ -178,7 +178,7 @@ func (r *Router) Init() {
 
 			/* Poin Siswa Transaction - Only for Pegawai */
 
-			poinSiswaPegawai := authorized.Group("", r.JWTService.IsPegawai)
+			poinSiswaPegawai := poinSiswa.Group("", r.JWTService.IsPegawai)
 			{
 				poinSiswaPegawai.POST("", r.PoinSiswaController.AddPoinSiswa)
 				poinSiswaPegawai.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)

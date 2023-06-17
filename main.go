@@ -46,8 +46,8 @@ func main() {
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowHeaders:     []string{"Content-Type", "Authorization", "X-Requested-With", "*"},
-		AllowMethods:     []string{"GET", "POST", "PATCH", "PUT", "DELETE"},
+		AllowHeaders:     []string{"*"},
+		AllowMethods:     []string{"*"},
 		MaxAge:           86400,
 		AllowCredentials: true,
 	}))
