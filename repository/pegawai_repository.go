@@ -31,7 +31,7 @@ func (r *pegawaiRepository) GetPegawai(ctx context.Context, page int, perPage in
 		temp.Where("nama ilike ?", search)
 	}
 
-	temp.Select("pegawai.id as id, pegawai.user_id as user_id, nip, tipe_pegawai, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, username").
+	temp.Select("pegawai.id as id, pegawai.user_id as user_id, nip, tipe_pegawai, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, username, foto").
 		Joins("join users on users.id = pegawai.user_id").
 		Joins("join profiles on profiles.user_id = users.id").
 		Order("nama asc")

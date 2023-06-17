@@ -32,7 +32,7 @@ func (r *poinSiswaRepository) GetPoinSiswa(ctx context.Context, siswaKelasID int
 	poinSiswa := entity.PoinSiswa{}
 	temp := r.db.Model(&poinSiswa)
 
-	temp.Select("nis, nama, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at").
+	temp.Select("nis, nama, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at, foto").
 		Where("siswa_kelas.id = ?", siswaKelasID).
 		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
 		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
@@ -140,6 +140,7 @@ func (r *poinSiswaRepository) AddPoinSiswa(ctx context.Context, req dto.PoinSisw
 		Poin:        req.Poin,
 		PoinBefore:  poinBefore,
 		PoinAfter:   poinAfter,
+		File:        req.File,
 		PegawaiID:   req.PegawaiID,
 		PoinSiswaID: poinSiswa.ID,
 	}

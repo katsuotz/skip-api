@@ -16,6 +16,7 @@ type PoinLogResponse struct {
 	Nama        *string `json:"nama,omitempty"`
 	Nis         *string `json:"nis,omitempty"`
 	Foto        *string `json:"foto,omitempty"`
+	File        *string `json:"file,omitempty"`
 	entity.Base
 }
 

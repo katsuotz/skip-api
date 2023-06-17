@@ -33,7 +33,7 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 		temp.Where(temp.Where("nama ilike ?", search).Or("nis ilike ?", search))
 	}
 
-	selectQuery := "siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, foto, nama, jenis_kelamin, tanggal_lahir, tempat_lahir"
+	selectQuery := "siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, foto, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, foto"
 
 	temp.Joins("join users on users.id = siswa.user_id").
 		Joins("join profiles on profiles.user_id = users.id")

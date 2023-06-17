@@ -8,6 +8,7 @@ type PoinSiswaRequest struct {
 	Poin         float64 `json:"poin" binding:"required" form:"poin"`
 	Type         string  `json:"type" binding:"required" form:"type"`
 	PegawaiID    int     `json:"pegawai_id" form:"pegawai_id"`
+	File         string  `json:"file" form:"file"`
 	SiswaKelasID int     `json:"siswa_kelas_id" binding:"required" form:"siswa_kelas_id"`
 }
 
