@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gorm.io/gorm"
 	"math"
+	"time"
 )
 
 type PoinSiswaRepository interface {
@@ -113,6 +115,31 @@ func (r *poinSiswaRepository) AddPoinSiswa(ctx context.Context, req dto.PoinSisw
 	if err != nil {
 		tx.Rollback()
 		return err
+	}
+
+	jakarta, err := time.LoadLocation("Asia/Jakarta")
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	now := time.Now().In(jakarta)
+	year, month, day := now.Date()
+	startOfDay := time.Date(year, month, day, 0, 0, 0, 0, now.Location())
+	endOfDay := time.Date(year, month, day+1, 0, 0, 0, 0, now.Location())
+
+	poinLogBefore := entity.PoinLog{}
+	err = tx.
+		Where("poin_siswa_id = ?", poinSiswa.ID).
+		Where("created_at >= ?", startOfDay).
+		Where("created_at < ?", endOfDay).
+		Where("title = ?", req.Title).
+		First(&poinLogBefore).Error
+
+	if poinLogBefore.ID != 0 {
+		tx.Rollback()
+		return errors.New(req.Type + " yang sama sudah dilaporkan untuk hari ini")
 	}
 
 	poinBefore := poinSiswa.Poin
