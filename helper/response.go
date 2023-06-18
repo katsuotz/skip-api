@@ -23,7 +23,7 @@ func getErrorMsg(fe validator.FieldError) string {
 	return fe.Tag()
 }
 
-func BuildSuccessResponse(message string, data interface{}) any {
+func BuildSuccessResponse(message string, data interface{}) interface{} {
 	if message == "" && data != nil {
 		return data
 	}
@@ -41,18 +41,22 @@ func BuildSuccessResponse(message string, data interface{}) any {
 	return res
 }
 
-func BuildErrorResponse(message string, err error, data interface{}) any {
+func BuildErrorResponse(message string, err error, data interface{}) interface{} {
 	res := gin.H{
 		"error":   true,
 		"message": message,
 	}
 	var ve validator.ValidationErrors
-	if err != nil && errors.As(err, &ve) {
-		errMsg := make([]ErrorMsg, len(ve))
-		for i, fe := range ve {
-			errMsg[i] = ErrorMsg{fe.Field(), getErrorMsg(fe)}
+	if err != nil {
+		if errors.As(err, &ve) {
+			errMsg := make([]ErrorMsg, len(ve))
+			for i, fe := range ve {
+				errMsg[i] = ErrorMsg{fe.Field(), getErrorMsg(fe)}
+			}
+			res["error"] = errMsg
+		} else {
+			res["error"] = err.Error()
 		}
-		res["error"] = errMsg
 	}
 
 	if data != nil {
