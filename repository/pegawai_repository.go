@@ -129,7 +129,7 @@ func (r *pegawaiRepository) UpdatePegawai(ctx context.Context, req dto.PegawaiRe
 	findPegawai := entity.Pegawai{
 		ID: pegawaiID,
 	}
-	tx.Find(&findPegawai)
+	tx.First(&findPegawai)
 
 	user := entity.User{
 		Username: req.Username,
@@ -184,7 +184,7 @@ func (r *pegawaiRepository) DeletePegawai(ctx context.Context, pegawaiID int) er
 	findPegawai := entity.Pegawai{
 		ID: pegawaiID,
 	}
-	tx.Find(&findPegawai)
+	tx.First(&findPegawai)
 
 	err := tx.Where("id = ?", findPegawai.ID).Delete(&entity.Pegawai{}).Error
 

@@ -9,7 +9,7 @@ import (
 )
 
 type KelasRepository interface {
-	GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []dto.KelasResponse
+	GetKelas(ctx context.Context, jurusanID string, tahunAjarID string, pegawaiID int) []dto.KelasResponse
 	GetKelasByID(ctx context.Context, kelasID int) dto.KelasResponse
 	CreateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
 	UpdateKelas(ctx context.Context, kelas entity.Kelas) (entity.Kelas, error)
@@ -27,7 +27,7 @@ func NewKelasRepository(db *gorm.DB) KelasRepository {
 	return &kelasRepository{db: db}
 }
 
-func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunAjarID string) []dto.KelasResponse {
+func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunAjarID string, pegawaiID int) []dto.KelasResponse {
 	var kelas []dto.KelasResponse
 	temp := r.db.Model(&entity.Kelas{})
 
@@ -37,6 +37,10 @@ func (r *kelasRepository) GetKelas(ctx context.Context, jurusanID string, tahunA
 
 	if tahunAjarID != "" {
 		temp.Where("tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
 	}
 
 	temp.Select("kelas.id as id, nama_kelas, jurusan_id, tahun_ajar_id, tahun_ajar, pegawai_id, nip, tipe_pegawai, nama").

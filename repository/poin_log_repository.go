@@ -2,22 +2,19 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gorm.io/gorm"
 	"sort"
-	"strconv"
-	"strings"
 )
 
 type PoinLogRepository interface {
 	GetPoinSiswaLog(ctx context.Context, page int, perPage int, siswaKelasID int) dto.PoinLogPagination
 	GetPoinLogSiswaByKelas(ctx context.Context, nis string) []dto.PoinLogSiswaByKelas
-	CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse
-	GetPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string) dto.PoinLogPagination
-	GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string) dto.PoinLogCountPagination
-	GetCountPoinLogPaginationByMonth(ctx context.Context, tahunAjarID string, poinType string) []dto.PoinLogCountGraphResponse
+	CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse
+	GetPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string, pegawaiID int) dto.PoinLogPagination
+	GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string, pegawaiID int) dto.PoinLogCountPagination
+	GetCountPoinLogPaginationByMonth(ctx context.Context, tahunAjarID string, poinType string, pegawaiID int) []dto.PoinLogCountGraphResponse
 }
 
 type poinLogRepository struct {
@@ -32,8 +29,6 @@ func (r *poinLogRepository) GetPoinSiswaLog(ctx context.Context, page int, perPa
 	result := dto.PoinLogPagination{}
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
-
-	fmt.Println(1231232)
 
 	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, file, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at").
 		Where("siswa_kelas.id = ?", siswaKelasID).
@@ -105,7 +100,7 @@ func (r *poinLogRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis stri
 	return result
 }
 
-func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse {
+func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse {
 	result := dto.CountResponse{}
 
 	temp := r.db.Model(&entity.PoinLog{}).
@@ -127,6 +122,10 @@ func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kela
 		temp.Where("kelas.jurusan_id = ?", jurusanID)
 	}
 
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
+	}
+
 	temp.
 		Where("poin_siswa.deleted_at is NULL").
 		Where("siswa_kelas.deleted_at is NULL").
@@ -140,13 +139,17 @@ func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kela
 	return result
 }
 
-func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string) dto.PoinLogPagination {
+func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string, pegawaiID int) dto.PoinLogPagination {
 	result := dto.PoinLogPagination{}
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 
 	if tahunAjarID != "" {
 		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
 	}
 
 	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, poin_log.pegawai_id, nip, pg.nama as nama_pegawai, nis, ps.nama as nama, ps.foto as foto, file, poin_log.created_at, poin_log.updated_at").
@@ -178,13 +181,17 @@ func (r *poinLogRepository) GetPoinLogPagination(ctx context.Context, page int, 
 	return result
 }
 
-func (r *poinLogRepository) GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string) dto.PoinLogCountPagination {
+func (r *poinLogRepository) GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string, pegawaiID int) dto.PoinLogCountPagination {
 	result := dto.PoinLogCountPagination{}
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 
 	if tahunAjarID != "" {
 		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
 	}
 
 	if poinType != "" {
@@ -238,22 +245,26 @@ func (r *poinLogRepository) GetCountPoinLogPagination(ctx context.Context, page 
 	return result
 }
 
-func (r *poinLogRepository) GetCountPoinLogPaginationByMonth(ctx context.Context, tahunAjarID string, poinType string) []dto.PoinLogCountGraphResponse {
+func (r *poinLogRepository) GetCountPoinLogPaginationByMonth(ctx context.Context, tahunAjarID string, poinType string, pegawaiID int) []dto.PoinLogCountGraphResponse {
 	var result []dto.PoinLogCountGraphResponse
 
 	tahunAjar := entity.TahunAjar{}
 	r.db.Model(&entity.TahunAjar{}).Where("id = ?", tahunAjarID).First(&tahunAjar)
 
-	tahunAjarSplice := strings.Split(tahunAjar.TahunAjar, "/")
+	//tahunAjarSplice := strings.Split(tahunAjar.TahunAjar, "/")
 
-	startMonth := 7
-	startYear, _ := strconv.Atoi(tahunAjarSplice[0])
-	endMonth := 6
-	endYear := startYear + 1
+	//startMonth := 7
+	//startYear, _ := strconv.Atoi(tahunAjarSplice[0])
+	//endMonth := 6
+	//endYear := startYear + 1
 
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 	temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
+	}
 
 	if poinType != "" {
 		temp.Where("poin_log.type = ?", poinType)
@@ -261,7 +272,7 @@ func (r *poinLogRepository) GetCountPoinLogPaginationByMonth(ctx context.Context
 
 	temp.
 		Select("count(*) as total, EXTRACT(YEAR FROM poin_log.created_at) as year, EXTRACT(MONTH FROM poin_log.created_at) as month").
-		Where("(EXTRACT(YEAR FROM poin_log.created_at) >= ? and EXTRACT(MONTH FROM poin_log.created_at) >= ?) or (EXTRACT(YEAR FROM poin_log.created_at) <= ? and EXTRACT(MONTH FROM poin_log.created_at) <= ?)", startYear, startMonth, endYear, endMonth).
+		//Where("(EXTRACT(YEAR FROM poin_log.created_at) >= ? and EXTRACT(MONTH FROM poin_log.created_at) >= ?) or (EXTRACT(YEAR FROM poin_log.created_at) <= ? and EXTRACT(MONTH FROM poin_log.created_at) <= ?)", startYear, startMonth, endYear, endMonth).
 		Joins("left join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
 		Joins("left join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
 		Joins("left join kelas on kelas.id = siswa_kelas.kelas_id").

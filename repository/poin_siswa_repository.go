@@ -17,8 +17,8 @@ type PoinSiswaRepository interface {
 	AddPoinSiswa(ctx context.Context, req dto.PoinSiswaRequest) error
 	UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error
 	DeletePoinSiswa(ctx context.Context, poinLogID int) error
-	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string) dto.PoinSiswaPagination
-	CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse
+	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int) dto.PoinSiswaPagination
+	CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse
 }
 
 type poinSiswaRepository struct {
@@ -210,7 +210,7 @@ func (r *poinSiswaRepository) DeletePoinSiswa(ctx context.Context, poinLogID int
 	}
 
 	poinSiswa := entity.PoinSiswa{
-		SiswaKelasID: poinLog.PoinSiswaID,
+		ID: poinLog.PoinSiswaID,
 	}
 
 	err = tx.First(&poinSiswa).Error
@@ -220,13 +220,48 @@ func (r *poinSiswaRepository) DeletePoinSiswa(ctx context.Context, poinLogID int
 		return err
 	}
 
+	currentPoin := poinSiswa.Poin
+
+	if poinLog.Type == "Pelanggaran" {
+		currentPoin += poinLog.Poin
+	} else if poinLog.Type == "Penghargaan" {
+		currentPoin -= poinLog.Poin
+	}
+
 	err = tx.Model(&entity.PoinSiswa{}).
 		Where("id = ?", poinSiswa.ID).
-		Update("poin", poinSiswa.Poin-poinLog.Poin).Error
+		Update("poin", currentPoin).Error
 
 	if err != nil {
 		tx.Rollback()
 		return err
+	}
+
+	var oldPoinLog []entity.PoinLog
+	err = r.db.
+		Where("poin_siswa_id = ?", poinLog.PoinSiswaID).
+		Where("created_at > ?", poinLog.CreatedAt).
+		Find(&oldPoinLog).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	for _, oldLog := range oldPoinLog {
+		if poinLog.Type == "Pelanggaran" {
+			oldLog.PoinBefore += poinLog.Poin
+			oldLog.PoinAfter += poinLog.Poin
+		} else if poinLog.Type == "Penghargaan" {
+			oldLog.PoinBefore -= poinLog.Poin
+			oldLog.PoinAfter -= poinLog.Poin
+		}
+		err = tx.Save(oldLog).Error
+
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	err = tx.Delete(&poinLog).Error
@@ -235,10 +270,11 @@ func (r *poinSiswaRepository) DeletePoinSiswa(ctx context.Context, poinLogID int
 		tx.Rollback()
 		return err
 	}
+
 	return tx.Commit().Error
 }
 
-func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string) dto.PoinSiswaPagination {
+func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int) dto.PoinSiswaPagination {
 	result := dto.PoinSiswaPagination{}
 	poinSiswa := entity.PoinSiswa{}
 	temp := r.db.Model(&poinSiswa)
@@ -249,6 +285,10 @@ func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page i
 
 	if tahunAjarID != "" {
 		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
 	}
 
 	temp.Select("nis, nama, foto, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at").
@@ -275,7 +315,7 @@ func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page i
 	return result
 }
 
-func (r *poinSiswaRepository) CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string) dto.CountResponse {
+func (r *poinSiswaRepository) CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse {
 	result := dto.CountResponse{}
 
 	temp := r.db.Model(&entity.PoinSiswa{})
@@ -298,6 +338,10 @@ func (r *poinSiswaRepository) CountPoin(ctx context.Context, countType string, k
 
 	if jurusanID != "" {
 		temp.Where("kelas.jurusan_id = ?", jurusanID)
+	}
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
 	}
 
 	temp.

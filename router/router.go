@@ -86,12 +86,16 @@ func (r *Router) Init() {
 
 		/* Jurusan CRUD */
 
-		jurusan := authorized.Group("jurusan", r.JWTService.IsAdmin)
+		jurusan := authorized.Group("jurusan")
 		{
 			jurusan.GET("", r.JurusanController.GetJurusan)
-			jurusan.POST("", r.JurusanController.CreateJurusan)
-			jurusan.PATCH(":jurusan_id", r.JurusanController.UpdateJurusan)
-			jurusan.DELETE(":jurusan_id", r.JurusanController.DeleteJurusan)
+
+			jurusanAdmin := jurusan.Group("", r.JWTService.IsAdmin)
+			{
+				jurusanAdmin.POST("", r.JurusanController.CreateJurusan)
+				jurusanAdmin.PATCH(":jurusan_id", r.JurusanController.UpdateJurusan)
+				jurusanAdmin.DELETE(":jurusan_id", r.JurusanController.DeleteJurusan)
+			}
 		}
 
 		/* Tahun Ajar CRUD */
@@ -181,13 +185,13 @@ func (r *Router) Init() {
 			poinSiswaPegawai := poinSiswa.Group("", r.JWTService.IsPegawai)
 			{
 				poinSiswaPegawai.POST("", r.PoinSiswaController.AddPoinSiswa)
-				poinSiswaPegawai.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
+				//poinSiswaPegawai.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
 				poinSiswaPegawai.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 			}
 
 			/* Poin Log API - Only for Admin */
 
-			poinSiswaLog := poinSiswa.Group("log", r.JWTService.IsStaff)
+			poinSiswaLog := poinSiswa.Group("log", r.JWTService.IsPegawai)
 			{
 				poinSiswaLog.GET("", r.PoinLogController.GetPoinLog)
 				poinSiswaLog.GET(":siswa_kelas_id", r.PoinLogController.GetPoinSiswaLog)
@@ -196,7 +200,7 @@ func (r *Router) Init() {
 
 		/* Info API - For statistics & metrics */
 
-		info := authorized.Group("info", r.JWTService.IsStaff)
+		info := authorized.Group("info", r.JWTService.IsPegawai)
 		{
 
 			/* Info Poin Siswa & Log */

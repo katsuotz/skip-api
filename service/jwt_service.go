@@ -147,8 +147,8 @@ func (s *jwtService) IsPegawai(ctx *gin.Context) {
 }
 
 func (s *jwtService) IsStaff(ctx *gin.Context) {
-	roles := "admin,staff-ict,guru-bk"
-	role := ctx.MustGet("role").(string)
+	roles := "admin;staff-ict;guru-bk;"
+	role := ctx.MustGet("role").(string) + ";"
 	if strings.Contains(roles, role) {
 		ctx.Next()
 		return

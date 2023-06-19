@@ -33,8 +33,14 @@ func (c *poinLogController) GetPoinLog(ctx *gin.Context) {
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
+	role := ctx.MustGet("role")
+	pegawaiID := 0
 
-	result := c.PoinLogRepository.GetPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, tahunAjarID)
+	if role == "guru" {
+		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+	}
+
+	result := c.PoinLogRepository.GetPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, tahunAjarID, pegawaiID)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return

@@ -41,7 +41,14 @@ func (c *kelasController) GetKelas(ctx *gin.Context) {
 		return
 	}
 
-	kelas := c.KelasRepository.GetKelas(ctx, jurusanID, tahunAjarID)
+	role := ctx.MustGet("role")
+	pegawaiID := 0
+
+	if role == "guru" {
+		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+	}
+
+	kelas := c.KelasRepository.GetKelas(ctx, jurusanID, tahunAjarID, pegawaiID)
 	response := helper.BuildSuccessResponse("", kelas)
 	ctx.JSON(http.StatusOK, response)
 	return
