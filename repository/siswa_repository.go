@@ -30,7 +30,7 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp := r.db.Model(&siswa)
 	if search != "" {
 		search = "%" + search + "%"
-		temp.Where(temp.Where("nama ilike ?", search).Or("nis ilike ?", search))
+		temp.Where("(nama ilike ? or nis ilike ?)", search, search)
 	}
 
 	selectQuery := "siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, foto, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, foto"
@@ -47,10 +47,10 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 			return result
 		}
 
-		temp.Joins("right join siswa_kelas on siswa_kelas.siswa_id = siswa.id").
+		temp.Where("kelas.tahun_ajar_id = ?", activeTahunAjar.ID).
+			Joins("join siswa_kelas on siswa_kelas.siswa_id = siswa.id").
 			Joins("join kelas on kelas.id = siswa_kelas.kelas_id").
-			Where("kelas.tahun_ajar_id = ?", activeTahunAjar.ID).
-			Joins("left join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
+			Joins("join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
 		selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
 	} else {
 		if kelasID != "" {
@@ -195,7 +195,7 @@ func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest,
 	findSiswa := entity.Siswa{
 		ID: siswaID,
 	}
-	tx.Find(&findSiswa)
+	tx.First(&findSiswa)
 
 	user := entity.User{
 		Username: req.Nis,
