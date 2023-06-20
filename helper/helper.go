@@ -16,7 +16,7 @@ func IsInArray(arr []int, val int) bool {
 }
 
 func IsPegawai(role string) bool {
-	roles := []string{"guru", "staff-ict", "guru-bk", "tata-usaha"}
+	roles := []string{"guru", "staff-ict", "guru-bk", "tata-usaha", "admin"}
 	return strings.Contains(strings.Join(roles, ","), role)
 }
 

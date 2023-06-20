@@ -47,7 +47,7 @@ func (s *jwtService) GenerateToken(ctx context.Context, user dto.UserResponse) s
 		"role":    user.Role,
 	}
 
-	if helper.IsPegawai(user.Role) {
+	if user.PegawaiID != 0 {
 		jwtData["pegawai_id"] = user.PegawaiID
 	} else if user.Role == "siswa" {
 		jwtData["siswa_id"] = user.SiswaID
@@ -134,8 +134,7 @@ func (s *jwtService) IsAdmin(ctx *gin.Context) {
 
 func (s *jwtService) IsPegawai(ctx *gin.Context) {
 	role := ctx.MustGet("role").(string)
-	pegawaiID := int(ctx.MustGet("pegawai_id").(float64))
-	if helper.IsPegawai(role) && pegawaiID != 0 {
+	if helper.IsPegawai(role) {
 		ctx.Next()
 		return
 	}
