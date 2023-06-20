@@ -25,9 +25,17 @@ type PoinLogPagination struct {
 	Pagination Pagination        `json:"pagination"`
 }
 
+type PoinLogSiswaKelasResponse struct {
+	entity.Kelas
+	entity.SiswaKelas
+	SiswaKelasID int     `json:"siswa_kelas_id"`
+	Poin         float64 `json:"poin"`
+	TahunAjar    string  `json:"tahun_ajar"`
+}
+
 type PoinLogSiswaByKelas struct {
-	Kelas entity.Kelas      `json:"kelas"`
-	Data  []PoinLogResponse `json:"data"`
+	Kelas PoinLogSiswaKelasResponse `json:"kelas"`
+	Data  []PoinLogResponse         `json:"data"`
 }
 
 type PoinLogCountResponse struct {
