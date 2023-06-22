@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"math"
 	"time"
+	_ "time/tzdata"
 )
 
 type PoinSiswaRepository interface {
