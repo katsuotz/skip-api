@@ -9,7 +9,7 @@ import (
 )
 
 type SiswaRepository interface {
-	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarID string, jurusanID string, tahunAjarActive string) dto.SiswaPagination
+	GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarID string, jurusanID string, tahunAjarActive string, summary bool) dto.SiswaPagination
 	GetSiswaByNIS(ctx context.Context, nis string) dto.SiswaResponse
 	CreateSiswa(ctx context.Context, siswa dto.SiswaRequest) error
 	UpdateSiswa(ctx context.Context, siswa dto.SiswaRequest, siswaID int) error
@@ -24,7 +24,7 @@ func NewSiswaRepository(db *gorm.DB) SiswaRepository {
 	return &siswaRepository{db: db}
 }
 
-func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarID string, jurusanID string, tahunAjarActive string) dto.SiswaPagination {
+func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, search string, kelasID string, tahunAjarID string, jurusanID string, tahunAjarActive string, summary bool) dto.SiswaPagination {
 	result := dto.SiswaPagination{}
 	siswa := entity.Siswa{}
 	temp := r.db.Model(&siswa)
@@ -72,6 +72,24 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp.Select(selectQuery)
 	temp.Order("nama asc")
 	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
+
+	if summary {
+		for i, siswa := range result.Data {
+			r.db.Model(&entity.PoinLog{}).
+				Select("sum(poin_log.poin)").
+				Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
+				Where("type = ?", "Penghargaan").
+				Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
+				Scan(&result.Data[i].TotalPenghargaan)
+
+			r.db.Model(&entity.PoinLog{}).
+				Select("sum(poin_log.poin)").
+				Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
+				Where("type = ?", "Pelanggaran").
+				Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
+				Scan(&result.Data[i].TotalPelanggaran)
+		}
+	}
 
 	var totalItem int64
 	temp.Offset(-1).Limit(-1).Count(&totalItem)

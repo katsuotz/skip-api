@@ -8,10 +8,12 @@ type SiswaRequest struct {
 }
 
 type SiswaResponse struct {
-	ID           int      `json:"id"`
-	UserID       int      `json:"user_id"`
-	Poin         *float64 `json:"poin,omitempty"`
-	SiswaKelasID *int     `json:"siswa_kelas_id,omitempty"`
+	ID               int      `json:"id"`
+	UserID           int      `json:"user_id"`
+	Poin             *float64 `json:"poin,omitempty"`
+	SiswaKelasID     *int     `json:"siswa_kelas_id,omitempty"`
+	TotalPenghargaan float64  `json:"total_penghargaan,omitempty"`
+	TotalPelanggaran float64  `json:"total_pelanggaran,omitempty"`
 	entity.Siswa
 	entity.Profile
 }
