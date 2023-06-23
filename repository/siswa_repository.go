@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
@@ -34,6 +35,11 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	}
 
 	selectQuery := "siswa.id as id, siswa.user_id as user_id, nis, profiles.id as profile_id, foto, nama, jenis_kelamin, tanggal_lahir, tempat_lahir, foto"
+
+	if summary {
+		selectQuery += ",(SELECT sum(poin_log.poin) FROM \"poin_log\" WHERE poin_log.poin_siswa_id = poin_siswa.id AND type = 'Penghargaan' AND \"poin_log\".\"deleted_at\" IS NULL) as total_penghargaan"
+		selectQuery += ",(SELECT sum(poin_log.poin) FROM \"poin_log\" WHERE poin_log.poin_siswa_id = poin_siswa.id AND type = 'Pelanggaran' AND \"poin_log\".\"deleted_at\" IS NULL) as total_pelanggaran"
+	}
 
 	temp.Joins("join users on users.id = siswa.user_id").
 		Joins("join profiles on profiles.user_id = users.id")
@@ -73,31 +79,39 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp.Order("nama asc")
 	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
 
-	if summary {
-		for i, siswa := range result.Data {
-			r.db.Model(&entity.PoinLog{}).
-				Select("sum(poin_log.poin)").
-				Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
-				Where("type = ?", "Penghargaan").
-				Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
-				Scan(&result.Data[i].TotalPenghargaan)
+	fmt.Println(result.Data[0].TotalPenghargaan)
 
-			r.db.Model(&entity.PoinLog{}).
-				Select("sum(poin_log.poin)").
-				Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
-				Where("type = ?", "Pelanggaran").
-				Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
-				Scan(&result.Data[i].TotalPelanggaran)
-		}
-	}
+	//if summary {
+	//	for i, siswa := range result.Data {
+	//		r.db.Model(&entity.PoinLog{}).
+	//			Select("sum(poin_log.poin)").
+	//			Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
+	//			Where("type = ?", "Penghargaan").
+	//			Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
+	//			Scan(&result.Data[i].TotalPenghargaan)
+	//
+	//		r.db.Model(&entity.PoinLog{}).
+	//			Select("sum(poin_log.poin)").
+	//			Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
+	//			Where("type = ?", "Pelanggaran").
+	//			Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
+	//			Scan(&result.Data[i].TotalPelanggaran)
+	//	}
+	//}
 
 	var totalItem int64
-	temp.Offset(-1).Limit(-1).Count(&totalItem)
-	result.Pagination.TotalItem = totalItem
-	result.Pagination.Page = page
-	totalPage := totalItem / int64(perPage)
-	if totalItem%int64(perPage) > 0 {
-		totalPage++
+	var totalPage int64
+	if perPage != -1 {
+		temp.Offset(-1).Limit(-1).Count(&totalItem)
+		result.Pagination.TotalItem = totalItem
+		result.Pagination.Page = page
+		totalPage = totalItem / int64(perPage)
+		if totalItem%int64(perPage) > 0 {
+			totalPage++
+		}
+	} else {
+		totalItem = int64(len(result.Data))
+		totalPage = int64(1)
 	}
 	result.Pagination.TotalPage = totalPage
 	result.Pagination.PerPage = perPage
