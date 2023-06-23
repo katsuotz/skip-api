@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/helper"
@@ -79,31 +78,10 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	temp.Order("nama asc")
 	temp.Offset(perPage * (page - 1)).Limit(perPage).Find(&result.Data)
 
-	fmt.Println(result.Data[0].TotalPenghargaan)
-
-	//if summary {
-	//	for i, siswa := range result.Data {
-	//		r.db.Model(&entity.PoinLog{}).
-	//			Select("sum(poin_log.poin)").
-	//			Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
-	//			Where("type = ?", "Penghargaan").
-	//			Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
-	//			Scan(&result.Data[i].TotalPenghargaan)
-	//
-	//		r.db.Model(&entity.PoinLog{}).
-	//			Select("sum(poin_log.poin)").
-	//			Where("poin_siswa.siswa_kelas_id = ?", siswa.SiswaKelasID).
-	//			Where("type = ?", "Pelanggaran").
-	//			Joins("join poin_siswa on poin_siswa.id = poin_log.poin_siswa_id").
-	//			Scan(&result.Data[i].TotalPelanggaran)
-	//	}
-	//}
-
 	var totalItem int64
 	var totalPage int64
 	if perPage != -1 {
 		temp.Offset(-1).Limit(-1).Count(&totalItem)
-		result.Pagination.TotalItem = totalItem
 		result.Pagination.Page = page
 		totalPage = totalItem / int64(perPage)
 		if totalItem%int64(perPage) > 0 {
@@ -112,7 +90,9 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 	} else {
 		totalItem = int64(len(result.Data))
 		totalPage = int64(1)
+		perPage = int(totalItem)
 	}
+	result.Pagination.TotalItem = totalItem
 	result.Pagination.TotalPage = totalPage
 	result.Pagination.PerPage = perPage
 

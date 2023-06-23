@@ -72,6 +72,7 @@ func (r *Router) Init() {
 	guest := r.server.Group("", r.JWTService.IsGuest)
 	{
 		guest.POST("login", r.AuthController.Login)
+		guest.GET("siswa/:nis/log", r.SiswaController.GetSiswaDetailByNIS)
 	}
 
 	/* Authorized User Only */
@@ -143,7 +144,7 @@ func (r *Router) Init() {
 		siswa := authorized.Group("siswa")
 		{
 			siswa.GET("", r.JWTService.IsNotSiswa, r.SiswaController.GetSiswa)
-			siswa.GET(":nis/log", r.SiswaController.GetSiswaDetailByNIS)
+			//siswa.GET(":nis/log", r.SiswaController.GetSiswaDetailByNIS)
 
 			siswaAdmin := siswa.Group("", r.JWTService.IsAdmin)
 			{
