@@ -46,8 +46,8 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 
 	profile := c.ProfileRepository.FindProfileByID(ctx, userID)
 	if profile.ID == 0 {
-		response := helper.BuildErrorResponse("Unauthorized", nil, nil)
-		ctx.JSON(http.StatusUnauthorized, response)
+		response := helper.BuildErrorResponse("Forbidden", nil, nil)
+		ctx.JSON(http.StatusForbidden, response)
 		return
 	}
 
