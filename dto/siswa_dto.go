@@ -14,6 +14,7 @@ type SiswaResponse struct {
 	SiswaKelasID     *int     `json:"siswa_kelas_id,omitempty"`
 	TotalPenghargaan *float64 `json:"total_penghargaan,omitempty"`
 	TotalPelanggaran *float64 `json:"total_pelanggaran,omitempty"`
+	NamaKelas        *string  `json:"nama_kelas,omitempty"`
 	entity.Siswa
 	entity.Profile
 }

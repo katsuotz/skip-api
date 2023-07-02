@@ -56,7 +56,7 @@ func (r *siswaRepository) GetSiswa(ctx context.Context, page int, perPage int, s
 			Joins("join siswa_kelas on siswa_kelas.siswa_id = siswa.id").
 			Joins("join kelas on kelas.id = siswa_kelas.kelas_id").
 			Joins("join poin_siswa on poin_siswa.siswa_kelas_id = siswa_kelas.id")
-		selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id"
+		selectQuery += ", poin_siswa.poin as poin, siswa_kelas.id as siswa_kelas_id, nama_kelas"
 	} else {
 		if kelasID != "" {
 			if kelasID != "0" {
