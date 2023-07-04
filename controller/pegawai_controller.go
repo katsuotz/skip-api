@@ -40,7 +40,7 @@ func (c *pegawaiController) GetPegawai(ctx *gin.Context) {
 }
 
 func (c *pegawaiController) CreatePegawai(ctx *gin.Context) {
-	req := dto.PegawaiRequest{}
+	req := dto.CreatePegawaiRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Gagal memproses permintaan", errDTO, nil)

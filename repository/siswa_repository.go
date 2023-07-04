@@ -178,6 +178,7 @@ func (r *siswaRepository) CreateSiswa(ctx context.Context, req dto.SiswaRequest)
 		JenisKelamin: req.JenisKelamin,
 		TanggalLahir: tanggalLahir,
 		TempatLahir:  req.TempatLahir,
+		Foto:         req.Foto,
 		UserID:       user.ID,
 	}
 
@@ -238,6 +239,7 @@ func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest,
 		JenisKelamin: req.JenisKelamin,
 		TanggalLahir: tanggalLahir,
 		TempatLahir:  req.TempatLahir,
+		Foto:         req.Foto,
 	}
 
 	err = tx.Where("user_id = ?", findSiswa.UserID).Updates(&profile).Error

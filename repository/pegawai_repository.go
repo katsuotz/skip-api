@@ -10,7 +10,7 @@ import (
 
 type PegawaiRepository interface {
 	GetPegawai(ctx context.Context, page int, perPage int, search string) dto.PegawaiPagination
-	CreatePegawai(ctx context.Context, pegawai dto.PegawaiRequest) error
+	CreatePegawai(ctx context.Context, pegawai dto.CreatePegawaiRequest) error
 	UpdatePegawai(ctx context.Context, pegawai dto.PegawaiRequest, pegawaiID int) error
 	DeletePegawai(ctx context.Context, pegawaiID int) error
 }
@@ -51,7 +51,7 @@ func (r *pegawaiRepository) GetPegawai(ctx context.Context, page int, perPage in
 	return result
 }
 
-func (r *pegawaiRepository) CreatePegawai(ctx context.Context, req dto.PegawaiRequest) error {
+func (r *pegawaiRepository) CreatePegawai(ctx context.Context, req dto.CreatePegawaiRequest) error {
 	tx := r.db.Begin()
 
 	defer func() {
@@ -98,6 +98,7 @@ func (r *pegawaiRepository) CreatePegawai(ctx context.Context, req dto.PegawaiRe
 		JenisKelamin: req.JenisKelamin,
 		TanggalLahir: tanggalLahir,
 		TempatLahir:  req.TempatLahir,
+		Foto:         req.Foto,
 		UserID:       user.ID,
 	}
 
@@ -124,7 +125,11 @@ func (r *pegawaiRepository) UpdatePegawai(ctx context.Context, req dto.PegawaiRe
 	}
 
 	tanggalLahir, _ := helper.StringToDate(req.TanggalLahir)
-	password, _ := helper.HashPassword(req.Password)
+	password := ""
+
+	if req.Password != "" {
+		password, _ = helper.HashPassword(req.Password)
+	}
 
 	findPegawai := entity.Pegawai{
 		ID: pegawaiID,
@@ -133,8 +138,11 @@ func (r *pegawaiRepository) UpdatePegawai(ctx context.Context, req dto.PegawaiRe
 
 	user := entity.User{
 		Username: req.Username,
-		Password: password,
 		Role:     getPegawaiRole(req.TipePegawai),
+	}
+
+	if password != "" {
+		user.Password = password
 	}
 
 	err := tx.Where("id = ?", findPegawai.UserID).Updates(&user).Error
@@ -161,6 +169,7 @@ func (r *pegawaiRepository) UpdatePegawai(ctx context.Context, req dto.PegawaiRe
 		JenisKelamin: req.JenisKelamin,
 		TanggalLahir: tanggalLahir,
 		TempatLahir:  req.TempatLahir,
+		Foto:         req.Foto,
 	}
 
 	err = tx.Where("user_id = ?", findPegawai.UserID).Updates(&profile).Error

@@ -6,8 +6,13 @@ type PegawaiRequest struct {
 	Nip         string `json:"nip" binding:"required" form:"nip"`
 	TipePegawai string `json:"tipe_pegawai" binding:"required" form:"tipe_pegawai"`
 	Username    string `json:"username" binding:"required" form:"username"`
-	Password    string `json:"password" binding:"required" form:"password"`
+	Password    string `json:"password" form:"password"`
 	ProfileRequest
+}
+
+type CreatePegawaiRequest struct {
+	Password string `json:"password" binding:"required" form:"password"`
+	PegawaiRequest
 }
 
 type PegawaiResponse struct {
