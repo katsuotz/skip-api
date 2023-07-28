@@ -30,7 +30,7 @@ func (r *poinLogRepository) GetPoinSiswaLog(ctx context.Context, page int, perPa
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 
-	temp.Select("poin_log.id as id, title, description, poin_log.poin, poin_before, poin_after, type, file, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at").
+	temp.Select("poin_log.id as id, title, description, penanganan, tindak_lanjut, poin_log.poin, poin_before, poin_after, type, file, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at").
 		Where("siswa_kelas.id = ?", siswaKelasID).
 		Joins("join pegawai on pegawai.id = poin_log.pegawai_id").
 		Joins("join users on users.id = pegawai.user_id").
@@ -61,12 +61,15 @@ func (r *poinLogRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis stri
 
 	var siswaKelas []dto.PoinLogSiswaKelasResponse
 	r.db.Model(&entity.SiswaKelas{}).
-		Select("kelas.*, siswa_kelas.id as siswa_kelas_id, siswa_kelas.kelas_id as kelas_id, siswa.nis as nis, poin_siswa.poin, tahun_ajar.tahun_ajar").
+		Select("kelas.*, siswa_kelas.id as siswa_kelas_id, siswa_kelas.kelas_id as kelas_id, siswa.nis as nis, poin_siswa.poin, tahun_ajar.tahun_ajar, profiles.nama as wali_kelas").
 		Where("siswa.nis = ?", nis).
 		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
 		Joins("join kelas on siswa_kelas.kelas_id = kelas.id").
 		Joins("join tahun_ajar on kelas.tahun_ajar_id = tahun_ajar.id").
 		Joins("join poin_siswa on siswa_kelas.id = poin_siswa.siswa_kelas_id").
+		Joins("join pegawai on pegawai.id = kelas.pegawai_id").
+		Joins("join users on users.id = pegawai.user_id").
+		Joins("join profiles on profiles.user_id = users.id").
 		Find(&siswaKelas)
 
 	for _, sKelas := range siswaKelas {

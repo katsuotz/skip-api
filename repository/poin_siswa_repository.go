@@ -164,6 +164,7 @@ func (r *poinSiswaRepository) AddPoinSiswa(ctx context.Context, req dto.PoinSisw
 	poinLog := entity.PoinLog{
 		Title:       req.Title,
 		Description: req.Description,
+		Penanganan:  req.Penanganan,
 		Type:        req.Type,
 		Poin:        req.Poin,
 		PoinBefore:  poinBefore,
@@ -185,7 +186,7 @@ func (r *poinSiswaRepository) AddPoinSiswa(ctx context.Context, req dto.PoinSisw
 func (r *poinSiswaRepository) UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error {
 	err := r.db.Model(&entity.PoinLog{}).
 		Where("id = ?", poinLog.ID).
-		Update("description", poinLog.Description).
+		Update("tindak_lanjut", poinLog.TindakLanjut).
 		Error
 	return err
 }

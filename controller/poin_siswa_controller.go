@@ -125,8 +125,8 @@ func (c *poinSiswaController) UpdatePoinSiswa(ctx *gin.Context) {
 	}
 
 	poinLog := entity.PoinLog{
-		ID:          poinLogID,
-		Description: req.Description,
+		ID:           poinLogID,
+		TindakLanjut: req.TindakLanjut,
 	}
 
 	err = c.PoinSiswaRepository.UpdatePoinSiswa(ctx, poinLog)

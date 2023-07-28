@@ -1,18 +1,20 @@
 package entity
 
 type PoinLog struct {
-	ID          int        `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	Title       string     `gorm:"type:varchar(50)" json:"title"`
-	Description string     `gorm:"type:text" json:"description"`
-	Poin        float64    `json:"poin"`
-	PoinBefore  float64    `json:"poin_before"`
-	PoinAfter   float64    `json:"poin_after"`
-	Type        string     `gorm:"index;type:varchar(20)" json:"type"`
-	File        string     `gorm:"type:text" json:"file"`
-	PegawaiID   int        `gorm:"index" json:"pegawai_id"`
-	Pegawai     *Pegawai   `gorm:"foreignKey:pegawai_id" json:"pegawai,omitempty"`
-	PoinSiswaID int        `gorm:"index" json:"poin_siswa_id"`
-	PoinSiswa   *PoinSiswa `gorm:"foreignKey:poin_siswa_id" json:"poin_siswa,omitempty"`
+	ID           int        `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
+	Title        string     `gorm:"type:varchar(50)" json:"title"`
+	Description  string     `gorm:"type:text" json:"description"`
+	Penanganan   string     `gorm:"type:text" json:"penanganan"`
+	TindakLanjut string     `gorm:"type:text" json:"tindak_lanjut,omitempty"`
+	Poin         float64    `json:"poin"`
+	PoinBefore   float64    `json:"poin_before"`
+	PoinAfter    float64    `json:"poin_after"`
+	Type         string     `gorm:"index;type:varchar(20)" json:"type"`
+	File         string     `gorm:"type:text" json:"file"`
+	PegawaiID    int        `gorm:"index" json:"pegawai_id"`
+	Pegawai      *Pegawai   `gorm:"foreignKey:pegawai_id" json:"pegawai,omitempty"`
+	PoinSiswaID  int        `gorm:"index" json:"poin_siswa_id"`
+	PoinSiswa    *PoinSiswa `gorm:"foreignKey:poin_siswa_id" json:"poin_siswa,omitempty"`
 	Base
 }
 

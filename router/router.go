@@ -180,6 +180,9 @@ func (r *Router) Init() {
 				poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
 				poinSiswaAdmin.GET("kelas/:kelas_id", r.PoinSiswaController.GetPoinKelas)
 				poinSiswaAdmin.GET("jurusan/:jurusan_id", r.PoinSiswaController.GetPoinJurusan)
+
+				// update tindak lanjut
+				poinSiswaAdmin.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
 			}
 
 			/* Poin Siswa Transaction - Only for Pegawai */
@@ -187,7 +190,6 @@ func (r *Router) Init() {
 			poinSiswaPegawai := poinSiswa.Group("", r.JWTService.IsPegawai)
 			{
 				poinSiswaPegawai.POST("", r.PoinSiswaController.AddPoinSiswa)
-				//poinSiswaPegawai.PATCH("log/:poin_log_id", r.PoinSiswaController.UpdatePoinSiswa)
 				poinSiswaPegawai.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 			}
 

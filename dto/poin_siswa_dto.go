@@ -5,6 +5,7 @@ import "gitlab.com/katsuotz/skip-api/entity"
 type PoinSiswaRequest struct {
 	Title        string  `json:"title" binding:"required" form:"title"`
 	Description  string  `json:"description" binding:"required" form:"description"`
+	Penanganan   string  `json:"penanganan" binding:"required" form:"penanganan"`
 	Poin         float64 `json:"poin" binding:"required" form:"poin"`
 	Type         string  `json:"type" binding:"required" form:"type"`
 	PegawaiID    int     `json:"pegawai_id" form:"pegawai_id"`
@@ -13,7 +14,7 @@ type PoinSiswaRequest struct {
 }
 
 type UpdatePoinLogRequest struct {
-	Description string `json:"description" binding:"required" form:"description"`
+	TindakLanjut string `json:"tindak_lanjut" binding:"required" form:"tindak_lanjut"`
 }
 
 type PoinSiswaResponse struct {
