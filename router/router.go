@@ -188,7 +188,7 @@ func (r *Router) Init() {
 
 			poinSiswaPegawai := poinSiswa.Group("", r.JWTService.IsPegawai)
 			{
-				poinSiswaAdmin.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
+				poinSiswaPegawai.GET("siswa/:siswa_kelas_id", r.PoinSiswaController.GetPoinSiswa)
 				poinSiswaPegawai.POST("", r.PoinSiswaController.AddPoinSiswa)
 				poinSiswaPegawai.DELETE("log/:poin_log_id", r.PoinSiswaController.DeletePoinSiswa)
 			}
