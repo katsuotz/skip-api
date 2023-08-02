@@ -9,7 +9,7 @@ type PoinLogResponse struct {
 	PoinAfter    float64 `json:"poin_after"`
 	Title        string  `json:"title"`
 	Description  string  `json:"description"`
-	Penanganan   string  `json:"penanganan"`
+	Penanganan   *string `json:"penanganan,omitempty"`
 	TindakLanjut *string `json:"tindak_lanjut,omitempty"`
 	Type         string  `json:"type"`
 	PegawaiID    int     `json:"pegawai_id"`
