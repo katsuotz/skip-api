@@ -11,6 +11,7 @@ type PoinSiswaRequest struct {
 	PegawaiID    int     `json:"pegawai_id" form:"pegawai_id"`
 	File         string  `json:"file" form:"file"`
 	SiswaKelasID int     `json:"siswa_kelas_id" binding:"required" form:"siswa_kelas_id"`
+	DataPoinID   int     `json:"data_poin_id" binding:"required" form:"data_poin_id"`
 }
 
 type UpdatePoinLogRequest struct {

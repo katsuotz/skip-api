@@ -9,6 +9,7 @@ import (
 
 type DataPoinRepository interface {
 	GetDataPoin(ctx context.Context, page int, perPage int, search string, poinType string, category string) dto.DataPoinPagination
+	GetDataPoinByID(ctx context.Context, dataPoinID int) entity.DataPoin
 	CreateDataPoin(ctx context.Context, dataPoin entity.DataPoin) (entity.DataPoin, error)
 	UpdateDataPoin(ctx context.Context, dataPoin entity.DataPoin) (entity.DataPoin, error)
 	DeleteDataPoin(ctx context.Context, dataPoinID int) error
@@ -55,6 +56,14 @@ func (r *dataPoinRepository) GetDataPoin(ctx context.Context, page int, perPage 
 	result.Pagination.PerPage = perPage
 
 	return result
+}
+
+func (r *dataPoinRepository) GetDataPoinByID(ctx context.Context, dataPoinID int) entity.DataPoin {
+	dataPoin := entity.DataPoin{
+		ID: dataPoinID,
+	}
+	r.db.First(&dataPoin)
+	return dataPoin
 }
 
 func (r *dataPoinRepository) CreateDataPoin(ctx context.Context, dataPoin entity.DataPoin) (entity.DataPoin, error) {

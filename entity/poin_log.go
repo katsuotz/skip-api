@@ -15,6 +15,8 @@ type PoinLog struct {
 	Pegawai      *Pegawai   `gorm:"foreignKey:pegawai_id" json:"pegawai,omitempty"`
 	PoinSiswaID  int        `gorm:"index" json:"poin_siswa_id"`
 	PoinSiswa    *PoinSiswa `gorm:"foreignKey:poin_siswa_id" json:"poin_siswa,omitempty"`
+	DataPoinID   int        `gorm:"index" json:"data_poin_id"`
+	DataPoin     *DataPoin  `gorm:"foreignKey:data_poin_id" json:"data_poin,omitempty"`
 	Base
 }
 

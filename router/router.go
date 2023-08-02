@@ -160,6 +160,7 @@ func (r *Router) Init() {
 		dataPoin := authorized.Group("data-poin")
 		{
 			dataPoin.GET("", r.DataPoinController.GetDataPoin)
+			dataPoin.GET(":data_poin_id", r.DataPoinController.GetDataPoinByID)
 
 			dataPoinAdmin := dataPoin.Group("", r.JWTService.IsStaff)
 			{

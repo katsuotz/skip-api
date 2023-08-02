@@ -13,6 +13,7 @@ type PoinLogResponse struct {
 	TindakLanjut *string `json:"tindak_lanjut,omitempty"`
 	Type         string  `json:"type"`
 	PegawaiID    int     `json:"pegawai_id"`
+	DataPoinID   int     `json:"data_poin_id"`
 	Nip          string  `json:"nip"`
 	NamaPegawai  string  `json:"nama_pegawai"`
 	Nama         *string `json:"nama,omitempty"`

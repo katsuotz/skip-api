@@ -30,7 +30,7 @@ func (r *poinLogRepository) GetPoinSiswaLog(ctx context.Context, page int, perPa
 	poinLog := entity.PoinLog{}
 	temp := r.db.Model(&poinLog)
 
-	temp.Select("poin_log.id as id, title, description, penanganan, tindak_lanjut, poin_log.poin, poin_before, poin_after, type, file, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at").
+	temp.Select("poin_log.id as id, title, description, penanganan, tindak_lanjut, poin_log.poin, poin_before, poin_after, type, file, pegawai_id, nip, profiles.nama as nama_pegawai, poin_log.created_at, poin_log.updated_at, poin_log.data_poin_id").
 		Where("siswa_kelas.id = ?", siswaKelasID).
 		Joins("join pegawai on pegawai.id = poin_log.pegawai_id").
 		Joins("join users on users.id = pegawai.user_id").

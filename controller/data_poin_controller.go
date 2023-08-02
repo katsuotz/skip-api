@@ -12,6 +12,7 @@ import (
 
 type DataPoinController interface {
 	GetDataPoin(ctx *gin.Context)
+	GetDataPoinByID(ctx *gin.Context)
 	CreateDataPoin(ctx *gin.Context)
 	UpdateDataPoin(ctx *gin.Context)
 	DeleteDataPoin(ctx *gin.Context)
@@ -42,6 +43,28 @@ func (c *dataPoinController) GetDataPoin(ctx *gin.Context) {
 	return
 }
 
+func (c *dataPoinController) GetDataPoinByID(ctx *gin.Context) {
+	dataPoinID, err := strconv.Atoi(ctx.Param("data_poin_id"))
+
+	if err != nil || dataPoinID == 0 {
+		response := helper.BuildErrorResponse("Gagal memproses permintaan", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	kelas := c.DataPoinRepository.GetDataPoinByID(ctx, dataPoinID)
+
+	if kelas.ID == 0 {
+		response := helper.BuildErrorResponse("Not Found", nil, nil)
+		ctx.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
+	}
+
+	response := helper.BuildSuccessResponse("", kelas)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
 func (c *dataPoinController) CreateDataPoin(ctx *gin.Context) {
 	req := dto.DataPoinRequest{}
 	errDTO := ctx.ShouldBindJSON(&req)
@@ -52,11 +75,13 @@ func (c *dataPoinController) CreateDataPoin(ctx *gin.Context) {
 	}
 
 	dataPoin := entity.DataPoin{
-		Title:       req.Title,
-		Description: req.Description,
-		Poin:        req.Poin,
-		Type:        req.Type,
-		Category:    req.Category,
+		Title:        req.Title,
+		Description:  req.Description,
+		Poin:         req.Poin,
+		Type:         req.Type,
+		Category:     req.Category,
+		Penanganan:   req.Penanganan,
+		TindakLanjut: req.TindakLanjut,
 	}
 
 	_, err := c.DataPoinRepository.CreateDataPoin(ctx, dataPoin)
