@@ -212,13 +212,22 @@ func (r *Router) Init() {
 
 			infoMetrics := info.Group("")
 			{
-				infoMetrics.GET("poin/count", r.InfoController.CountPoin)
-				infoMetrics.GET("poin/max", r.InfoController.MaxPoin)
-				infoMetrics.GET("poin/min", r.InfoController.MinPoin)
-				infoMetrics.GET("poin/avg", r.InfoController.AvgPoin)
+				// count poin log by category
+				infoMetrics.GET("poin/count", r.InfoController.CountPoinLog)
+				// get max poin siswa
+				infoMetrics.GET("poin/max", r.InfoController.MaxPoinSiswa)
+				// get min poin siswa
+				infoMetrics.GET("poin/min", r.InfoController.MinPoinSiswa)
+				// get avg poin siswa
+				infoMetrics.GET("poin/avg", r.InfoController.AvgPoinSiswa)
+				// get poin list
 				infoMetrics.GET("poin/list", r.InfoController.ListPoinSiswa)
+				// get poin siswa list grouped by category
 				infoMetrics.GET("poin/list/count", r.InfoController.ListCountPoinLog)
+				// get poin log list grouped by month
 				infoMetrics.GET("poin/graph/count", r.InfoController.GraphCountPoinLog)
+				// get poin siswa total with filter
+				infoMetrics.GET("poin/total", r.InfoController.CountPoinSiswaTotal)
 			}
 
 			/* Info Auth */

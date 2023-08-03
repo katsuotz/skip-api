@@ -19,7 +19,8 @@ type PoinSiswaRepository interface {
 	UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error
 	DeletePoinSiswa(ctx context.Context, poinLogID int) error
 	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int, maxPoin string) dto.PoinSiswaPagination
-	CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse
+	CountPoinSiswa(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse
+	CountPoinSiswaTotal(ctx context.Context, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int, maxPoin string) dto.CountResponse
 }
 
 type poinSiswaRepository struct {
@@ -322,7 +323,7 @@ func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page i
 	return result
 }
 
-func (r *poinSiswaRepository) CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse {
+func (r *poinSiswaRepository) CountPoinSiswa(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse {
 	result := dto.CountResponse{}
 
 	temp := r.db.Model(&entity.PoinSiswa{})
@@ -349,6 +350,45 @@ func (r *poinSiswaRepository) CountPoin(ctx context.Context, countType string, k
 
 	if pegawaiID != 0 {
 		temp.Where("kelas.pegawai_id = ?", pegawaiID)
+	}
+
+	temp.
+		Where("poin_siswa.deleted_at is NULL").
+		Where("siswa_kelas.deleted_at is NULL").
+		Where("kelas.deleted_at is NULL").
+		Joins("left join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
+		Joins("left join kelas on kelas.id = siswa_kelas.kelas_id")
+
+	temp.Scan(&result.Total)
+
+	return result
+}
+
+func (r *poinSiswaRepository) CountPoinSiswaTotal(ctx context.Context, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int, maxPoin string) dto.CountResponse {
+	result := dto.CountResponse{}
+
+	temp := r.db.Model(&entity.PoinSiswa{})
+
+	temp.Select("count(*)")
+
+	if kelasID != "" {
+		temp.Where("kelas.id = ?", kelasID)
+	}
+
+	if tahunAjarID != "" {
+		temp.Where("kelas.tahun_ajar_id = ?", tahunAjarID)
+	}
+
+	if jurusanID != "" {
+		temp.Where("kelas.jurusan_id = ?", jurusanID)
+	}
+
+	if pegawaiID != 0 {
+		temp.Where("kelas.pegawai_id = ?", pegawaiID)
+	}
+
+	if maxPoin != "" {
+		temp.Where("poin_siswa.poin <= ?", maxPoin)
 	}
 
 	temp.

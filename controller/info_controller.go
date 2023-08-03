@@ -9,14 +9,15 @@ import (
 )
 
 type InfoController interface {
-	CountPoin(ctx *gin.Context)
-	MaxPoin(ctx *gin.Context)
-	MinPoin(ctx *gin.Context)
-	AvgPoin(ctx *gin.Context)
+	CountPoinLog(ctx *gin.Context)
+	MaxPoinSiswa(ctx *gin.Context)
+	MinPoinSiswa(ctx *gin.Context)
+	AvgPoinSiswa(ctx *gin.Context)
 	ListPoinSiswa(ctx *gin.Context)
 	ListPoinLog(ctx *gin.Context)
 	ListCountPoinLog(ctx *gin.Context)
 	GraphCountPoinLog(ctx *gin.Context)
+	CountPoinSiswaTotal(ctx *gin.Context)
 }
 
 type infoController struct {
@@ -34,7 +35,7 @@ func NewInfoController(
 	}
 }
 
-func (c *infoController) CountPoin(ctx *gin.Context) {
+func (c *infoController) CountPoinLog(ctx *gin.Context) {
 	poinType := ctx.DefaultQuery("type", "")
 	kelasID := ctx.DefaultQuery("kelas_id", "")
 	jurusanID := ctx.DefaultQuery("jurusan_id", "")
@@ -47,13 +48,13 @@ func (c *infoController) CountPoin(ctx *gin.Context) {
 		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
 	}
 
-	result := c.PoinLogRepository.CountPoin(ctx, poinType, kelasID, jurusanID, tahunAjarID, pegawaiID, maxPoin)
+	result := c.PoinLogRepository.CountPoinLog(ctx, poinType, kelasID, jurusanID, tahunAjarID, pegawaiID, maxPoin)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *infoController) MaxPoin(ctx *gin.Context) {
+func (c *infoController) MaxPoinSiswa(ctx *gin.Context) {
 	kelasID := ctx.DefaultQuery("kelas_id", "")
 	jurusanID := ctx.DefaultQuery("jurusan_id", "")
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
@@ -64,13 +65,13 @@ func (c *infoController) MaxPoin(ctx *gin.Context) {
 		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
 	}
 
-	result := c.PoinSiswaRepository.CountPoin(ctx, "max", kelasID, jurusanID, tahunAjarID, pegawaiID)
+	result := c.PoinSiswaRepository.CountPoinSiswa(ctx, "max", kelasID, jurusanID, tahunAjarID, pegawaiID)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *infoController) MinPoin(ctx *gin.Context) {
+func (c *infoController) MinPoinSiswa(ctx *gin.Context) {
 	kelasID := ctx.DefaultQuery("kelas_id", "")
 	jurusanID := ctx.DefaultQuery("jurusan_id", "")
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
@@ -81,13 +82,13 @@ func (c *infoController) MinPoin(ctx *gin.Context) {
 		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
 	}
 
-	result := c.PoinSiswaRepository.CountPoin(ctx, "min", kelasID, jurusanID, tahunAjarID, pegawaiID)
+	result := c.PoinSiswaRepository.CountPoinSiswa(ctx, "min", kelasID, jurusanID, tahunAjarID, pegawaiID)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
 
-func (c *infoController) AvgPoin(ctx *gin.Context) {
+func (c *infoController) AvgPoinSiswa(ctx *gin.Context) {
 	kelasID := ctx.DefaultQuery("kelas_id", "")
 	jurusanID := ctx.DefaultQuery("jurusan_id", "")
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
@@ -98,7 +99,7 @@ func (c *infoController) AvgPoin(ctx *gin.Context) {
 		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
 	}
 
-	result := c.PoinSiswaRepository.CountPoin(ctx, "avg", kelasID, jurusanID, tahunAjarID, pegawaiID)
+	result := c.PoinSiswaRepository.CountPoinSiswa(ctx, "avg", kelasID, jurusanID, tahunAjarID, pegawaiID)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
@@ -182,6 +183,24 @@ func (c *infoController) GraphCountPoinLog(ctx *gin.Context) {
 	}
 
 	result := c.PoinLogRepository.GetCountPoinLogPaginationByMonth(ctx, tahunAjarID, poinType, pegawaiID)
+	response := helper.BuildSuccessResponse("", result)
+	ctx.JSON(http.StatusOK, response)
+	return
+}
+
+func (c *infoController) CountPoinSiswaTotal(ctx *gin.Context) {
+	kelasID := ctx.DefaultQuery("kelas_id", "")
+	jurusanID := ctx.DefaultQuery("jurusan_id", "")
+	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
+	maxPoin := ctx.DefaultQuery("max_poin", "")
+	role := ctx.MustGet("role")
+	pegawaiID := 0
+
+	if role == "guru" {
+		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+	}
+
+	result := c.PoinSiswaRepository.CountPoinSiswaTotal(ctx, kelasID, jurusanID, tahunAjarID, pegawaiID, maxPoin)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
