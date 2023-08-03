@@ -11,7 +11,7 @@ import (
 type PoinLogRepository interface {
 	GetPoinSiswaLog(ctx context.Context, page int, perPage int, siswaKelasID int) dto.PoinLogPagination
 	GetPoinLogSiswaByKelas(ctx context.Context, nis string) []dto.PoinLogSiswaByKelas
-	CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse
+	CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int, maxPoin string) dto.CountResponse
 	GetPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, tahunAjarID string, pegawaiID int) dto.PoinLogPagination
 	GetCountPoinLogPagination(ctx context.Context, page int, perPage int, order string, orderBy string, groupBy string, tahunAjarID string, poinType string, pegawaiID int) dto.PoinLogCountPagination
 	GetCountPoinLogPaginationByMonth(ctx context.Context, tahunAjarID string, poinType string, pegawaiID int) []dto.PoinLogCountGraphResponse
@@ -100,7 +100,7 @@ func (r *poinLogRepository) GetPoinLogSiswaByKelas(ctx context.Context, nis stri
 	return result
 }
 
-func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse {
+func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int, maxPoin string) dto.CountResponse {
 	result := dto.CountResponse{}
 
 	temp := r.db.Model(&entity.PoinLog{}).
@@ -124,6 +124,10 @@ func (r *poinLogRepository) CountPoin(ctx context.Context, poinType string, kela
 
 	if pegawaiID != 0 {
 		temp.Where("kelas.pegawai_id = ?", pegawaiID)
+	}
+
+	if maxPoin != "" {
+		temp.Where("poin <= ?", maxPoin)
 	}
 
 	temp.
