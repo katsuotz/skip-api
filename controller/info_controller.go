@@ -39,6 +39,7 @@ func (c *infoController) CountPoin(ctx *gin.Context) {
 	kelasID := ctx.DefaultQuery("kelas_id", "")
 	jurusanID := ctx.DefaultQuery("jurusan_id", "")
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
+	maxPoin := ctx.DefaultQuery("max_poin", "")
 	role := ctx.MustGet("role")
 	pegawaiID := 0
 
@@ -46,7 +47,7 @@ func (c *infoController) CountPoin(ctx *gin.Context) {
 		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
 	}
 
-	result := c.PoinLogRepository.CountPoin(ctx, poinType, kelasID, jurusanID, tahunAjarID, pegawaiID)
+	result := c.PoinLogRepository.CountPoin(ctx, poinType, kelasID, jurusanID, tahunAjarID, pegawaiID, maxPoin)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return
@@ -109,6 +110,7 @@ func (c *infoController) ListPoinSiswa(ctx *gin.Context) {
 	search := ctx.DefaultQuery("search", "")
 	order := ctx.DefaultQuery("order", "asc")
 	orderBy := ctx.DefaultQuery("order_by", "nama")
+	maxPoin := ctx.DefaultQuery("max_poin", "")
 	pageInt, _ := strconv.Atoi(page)
 	perPageInt, _ := strconv.Atoi(perPage)
 	tahunAjarID := ctx.DefaultQuery("tahun_ajar_id", "")
@@ -119,7 +121,7 @@ func (c *infoController) ListPoinSiswa(ctx *gin.Context) {
 		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
 	}
 
-	result := c.PoinSiswaRepository.GetPoinSiswaPagination(ctx, pageInt, perPageInt, order, orderBy, search, tahunAjarID, pegawaiID)
+	result := c.PoinSiswaRepository.GetPoinSiswaPagination(ctx, pageInt, perPageInt, order, orderBy, search, tahunAjarID, pegawaiID, maxPoin)
 	response := helper.BuildSuccessResponse("", result)
 	ctx.JSON(http.StatusOK, response)
 	return

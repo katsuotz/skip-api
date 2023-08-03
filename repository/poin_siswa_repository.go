@@ -18,7 +18,7 @@ type PoinSiswaRepository interface {
 	AddPoinSiswa(ctx context.Context, req dto.PoinSiswaRequest) error
 	UpdatePoinSiswa(ctx context.Context, poinLog entity.PoinLog) error
 	DeletePoinSiswa(ctx context.Context, poinLogID int) error
-	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int) dto.PoinSiswaPagination
+	GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int, maxPoin string) dto.PoinSiswaPagination
 	CountPoin(ctx context.Context, countType string, kelasID string, jurusanID string, tahunAjarID string, pegawaiID int) dto.CountResponse
 }
 
@@ -277,7 +277,7 @@ func (r *poinSiswaRepository) DeletePoinSiswa(ctx context.Context, poinLogID int
 	return tx.Commit().Error
 }
 
-func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int) dto.PoinSiswaPagination {
+func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page int, perPage int, order string, orderBy string, search string, tahunAjarID string, pegawaiID int, maxPoin string) dto.PoinSiswaPagination {
 	result := dto.PoinSiswaPagination{}
 	poinSiswa := entity.PoinSiswa{}
 	temp := r.db.Model(&poinSiswa)
@@ -292,6 +292,10 @@ func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page i
 
 	if pegawaiID != 0 {
 		temp.Where("kelas.pegawai_id = ?", pegawaiID)
+	}
+
+	if maxPoin != "" {
+		temp.Where("poin <= ?", maxPoin)
 	}
 
 	temp.Select("nis, nama, foto, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at").
