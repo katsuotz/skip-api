@@ -252,11 +252,30 @@ func (r *siswaRepository) UpdateSiswa(ctx context.Context, req dto.SiswaRequest,
 }
 
 func (r *siswaRepository) DeleteSiswa(ctx context.Context, siswaID int) error {
-	err := r.db.Where("id = ?", siswaID).Delete(&entity.Siswa{}).Error
+	tx := r.db.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	err := tx.Where("id = ?", siswaID).Delete(&entity.Siswa{}).Error
 
 	if err == nil {
-		err = r.db.Where("siswa_id = ?", siswaID).Delete(&entity.SiswaKelas{}).Error
+		siswaKelas := entity.SiswaKelas{}
+		tx.Where("siswa_id = ?", siswaID).First(&siswaKelas)
+
+		err = tx.Where("siswa_kelas_id = ?", siswaKelas.ID).Delete(&entity.PoinSiswa{}).Error
+
+		if err == nil {
+			err = tx.Delete(&siswaKelas).Error
+		}
 	}
 
-	return err
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
 }
