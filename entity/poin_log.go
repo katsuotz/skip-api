@@ -2,7 +2,7 @@ package entity
 
 type PoinLog struct {
 	ID           int        `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	Title        string     `gorm:"type:varchar(50)" json:"title"`
+	Title        string     `gorm:"type:varchar(200)" json:"title"`
 	Description  string     `gorm:"type:text" json:"description"`
 	Penanganan   string     `gorm:"type:text" json:"penanganan,omitempty"`
 	TindakLanjut string     `gorm:"type:text" json:"tindak_lanjut,omitempty"`
