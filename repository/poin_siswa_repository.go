@@ -299,7 +299,7 @@ func (r *poinSiswaRepository) GetPoinSiswaPagination(ctx context.Context, page i
 		temp.Where("poin <= ?", maxPoin)
 	}
 
-	temp.Select("nis, nama, foto, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at").
+	temp.Select("nis, nama, foto, kelas.id as kelas_id, siswa_kelas.id as siswa_kelas_id, nama_kelas, poin, poin_siswa.created_at, poin_siswa.updated_at").
 		Joins("join siswa_kelas on siswa_kelas.id = poin_siswa.siswa_kelas_id").
 		Joins("join siswa on siswa.id = siswa_kelas.siswa_id").
 		Joins("join users on users.id = siswa.user_id").

@@ -19,11 +19,13 @@ type UpdatePoinLogRequest struct {
 }
 
 type PoinSiswaResponse struct {
-	Nis       string  `json:"nis"`
-	Nama      string  `json:"nama"`
-	NamaKelas string  `json:"nama_kelas"`
-	Foto      string  `json:"foto"`
-	Poin      float64 `json:"poin"`
+	Nis          string  `json:"nis"`
+	Nama         string  `json:"nama"`
+	SiswaKelasID string  `json:"siswa_kelas_id"`
+	KelasID      string  `json:"kelas_id"`
+	NamaKelas    string  `json:"nama_kelas"`
+	Foto         string  `json:"foto"`
+	Poin         float64 `json:"poin"`
 	entity.Base
 }
 
