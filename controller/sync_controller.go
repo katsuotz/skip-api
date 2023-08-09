@@ -60,8 +60,8 @@ func (c *sitiController) SyncPassword(ctx *gin.Context) {
 		return
 	}
 
-	c.SyncRepository.SyncPassword(ctx)
-	response := helper.BuildSuccessResponse("Synchronize Password Done", nil)
+	go c.SyncRepository.SyncPassword(ctx)
+	response := helper.BuildSuccessResponse("Synchronize starting", nil)
 	ctx.JSON(http.StatusOK, response)
 	return
 }
