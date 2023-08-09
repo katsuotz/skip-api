@@ -31,7 +31,7 @@ func main() {
 	poinLogRepository := repository.NewPoinLogRepository(database)
 	loginLogRepository := repository.NewLoginLogRepository(database)
 	settingRepository := repository.NewSettingRepository(database)
-	sitiRepository := repository.NewSitiRepository(database, sitiDatabase)
+	syncRepository := repository.NewSyncRepository(database, sitiDatabase)
 
 	authController := controller.NewAuthController(userRepository, loginLogRepository, jwtService)
 	profileController := controller.NewProfileController(profileRepository)
@@ -46,7 +46,7 @@ func main() {
 	settingController := controller.NewSettingController(settingRepository)
 	infoController := controller.NewInfoController(poinLogRepository, poinSiswaRepository)
 	fileController := controller.NewFileController()
-	sitiController := controller.NewSitiController(sitiRepository)
+	syncController := controller.NewSyncController(syncRepository)
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -72,7 +72,7 @@ func main() {
 		settingController,
 		infoController,
 		fileController,
-		sitiController,
+		syncController,
 		jwtService,
 	)
 

@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/entity/siti_entity"
 	"gitlab.com/katsuotz/skip-api/helper"
@@ -10,24 +12,65 @@ import (
 	"strings"
 )
 
-type SitiRepository interface {
+type SyncRepository interface {
+	GetSync(ctx context.Context, page int, perPage int) dto.SyncPagination
+	IsOnProgress(ctx context.Context, syncType string) bool
 	Sync(ctx context.Context)
 	SyncPassword(ctx context.Context)
 }
 
-type sitiRepository struct {
+type syncRepository struct {
 	db     *gorm.DB
 	sitiDb *gorm.DB
 }
 
-func NewSitiRepository(db *gorm.DB, sitiDb *gorm.DB) SitiRepository {
-	return &sitiRepository{
+func NewSyncRepository(db *gorm.DB, sitiDb *gorm.DB) SyncRepository {
+	return &syncRepository{
 		db,
 		sitiDb,
 	}
 }
 
-func (r *sitiRepository) Sync(ctx context.Context) {
+func (r *syncRepository) GetSync(ctx context.Context, page int, perPage int) dto.SyncPagination {
+	result := dto.SyncPagination{}
+	sync := entity.Sync{}
+	temp := r.db.Model(&sync)
+
+	temp.Order("created_at desc")
+	temp.Offset(perPage * (page - 1)).Limit(perPage)
+	temp.Find(&result.Data)
+
+	var totalItem int64
+	temp.Offset(-1).Limit(-1).Count(&totalItem)
+	result.Pagination.TotalItem = totalItem
+	result.Pagination.Page = page
+	totalPage := totalItem / int64(perPage)
+	if totalItem%int64(perPage) > 0 {
+		totalPage++
+	}
+	result.Pagination.TotalPage = totalPage
+	result.Pagination.PerPage = perPage
+
+	return result
+}
+
+func (r *syncRepository) IsOnProgress(ctx context.Context, syncType string) bool {
+	sync := entity.Sync{}
+	r.db.
+		Where("status = ?", "on progress").
+		Where("type = ?", syncType).
+		First(&sync)
+	return sync.ID != 0
+}
+
+func (r *syncRepository) Sync(ctx context.Context) {
+	sync := entity.Sync{
+		Type:        "siti",
+		Status:      "on progress",
+		Description: "Start synchronizing - synchronizing tahun ajar",
+	}
+	r.db.Create(&sync)
+
 	var tahunPelajaran siti_entity.TahunPelajaran
 	r.sitiDb.
 		Where("aktif = ?", true).
@@ -38,7 +81,14 @@ func (r *sitiRepository) Sync(ctx context.Context) {
 		TahunAjar: tahunPelajaran.TahunPelajaran,
 	}
 
-	r.db.Create(&tahunAjar)
+	err := r.db.First(&tahunAjar).Error
+
+	if err != nil {
+		r.db.Create(&tahunAjar)
+	}
+
+	sync.Description = "Synchronizing jurusan"
+	r.db.Save(&sync)
 
 	var keahlian []siti_entity.Keahlian
 	r.sitiDb.Find(&keahlian)
@@ -50,6 +100,9 @@ func (r *sitiRepository) Sync(ctx context.Context) {
 		}
 		r.db.Create(&jurusan)
 	}
+
+	sync.Description = "Synchronizing guru"
+	r.db.Save(&sync)
 
 	var sitiGuru []siti_entity.GuruBio
 	r.sitiDb.
@@ -109,10 +162,14 @@ func (r *sitiRepository) Sync(ctx context.Context) {
 		}
 	}
 
+	sync.Description = "Synchronizing kelas"
+	r.db.Save(&sync)
+
 	var sitiKelas []siti_entity.Kelas
 	r.sitiDb.Where("id_tahun_pelajaran = ?", tahunPelajaran.IDTahunPelajaran).Find(&sitiKelas)
 
 	tahunPelajaranString := strings.Split(tahunAjar.TahunAjar, "/")
+	fmt.Println(tahunPelajaranString)
 	tahunPelajaran1, _ := strconv.Atoi(tahunPelajaranString[0])
 	tahunPelajaran2, _ := strconv.Atoi(tahunPelajaranString[1])
 
@@ -126,6 +183,9 @@ func (r *sitiRepository) Sync(ctx context.Context) {
 	r.db.Where("tahun_ajar = ?", prevTahunPelajaran).First(&prevTahunAjar)
 
 	for _, item := range sitiKelas {
+		sync.Description = "Synchronizing kelas - " + item.NamaKelas
+		r.db.Save(&sync)
+
 		kelas := entity.Kelas{
 			ID:          item.IDKelas,
 			NamaKelas:   item.NamaKelas,
@@ -233,9 +293,20 @@ func (r *sitiRepository) Sync(ctx context.Context) {
 			}
 		}
 	}
+
+	sync.Status = "done"
+	sync.Description = "Synchronizing success"
+	r.db.Save(&sync)
 }
 
-func (r *sitiRepository) SyncPassword(ctx context.Context) {
+func (r *syncRepository) SyncPassword(ctx context.Context) {
+	sync := entity.Sync{
+		Type:        "password",
+		Status:      "on progress",
+		Description: "Start synchronizing - synchronizing password",
+	}
+	r.db.Create(&sync)
+
 	var users []entity.User
 	r.db.Find(&users)
 
@@ -250,4 +321,8 @@ func (r *sitiRepository) SyncPassword(ctx context.Context) {
 			r.db.Save(&user)
 		}
 	}
+
+	sync.Status = "done"
+	sync.Description = "Synchronizing success"
+	r.db.Save(&sync)
 }
