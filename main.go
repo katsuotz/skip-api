@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gitlab.com/katsuotz/skip-api/config"
 	"gitlab.com/katsuotz/skip-api/controller"
 	"gitlab.com/katsuotz/skip-api/repository"
@@ -15,6 +16,8 @@ func main() {
 	os.Setenv("TZ", "Asia/Jakarta")
 
 	database := config.SetupDatabaseConnection()
+	sitiDatabase := config.SitiDatabaseConnection()
+
 	jwtService := service.NewJWTService(database)
 	userRepository := repository.NewUserRepository(database)
 	profileRepository := repository.NewProfileRepository(database)
@@ -28,6 +31,7 @@ func main() {
 	poinLogRepository := repository.NewPoinLogRepository(database)
 	loginLogRepository := repository.NewLoginLogRepository(database)
 	settingRepository := repository.NewSettingRepository(database)
+	sitiRepository := repository.NewSitiRepository(database, sitiDatabase)
 
 	authController := controller.NewAuthController(userRepository, loginLogRepository, jwtService)
 	profileController := controller.NewProfileController(profileRepository)
@@ -42,6 +46,7 @@ func main() {
 	settingController := controller.NewSettingController(settingRepository)
 	infoController := controller.NewInfoController(poinLogRepository, poinSiswaRepository)
 	fileController := controller.NewFileController()
+	sitiController := controller.NewSitiController(sitiRepository)
 
 	app := gin.Default()
 	app.Use(cors.New(cors.Config{
@@ -67,12 +72,19 @@ func main() {
 		settingController,
 		infoController,
 		fileController,
+		sitiController,
 		jwtService,
 	)
 
 	r.Init()
 
-	err := app.Run(":9200")
+	err := godotenv.Load()
+	if err != nil {
+		panic("File env not found")
+	}
+	port := os.Getenv("PORT")
+
+	err = app.Run(":" + port)
 	if err != nil {
 		return
 	}

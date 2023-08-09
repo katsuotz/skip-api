@@ -21,6 +21,7 @@ type Router struct {
 	SettingController   controller.SettingController
 	InfoController      controller.InfoController
 	FileController      controller.FileController
+	SitiController      controller.SitiController
 	JWTService          service.JWTService
 }
 
@@ -38,6 +39,7 @@ func NewRouter(server *gin.Engine,
 	settingController controller.SettingController,
 	infoController controller.InfoController,
 	fileController controller.FileController,
+	sitiController controller.SitiController,
 	jwtService service.JWTService,
 ) *Router {
 	return &Router{
@@ -55,6 +57,7 @@ func NewRouter(server *gin.Engine,
 		settingController,
 		infoController,
 		fileController,
+		sitiController,
 		jwtService,
 	}
 }
@@ -252,4 +255,7 @@ func (r *Router) Init() {
 
 		authorized.POST("upload", r.FileController.Upload)
 	}
+
+	r.server.POST("/sync", r.SitiController.Sync)
+	r.server.POST("/sync/password", r.SitiController.SyncPassword)
 }

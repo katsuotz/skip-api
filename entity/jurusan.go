@@ -2,7 +2,7 @@ package entity
 
 type Jurusan struct {
 	ID          int    `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	NamaJurusan string `gorm:"type:varchar(50)" json:"nama_jurusan"`
+	NamaJurusan string `gorm:"type:varchar(80)" json:"nama_jurusan"`
 	Base
 }
 

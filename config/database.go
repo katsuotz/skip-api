@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/seeder"
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"os"
@@ -58,6 +59,32 @@ func SetupDatabaseConnection() *gorm.DB {
 	}
 
 	return db
+}
+
+func SitiDatabaseConnection() *gorm.DB {
+	err := godotenv.Load()
+	if err != nil {
+		panic("File env not found")
+	}
+	dbUser := os.Getenv("DB_SITI_USER")
+	dbPass := os.Getenv("DB_SIT_PASS")
+	dbHost := os.Getenv("DB_SITI_HOST")
+	dbName := os.Getenv("DB_SITI_NAME")
+	dbPort := os.Getenv("DB_SITI_PORT")
+
+	if dbUser != "" {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
+		db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+			//Logger: logger.Default.LogMode(logger.Info),
+		})
+		if err != nil {
+			fmt.Println("Failed connect siti database")
+		}
+
+		return db
+	}
+
+	return nil
 }
 
 func CloseDatabaseConnection(db *gorm.DB) {
