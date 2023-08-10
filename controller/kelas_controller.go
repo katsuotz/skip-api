@@ -45,7 +45,7 @@ func (c *kelasController) GetKelas(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	kelas := c.KelasRepository.GetKelas(ctx, jurusanID, tahunAjarID, pegawaiID)

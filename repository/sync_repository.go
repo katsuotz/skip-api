@@ -90,17 +90,6 @@ func (r *syncRepository) Sync(ctx context.Context) {
 	sync.Description = "Synchronizing jurusan"
 	r.db.Save(&sync)
 
-	var keahlian []siti_entity.Keahlian
-	r.sitiDb.Find(&keahlian)
-
-	for _, item := range keahlian {
-		jurusan := entity.Jurusan{
-			ID:          item.IDKeahlian,
-			NamaJurusan: item.NamaKeahlian,
-		}
-		r.db.Create(&jurusan)
-	}
-
 	sync.Description = "Synchronizing guru"
 	r.db.Save(&sync)
 
@@ -186,12 +175,22 @@ func (r *syncRepository) Sync(ctx context.Context) {
 		sync.Description = "Synchronizing kelas - " + item.NamaKelas
 		r.db.Save(&sync)
 
+		var keahlian siti_entity.Keahlian
+		r.sitiDb.Where("id_keahlian = ?", item.IDKeahlian).First(&keahlian)
+
+		jurusan := entity.Jurusan{
+			ID:          keahlian.IDKeahlian,
+			NamaJurusan: keahlian.NamaKeahlian,
+		}
+		r.db.Create(&jurusan)
+
 		kelas := entity.Kelas{
 			ID:          item.IDKelas,
 			NamaKelas:   item.NamaKelas,
 			TahunAjarID: item.IDTahunPelajaran,
 			JurusanID:   item.IDKeahlian,
 			PegawaiID:   item.IDGuru,
+			Tingkat:     item.Tingkat,
 		}
 		r.db.Create(&kelas)
 

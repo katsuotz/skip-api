@@ -31,7 +31,7 @@ func (r *profileRepository) FindProfileWithJoinByID(ctx context.Context, userID 
 	profile := dto.UserResponse{}
 	r.db.
 		Model(&entity.Profile{}).
-		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role, foto").
+		Select("users.id as id, nis, nip, nama, jenis_kelamin, tempat_lahir, tanggal_lahir, username, role, foto, pegawai.can_view, pegawai.can_add").
 		Where("profiles.user_id = ?", userID).
 		Joins("join users on users.id = profiles.user_id").
 		Joins("left join pegawai on pegawai.user_id = users.id").

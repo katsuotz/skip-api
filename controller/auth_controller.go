@@ -97,7 +97,7 @@ func (c *authController) UpdatePassword(ctx *gin.Context) {
 		return
 	}
 
-	userID := int(ctx.MustGet("user_id").(float64))
+	userID := ctx.MustGet("user_id").(int)
 
 	user := c.UserRepository.FindByID(ctx, userID)
 	match := helper.CheckPasswordHash(req.OldPassword, user.Password)

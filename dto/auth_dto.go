@@ -19,6 +19,8 @@ type UserResponse struct {
 	PegawaiID   int     `json:"-"`
 	SiswaID     int     `json:"-"`
 	TipePegawai *string `json:"tipe_pegawai,omitempty"`
+	CanView     bool    `json:"can_view"`
+	CanAdd      bool    `json:"can_add"`
 	entity.Profile
 	entity.Pegawai
 	entity.Siswa

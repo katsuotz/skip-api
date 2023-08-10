@@ -37,7 +37,7 @@ func (c *poinLogController) GetPoinLog(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinLogRepository.GetPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, tahunAjarID, pegawaiID)

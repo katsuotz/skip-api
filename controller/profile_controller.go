@@ -25,7 +25,7 @@ func NewProfileController(profileRepository repository.ProfileRepository) Profil
 }
 
 func (c *profileController) GetMyProfile(ctx *gin.Context) {
-	userID := int(ctx.MustGet("user_id").(float64))
+	userID := ctx.MustGet("user_id").(int)
 
 	profile := c.ProfileRepository.FindProfileWithJoinByID(ctx, userID)
 	response := helper.BuildSuccessResponse("", profile)
@@ -42,7 +42,7 @@ func (c *profileController) UpdateProfile(ctx *gin.Context) {
 		return
 	}
 
-	userID := int(ctx.MustGet("user_id").(float64))
+	userID := ctx.MustGet("user_id").(int)
 
 	profile := c.ProfileRepository.FindProfileByID(ctx, userID)
 	if profile.ID == 0 {

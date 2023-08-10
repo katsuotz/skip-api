@@ -7,6 +7,7 @@ type KelasRequest struct {
 	JurusanID   int    `json:"jurusan_id" binding:"required" form:"jurusan_id"`
 	TahunAjarID int    `json:"tahun_ajar_id" binding:"required" form:"tahun_ajar_id"`
 	PegawaiID   int    `json:"pegawai_id" binding:"required" form:"pegawai_id"`
+	Tingkat     int    `json:"tingkat" binding:"required" form:"tingkat"`
 }
 
 type SiswaKelasRequest struct {

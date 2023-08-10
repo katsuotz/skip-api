@@ -45,7 +45,7 @@ func (c *infoController) CountPoinLog(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinLogRepository.CountPoinLog(ctx, poinType, kelasID, jurusanID, tahunAjarID, pegawaiID, maxPoin)
@@ -62,7 +62,7 @@ func (c *infoController) MaxPoinSiswa(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinSiswaRepository.CountPoinSiswa(ctx, "max", kelasID, jurusanID, tahunAjarID, pegawaiID)
@@ -79,7 +79,7 @@ func (c *infoController) MinPoinSiswa(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinSiswaRepository.CountPoinSiswa(ctx, "min", kelasID, jurusanID, tahunAjarID, pegawaiID)
@@ -96,7 +96,7 @@ func (c *infoController) AvgPoinSiswa(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinSiswaRepository.CountPoinSiswa(ctx, "avg", kelasID, jurusanID, tahunAjarID, pegawaiID)
@@ -119,7 +119,7 @@ func (c *infoController) ListPoinSiswa(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinSiswaRepository.GetPoinSiswaPagination(ctx, pageInt, perPageInt, order, orderBy, search, tahunAjarID, pegawaiID, maxPoin)
@@ -140,7 +140,7 @@ func (c *infoController) ListPoinLog(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinLogRepository.GetPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, tahunAjarID, pegawaiID)
@@ -163,7 +163,7 @@ func (c *infoController) ListCountPoinLog(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinLogRepository.GetCountPoinLogPagination(ctx, pageInt, perPageInt, order, orderBy, groupBy, tahunAjarID, poinType, pegawaiID)
@@ -179,7 +179,7 @@ func (c *infoController) GraphCountPoinLog(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinLogRepository.GetCountPoinLogPaginationByMonth(ctx, tahunAjarID, poinType, pegawaiID)
@@ -197,7 +197,7 @@ func (c *infoController) CountPoinSiswaTotal(ctx *gin.Context) {
 	pegawaiID := 0
 
 	if role == "guru" {
-		pegawaiID = int(ctx.MustGet("pegawai_id").(float64))
+		pegawaiID = ctx.MustGet("pegawai_id").(int)
 	}
 
 	result := c.PoinSiswaRepository.CountPoinSiswaTotal(ctx, kelasID, jurusanID, tahunAjarID, pegawaiID, maxPoin)

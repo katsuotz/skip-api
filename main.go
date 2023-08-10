@@ -18,8 +18,8 @@ func main() {
 	database := config.SetupDatabaseConnection()
 	sitiDatabase := config.SitiDatabaseConnection()
 
-	jwtService := service.NewJWTService(database)
 	userRepository := repository.NewUserRepository(database)
+	jwtService := service.NewJWTService(database, userRepository)
 	profileRepository := repository.NewProfileRepository(database)
 	jurusanRepository := repository.NewJurusanRepository(database)
 	tahunAjarRepository := repository.NewTahunAjarRepository(database)

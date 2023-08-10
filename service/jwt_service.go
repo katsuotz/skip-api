@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/helper"
+	"gitlab.com/katsuotz/skip-api/repository"
 	"gorm.io/gorm"
 	"net/http"
 	"os"
@@ -26,14 +27,16 @@ type JWTService interface {
 }
 
 type jwtService struct {
-	secretKey string
-	db        *gorm.DB
+	secretKey      string
+	db             *gorm.DB
+	UserRepository repository.UserRepository
 }
 
-func NewJWTService(db *gorm.DB) JWTService {
+func NewJWTService(db *gorm.DB, userRepository repository.UserRepository) JWTService {
 	return &jwtService{
-		secretKey: getSecretKey(),
-		db:        db,
+		secretKey:      getSecretKey(),
+		db:             db,
+		UserRepository: userRepository,
 	}
 }
 
@@ -79,12 +82,18 @@ func (s *jwtService) IsLoggedIn(ctx *gin.Context) {
 		if err == nil {
 			claims := aToken.Claims.(jwt.MapClaims)
 			if claims["user_id"] != nil {
-				ctx.Set("user_id", claims["user_id"])
-				ctx.Set("role", claims["role"])
-				ctx.Set("pegawai_id", claims["pegawai_id"])
-				ctx.Set("siswa_id", claims["siswa_id"])
-				ctx.Next()
-				return
+				userID := int(claims["user_id"].(float64))
+				fmt.Println(userID)
+				user := s.UserRepository.FindByID(ctx, userID)
+				if user.ID != 0 {
+					userID = user.ID
+					ctx.Set("user_id", userID)
+					ctx.Set("role", user.Role)
+					ctx.Set("pegawai_id", user.PegawaiID)
+					ctx.Set("siswa_id", user.SiswaID)
+					ctx.Next()
+					return
+				}
 			}
 		}
 	}
