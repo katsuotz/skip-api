@@ -178,11 +178,15 @@ func (r *syncRepository) Sync(ctx context.Context) {
 		var keahlian siti_entity.Keahlian
 		r.sitiDb.Where("id_keahlian = ?", item.IDKeahlian).First(&keahlian)
 
-		jurusan := entity.Jurusan{
-			ID:          keahlian.IDKeahlian,
-			NamaJurusan: keahlian.NamaKeahlian,
+		var jurusan entity.Jurusan
+		r.db.Where("nama_jurusan = ?", keahlian.NamaKeahlian).First(&jurusan)
+
+		if jurusan.ID == 0 {
+			jurusan = entity.Jurusan{
+				NamaJurusan: keahlian.NamaKeahlian,
+			}
+			r.db.Create(&jurusan)
 		}
-		r.db.Create(&jurusan)
 
 		kelas := entity.Kelas{
 			ID:          item.IDKelas,
