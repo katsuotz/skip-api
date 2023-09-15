@@ -68,7 +68,7 @@ func SitiDatabaseConnection() *gorm.DB {
 		panic("File env not found")
 	}
 	dbUser := os.Getenv("DB_SITI_USER")
-	dbPass := os.Getenv("DB_SIT_PASS")
+	dbPass := os.Getenv("DB_SITI_PASS")
 	dbHost := os.Getenv("DB_SITI_HOST")
 	dbName := os.Getenv("DB_SITI_NAME")
 	dbPort := os.Getenv("DB_SITI_PORT")
