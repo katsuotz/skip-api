@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"gitlab.com/katsuotz/skip-api/dto"
 	"gitlab.com/katsuotz/skip-api/entity"
 	"gitlab.com/katsuotz/skip-api/entity/siti_entity"
@@ -158,7 +157,6 @@ func (r *syncRepository) Sync(ctx context.Context) {
 	r.sitiDb.Where("id_tahun_pelajaran = ?", tahunPelajaran.IDTahunPelajaran).Find(&sitiKelas)
 
 	tahunPelajaranString := strings.Split(tahunAjar.TahunAjar, "/")
-	fmt.Println(tahunPelajaranString)
 	tahunPelajaran1, _ := strconv.Atoi(tahunPelajaranString[0])
 	tahunPelajaran2, _ := strconv.Atoi(tahunPelajaranString[1])
 
@@ -192,7 +190,7 @@ func (r *syncRepository) Sync(ctx context.Context) {
 			ID:          item.IDKelas,
 			NamaKelas:   item.NamaKelas,
 			TahunAjarID: item.IDTahunPelajaran,
-			JurusanID:   item.IDKeahlian,
+			JurusanID:   jurusan.ID,
 			PegawaiID:   item.IDGuru,
 			Tingkat:     item.Tingkat,
 		}
